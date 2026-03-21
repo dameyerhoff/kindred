@@ -1,12 +1,12 @@
 import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
 
-// Dave: Cleaned up the list. Since we're removing the Proxy URL from Vercel,
-// we no longer need to whitelist /__clerk here.
+// Dave: Added /sso-callback to the public list to catch the Clerk handshake
 const isPublicRoute = createRouteMatcher([
   "/",
   "/setup",
   "/sign-in(.*)",
   "/sign-up(.*)",
+  "/sso-callback(.*)",
 ]);
 
 export default clerkMiddleware(async (auth, request) => {
