@@ -1,6 +1,6 @@
 import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
 
-// Dave: Keeping your exact public route list
+// Dave: Your exact public route list
 const isPublicRoute = createRouteMatcher([
   "/",
   "/setup",
@@ -9,19 +9,18 @@ const isPublicRoute = createRouteMatcher([
 ]);
 
 export default clerkMiddleware(async (auth, request) => {
-  // Dave: This 'await auth()' is the handshake.
-  // We've seen it returning NULL, so we are keeping the log to verify the fix.
+  // Dave: Check if it's a private route FIRST.
+  // If it's NOT public, protect it immediately.
+  if (!isPublicRoute(request)) {
+    await auth.protect();
+  }
+
+  // Dave: Now that we've cleared the "Gatekeeper," we can safely check the userId
+  // for your diagnostic logs without accidentally blocking the public homepage.
   const { userId } = await auth();
 
   if (request.nextUrl.pathname === "/setup") {
     console.log("DEBUG: Middleware checking /setup. UserID:", userId || "NULL");
-  }
-
-  // If it's not a public route, protect it.
-  // If it IS a public route (like /setup), we still want the session to sync,
-  // which is handled by the 'await auth()' call above.
-  if (!isPublicRoute(request)) {
-    await auth.protect();
   }
 });
 

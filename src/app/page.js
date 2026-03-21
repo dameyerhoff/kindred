@@ -4,7 +4,7 @@ import {
   getMyRequests,
   getMySentRequests,
 } from "./actions";
-import { UserButton } from "@clerk/nextjs";
+import { UserButton, SignInButton } from "@clerk/nextjs";
 import { auth } from "@clerk/nextjs/server";
 import Link from "next/link";
 // Dave: Diagnostic tracer intact
@@ -38,8 +38,10 @@ export default async function Home() {
   const communityProfiles = profiles.filter((p) => p.clerk_id !== userId);
 
   return (
-    <main className="min-h-screen bg-[#061a06] p-4 md:p-8 text-white relative overflow-hidden">
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[1000px] h-[400px] bg-green-500/10 blur-[120px] pointer-events-none"></div>
+    /* Dave: Added "isolate" to ensure Clerk's external portal doesn't get trapped in our stack */
+    <main className="min-h-screen bg-[#061a06] p-4 md:p-8 text-white relative overflow-hidden isolate">
+      {/* Dave: Set z-index to -10 to push the glow behind EVERYTHING, including the background */}
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[1000px] h-[400px] bg-green-500/10 blur-[120px] pointer-events-none -z-10"></div>
 
       {/* --- HEADER --- */}
       <header className="max-w-6xl mx-auto flex justify-between items-end mb-16 relative z-10 border-b border-white/10 pb-8">
@@ -48,7 +50,6 @@ export default async function Home() {
             src="/kindred-logo.png"
             alt="Kindred Logo"
             className="h-24 w-auto object-contain drop-shadow-[0_0_15px_rgba(255,255,255,0.2)]"
-            /* Dave: Reduced logo size by 25% (h-32 -> h-24) */
           />
         </div>
         <div className="pb-4 scale-125">
@@ -95,7 +96,6 @@ export default async function Home() {
                       Manage Profile
                     </Link>
 
-                    {/* Dave: Interactive Mail Icons */}
                     <div className="flex gap-2">
                       <Link
                         href="/inbox"
@@ -128,7 +128,6 @@ export default async function Home() {
               </div>
             </div>
 
-            {/* Kindred Deeds Log */}
             {myDeeds && myDeeds.length > 0 && (
               <div className="bg-white/5 rounded-[2rem] p-6 border border-white/5 backdrop-blur-sm">
                 <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-lime-400/50 mb-4">
@@ -200,28 +199,39 @@ export default async function Home() {
                     </span>
                   </div>
                 </div>
-                <form
-                  action={sendFavourRequest}
-                  className="relative z-10 mt-auto pt-4 border-t border-white/10"
-                >
-                  <input
-                    type="hidden"
-                    name="receiverId"
-                    value={profile.clerk_id}
-                  />
-                  <textarea
-                    name="favourText"
-                    placeholder="What favour do you need?..."
-                    required
-                    className="w-full bg-black/40 border border-white/10 rounded-xl p-3 text-xs text-white placeholder:text-white/20 focus:outline-none focus:border-lime-400/50 transition-all resize-none h-20 mb-3"
-                  />
-                  <button
-                    type="submit"
-                    className="w-full bg-white/10 hover:bg-lime-400 text-white hover:text-green-950 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all border border-white/10 hover:border-lime-400"
+
+                {userId ? (
+                  <form
+                    action={sendFavourRequest}
+                    className="relative z-10 mt-auto pt-4 border-t border-white/10"
                   >
-                    Send Favour Request 😇
-                  </button>
-                </form>
+                    <input
+                      type="hidden"
+                      name="receiverId"
+                      value={profile.clerk_id}
+                    />
+                    <textarea
+                      name="favourText"
+                      placeholder="What favour do you need?..."
+                      required
+                      className="w-full bg-black/40 border border-white/10 rounded-xl p-3 text-xs text-white placeholder:text-white/20 focus:outline-none focus:border-lime-400/50 transition-all resize-none h-20 mb-3"
+                    />
+                    <button
+                      type="submit"
+                      className="w-full bg-white/10 hover:bg-lime-400 text-white hover:text-green-950 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all border border-white/10 hover:border-lime-400"
+                    >
+                      Send Favour Request 😇
+                    </button>
+                  </form>
+                ) : (
+                  <div className="mt-auto pt-4 border-t border-white/10">
+                    <SignInButton mode="modal">
+                      <button className="w-full bg-white/5 hover:bg-white/10 text-white/40 hover:text-white py-3 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all border border-white/10">
+                        Log in to ask a favour 😇
+                      </button>
+                    </SignInButton>
+                  </div>
+                )}
               </div>
             ))}
           </div>
