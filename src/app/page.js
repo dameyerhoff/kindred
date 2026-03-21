@@ -4,7 +4,7 @@ import {
   getMyRequests,
   getMySentRequests,
 } from "./actions";
-import { UserButton, SignInButton } from "@clerk/nextjs";
+import { UserButton, SignInButton, SignUpButton } from "@clerk/nextjs";
 import { auth } from "@clerk/nextjs/server";
 import Link from "next/link";
 // Dave: Diagnostic tracer intact
@@ -44,16 +44,27 @@ export default async function Home() {
       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[1000px] h-[400px] bg-green-500/10 blur-[120px] pointer-events-none -z-10"></div>
 
       {/* --- HEADER --- */}
-      <header className="max-w-6xl mx-auto flex justify-between items-end mb-16 relative z-10 border-b border-white/10 pb-8">
+      <header className="max-w-6xl mx-auto flex justify-between items-center mb-16 relative z-10 border-b border-white/10 pb-8">
         <div>
           <img
             src="/kindred-logo.png"
             alt="Kindred Logo"
-            className="h-24 w-auto object-contain drop-shadow-[0_0_15px_rgba(255,255,255,0.2)]"
+            className="h-20 w-auto object-contain drop-shadow-[0_0_15px_rgba(255,255,255,0.2)]"
           />
         </div>
-        <div className="pb-4 scale-125">
-          <UserButton afterSignOutUrl="/" />
+
+        <div className="flex items-center gap-6">
+          {!userId ? (
+            <SignUpButton mode="modal">
+              <button className="bg-lime-400 hover:bg-white text-green-950 px-6 py-2.5 rounded-full text-[10px] font-black uppercase tracking-widest transition-all shadow-[0_0_20px_rgba(163,230,53,0.4)]">
+                Join Community 😇
+              </button>
+            </SignUpButton>
+          ) : (
+            <div className="scale-125">
+              <UserButton afterSignOutUrl="/" />
+            </div>
+          )}
         </div>
       </header>
 
