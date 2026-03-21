@@ -106,7 +106,10 @@ export async function sendFavourRequest(formData) {
   });
 
   if (error) throw error;
+
   revalidatePath("/");
+  // Dave: Redirecting back to home. We've removed the success flag from the URL in page.js
+  redirect("/");
 }
 
 export async function getMyRequests() {
@@ -124,8 +127,28 @@ export async function getMyRequests() {
   return data;
 }
 
-export async function completeFavour(favourId, receiverId) {
+// Dave: New action to fetch favours sent BY me
+export async function getMySentRequests() {
+  const { userId } = await auth();
+  if (!userId) return [];
+
   const supabase = getSupabase();
+  const { data, error } = await supabase
+    .from("favours")
+    .select("*")
+    .eq("sender_id", userId)
+    .eq("status", "pending");
+
+  if (error) return [];
+  return data;
+}
+
+export async function completeFavour(formData) {
+  const supabase = getSupabase();
+  const favourId =
+    formData instanceof FormData ? formData.get("favourId") : formData;
+  const receiverId =
+    formData instanceof FormData ? formData.get("receiverId") : null;
 
   const { error: favourError } = await supabase
     .from("favours")
@@ -134,11 +157,27 @@ export async function completeFavour(favourId, receiverId) {
 
   if (favourError) throw favourError;
 
-  const { error: haloError } = await supabase.rpc("increment_halos", {
-    user_id: receiverId,
-  });
+  if (receiverId) {
+    const { error: haloError } = await supabase.rpc("increment_halos", {
+      user_id: receiverId,
+    });
+    if (haloError) throw haloError;
+  }
 
-  if (haloError) throw haloError;
+  revalidatePath("/");
+}
+
+export async function declineFavour(formData) {
+  const supabase = getSupabase();
+  const favourId =
+    formData instanceof FormData ? formData.get("favourId") : formData;
+
+  const { error } = await supabase
+    .from("favours")
+    .update({ status: "declined" })
+    .eq("id", favourId);
+
+  if (error) throw error;
 
   revalidatePath("/");
 }
