@@ -1,22 +1,21 @@
 import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
 
-// Dave: Your exact public route list
+// Dave: Adding /__clerk to the public routes so the proxy can load scripts!
 const isPublicRoute = createRouteMatcher([
   "/",
   "/setup",
   "/sign-in(.*)",
   "/sign-up(.*)",
+  "/__clerk(.*)", // <--- THIS IS THE KEY FIX FOR THE 404s
 ]);
 
 export default clerkMiddleware(async (auth, request) => {
   // Dave: Check if it's a private route FIRST.
-  // If it's NOT public, protect it immediately.
   if (!isPublicRoute(request)) {
     await auth.protect();
   }
 
-  // Dave: Now that we've cleared the "Gatekeeper," we can safely check the userId
-  // for your diagnostic logs without accidentally blocking the public homepage.
+  // Dave: Diagnostic tracer for the /setup flow
   const { userId } = await auth();
 
   if (request.nextUrl.pathname === "/setup") {
