@@ -1,12 +1,12 @@
 import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
 
-// Dave: Adding /__clerk to the public routes so the proxy can load scripts!
+// Dave: Cleaned up the list. Since we're removing the Proxy URL from Vercel,
+// we no longer need to whitelist /__clerk here.
 const isPublicRoute = createRouteMatcher([
   "/",
   "/setup",
   "/sign-in(.*)",
   "/sign-up(.*)",
-  "/__clerk(.*)", // <--- THIS IS THE KEY FIX FOR THE 404s
 ]);
 
 export default clerkMiddleware(async (auth, request) => {
