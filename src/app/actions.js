@@ -179,6 +179,8 @@ export async function completeFavour(formData) {
     if (haloError) throw haloError;
   }
   revalidatePath("/");
+  revalidatePath("/inbox");
+  redirect("/");
 }
 
 export async function declineFavour(formData) {
