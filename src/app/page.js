@@ -86,6 +86,7 @@ export default async function Home() {
 
           {!userId ? (
             <SignUpButton mode="modal">
+              {/* Dave: Keeping it to one clean child element to fix the Runtime Error */}
               <button className="bg-lime-400 hover:bg-white text-green-950 px-6 py-2.5 rounded-full text-[10px] font-black uppercase tracking-widest transition-all shadow-[0_0_20px_rgba(163,230,53,0.4)] ml-2">
                 Join Community 😇
               </button>

@@ -124,8 +124,10 @@ export async function sendFavourRequest(formData) {
   });
 
   if (error) throw error;
+
+  // Dave: Removed redirect("/") to keep you on the Community Grid page
   revalidatePath("/");
-  redirect("/");
+  revalidatePath("/community");
 }
 
 export async function getMyRequests() {
@@ -162,24 +164,26 @@ export async function completeFavour(formData) {
   const supabase = getSupabase();
   const favourId =
     formData instanceof FormData ? formData.get("favourId") : formData;
-  const receiverId =
-    formData instanceof FormData ? formData.get("receiverId") : null;
 
+  if (!favourId) return;
+
+  // 1. Update the status
   const { error: favourError } = await supabase
     .from("favours")
     .update({ status: "completed" })
     .eq("id", favourId);
 
-  if (favourError) throw favourError;
-
-  if (receiverId) {
-    const { error: haloError } = await supabase.rpc("increment_halos", {
-      user_id: receiverId,
-    });
-    if (haloError) throw haloError;
+  if (favourError) {
+    console.error("Favour Update Error:", favourError.message);
+    throw favourError;
   }
+
+  // 2. Clear the cache so Dashboard sees the new Halo
   revalidatePath("/");
   revalidatePath("/inbox");
+
+  // 3. THE FIX: Only redirect if the update was successful.
+  // Next.js redirect() throws an error by design, so it must be the very last line.
   redirect("/");
 }
 
