@@ -1,20 +1,115 @@
+"use client";
 import { saveProfile, getProfiles } from "../actions";
-import { auth } from "@clerk/nextjs/server";
-import { SignInButton } from "@clerk/nextjs";
+import { useAuth, SignInButton } from "@clerk/nextjs";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 
-export default async function SetupPage() {
-  const { userId } = await auth();
+// Dave: Master List with Slugs for perfect database filtering
+const KINDRED_BANK = [
+  { label: "Admin Support", slug: "admin-support" },
+  { label: "Animal Care", slug: "animal-care" },
+  { label: "Art & Illustration", slug: "art-illustration" },
+  { label: "Baking", slug: "baking" },
+  { label: "Bicycle Repair", slug: "bicycle-repair" },
+  { label: "Bookkeeping", slug: "bookkeeping" },
+  { label: "Car Washing", slug: "car-washing" },
+  { label: "Cleaning", slug: "cleaning" },
+  { label: "Cooking", slug: "cooking" },
+  { label: "CV Writing", slug: "cv-writing" },
+  { label: "DIY & Repairs", slug: "diy-repairs" },
+  { label: "Dog Walking", slug: "dog-walking" },
+  { label: "Driving", slug: "driving" },
+  { label: "Electrician", slug: "electrician" },
+  { label: "Event Planning", slug: "event-planning" },
+  { label: "Furniture Assembly", slug: "furniture-assembly" },
+  { label: "Gardening", slug: "gardening" },
+  { label: "Graphic Design", slug: "graphic-design" },
+  { label: "Heavy Lifting", slug: "heavy-lifting" },
+  { label: "Ironing", slug: "ironing" },
+  { label: "IT Support", slug: "it-support" },
+  { label: "Language Lessons", slug: "language-lessons" },
+  { label: "Music Lessons", slug: "music-lessons" },
+  { label: "Painting", slug: "painting" },
+  { label: "PC Repair", slug: "pc-repair" },
+  { label: "Photography", slug: "photography" },
+  { label: "Plumbing", slug: "plumbing" },
+  { label: "Proofreading", slug: "proofreading" },
+  { label: "Sewing", slug: "sewing" },
+  { label: "Shopping", slug: "shopping" },
+  { label: "Translation", slug: "translation" },
+  { label: "Tutoring", slug: "tutoring" },
+  { label: "Web Design", slug: "web-design" },
+  { label: "Yoga Instruction", slug: "yoga-instruction" },
+].sort((a, b) => a.label.localeCompare(b.label));
 
-  // Dave: Fetching all profiles and finding yours to "Auto-Fill" the form
-  const profiles = (await getProfiles()) || [];
-  const myProfile = profiles.find((p) => p.clerk_id === userId);
+export default function SetupPage() {
+  const { userId, isLoaded } = useAuth();
+  const [myProfile, setMyProfile] = useState(null);
+  const [tags, setTags] = useState([]);
+  const [search, setSearch] = useState("");
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function loadData() {
+      if (userId) {
+        const profiles = await getProfiles();
+        const found = profiles?.find((p) => p.clerk_id === userId);
+        if (found) {
+          setMyProfile(found);
+
+          // Dave: Safety Bridge - Ensure tags are parsed correctly from Supabase
+          let savedTags = found.tags || [];
+          if (typeof savedTags === "string") {
+            try {
+              savedTags = JSON.parse(savedTags);
+            } catch (e) {
+              savedTags = [];
+            }
+          }
+          setTags(Array.isArray(savedTags) ? savedTags : []);
+        }
+      }
+      setLoading(false);
+    }
+    loadData();
+  }, [userId]);
+
+  const addTag = (item) => {
+    if (!tags.find((t) => t.slug === item.slug)) {
+      setTags([...tags, item]);
+    }
+    setSearch("");
+  };
+
+  const removeTag = (slugToRemove) => {
+    setTags(tags.filter((t) => t.slug !== slugToRemove));
+  };
+
+  const createCustomTag = (name) => {
+    const slug = name
+      .toLowerCase()
+      .trim()
+      .replace(/\s+/g, "-")
+      .replace(/[^\w-]+/g, "");
+    addTag({ label: name, slug: slug });
+  };
+
+  // Dave: Force-sync logic to ensure tags are current when the form submits
+  const handleSubmit = (e) => {
+    const hiddenInput = e.currentTarget.querySelector('input[name="tags"]');
+    if (hiddenInput) {
+      hiddenInput.value = JSON.stringify(tags);
+      console.log("🚀 DAVE DEBUG: Shipping Tags:", hiddenInput.value);
+    }
+  };
+
+  if (!isLoaded || loading) return null;
 
   if (!userId) {
     return (
-      <main className="min-h-screen bg-[#061a06] flex items-center justify-center p-6 text-white">
-        <div className="w-full max-w-md bg-white/5 backdrop-blur-3xl p-8 rounded-[2.5rem] border border-white/10 text-center">
-          <h2 className="text-2xl font-black mb-6 uppercase tracking-tighter">
+      <main className="min-h-screen bg-[#061a06] flex items-center justify-center p-6 text-white text-center">
+        <div className="w-full max-w-md bg-white/5 backdrop-blur-3xl p-8 rounded-[2.5rem] border border-white/10">
+          <h2 className="text-2xl font-black mb-6 uppercase tracking-tighter text-white">
             Identity Required
           </h2>
           <SignInButton mode="modal">
@@ -29,7 +124,6 @@ export default async function SetupPage() {
 
   return (
     <main className="min-h-screen bg-[#061a06] p-4 md:p-8 text-white relative overflow-hidden flex items-center justify-center">
-      {/* Dave: Signature green glow */}
       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[1000px] h-[400px] bg-green-500/10 blur-[120px] pointer-events-none"></div>
 
       <div className="w-full max-w-xl relative z-10">
@@ -41,7 +135,7 @@ export default async function SetupPage() {
         </Link>
 
         <div className="bg-white/5 backdrop-blur-3xl border border-white/10 p-8 md:p-12 rounded-[3rem] shadow-2xl">
-          <h2 className="text-4xl font-black mb-2 text-white tracking-tighter uppercase">
+          <h2 className="text-4xl font-black mb-2 tracking-tighter uppercase text-white">
             {myProfile ? "Manage Profile" : "Create Profile"}
           </h2>
           <p className="text-lime-400/60 text-xs font-bold uppercase tracking-[0.2em] mb-10">
@@ -50,7 +144,14 @@ export default async function SetupPage() {
               : "Join the kindred guardian network"}
           </p>
 
-          <form action={saveProfile} className="space-y-6">
+          <form
+            action={saveProfile}
+            onSubmit={handleSubmit}
+            className="space-y-6"
+          >
+            {/* Dave: Hidden input synced by the handleSubmit function */}
+            <input type="hidden" name="tags" value={JSON.stringify(tags)} />
+
             <div>
               <label className="block text-[10px] font-black uppercase tracking-widest mb-2 text-white/40">
                 Full Name
@@ -58,7 +159,7 @@ export default async function SetupPage() {
               <input
                 name="full_name"
                 defaultValue={myProfile?.full_name || ""}
-                className="w-full p-4 rounded-2xl bg-black/40 border border-white/10 focus:border-lime-400/50 outline-none text-white transition-all font-bold"
+                className="w-full p-4 rounded-2xl bg-black/40 border border-white/10 focus:border-lime-400/50 outline-none text-white font-bold"
                 required
               />
             </div>
@@ -71,7 +172,7 @@ export default async function SetupPage() {
                 <input
                   name="city"
                   defaultValue={myProfile?.city || ""}
-                  className="w-full p-4 rounded-2xl bg-black/40 border border-white/10 focus:border-lime-400/50 outline-none text-white transition-all font-bold"
+                  className="w-full p-4 rounded-2xl bg-black/40 border border-white/10 focus:border-lime-400/50 outline-none text-white font-bold"
                   required
                 />
               </div>
@@ -82,34 +183,72 @@ export default async function SetupPage() {
                 <input
                   name="postcode"
                   defaultValue={myProfile?.postcode || ""}
-                  className="w-full p-4 rounded-2xl bg-black/40 border border-white/10 focus:border-lime-400/50 outline-none text-white transition-all font-bold"
+                  className="w-full p-4 rounded-2xl bg-black/40 border border-white/10 focus:border-lime-400/50 outline-none text-white font-bold"
                   required
                 />
               </div>
             </div>
 
-            <div>
+            <div className="relative">
               <label className="block text-[10px] font-black uppercase tracking-widest mb-2 text-white/40">
-                Skills (What you offer)
+                Skills & Interests (Your Offerings)
               </label>
-              <input
-                name="skills"
-                defaultValue={myProfile?.skills?.join(", ") || ""}
-                placeholder="Painting, Baking, Coding"
-                className="w-full p-4 rounded-2xl bg-black/40 border border-white/10 focus:border-lime-400/50 outline-none text-white transition-all font-bold"
-              />
-            </div>
 
-            <div>
-              <label className="block text-[10px] font-black uppercase tracking-widest mb-2 text-white/40">
-                Interests (What you seek)
-              </label>
+              <div className="flex flex-wrap gap-2 mb-4">
+                {tags
+                  .filter((tag) => tag && tag.slug)
+                  .map((tag, index) => (
+                    <button
+                      key={`${tag.slug}-${index}`}
+                      type="button"
+                      onClick={() => removeTag(tag.slug)}
+                      className="bg-lime-400 text-green-950 text-[10px] font-black px-3 py-1.5 rounded-full hover:bg-red-500 hover:text-white transition-all uppercase flex items-center gap-2 group"
+                    >
+                      {tag.label}{" "}
+                      <span className="opacity-50 group-hover:opacity-100">
+                        ×
+                      </span>
+                    </button>
+                  ))}
+              </div>
+
               <input
-                name="interests"
-                defaultValue={myProfile?.interests?.join(", ") || ""}
-                placeholder="Gardening, Dogs, Music"
-                className="w-full p-4 rounded-2xl bg-black/40 border border-white/10 focus:border-lime-400/50 outline-none text-white transition-all font-bold"
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                placeholder="Search (e.g. Gardening, Baking...)"
+                className="w-full p-4 rounded-2xl bg-black/40 border border-white/10 focus:border-lime-400/50 outline-none text-white font-bold transition-all"
               />
+
+              {search && (
+                <div className="absolute z-20 w-full mt-2 bg-[#0a240a] border border-white/10 rounded-2xl overflow-hidden shadow-2xl max-h-48 overflow-y-auto">
+                  {KINDRED_BANK.filter(
+                    (item) =>
+                      item.label.toLowerCase().includes(search.toLowerCase()) &&
+                      !tags.some((t) => t?.slug === item.slug),
+                  ).map((item) => (
+                    <button
+                      key={item.slug}
+                      type="button"
+                      onClick={() => addTag(item)}
+                      className="w-full text-left p-4 hover:bg-lime-400 hover:text-green-950 font-bold text-sm transition-colors border-b border-white/5 last:border-0"
+                    >
+                      + {item.label}
+                    </button>
+                  ))}
+                  {search.length > 2 &&
+                    !KINDRED_BANK.some(
+                      (i) => i.label.toLowerCase() === search.toLowerCase(),
+                    ) && (
+                      <button
+                        type="button"
+                        onClick={() => createCustomTag(search)}
+                        className="w-full text-left p-4 bg-white/5 hover:bg-lime-400 hover:text-green-950 font-bold text-xs italic transition-colors"
+                      >
+                        Add custom: "{search}"
+                      </button>
+                    )}
+                </div>
+              )}
             </div>
 
             <button

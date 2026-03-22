@@ -79,7 +79,7 @@ export default async function Home() {
                   <div className="w-24 h-24 rounded-full border-4 border-lime-400 flex items-center justify-center bg-green-900 text-4xl font-black text-white shadow-[0_0_30px_rgba(163,230,53,0.3)]">
                     {myProfile.full_name.charAt(0)}
                   </div>
-                  <div className="absolute -top-2 -right-2 bg-white text-green-900 text-[11px] font-black px-3 py-1 rounded-full animate-bounce shadow-xl uppercase border-2 border-lime-400">
+                  <div className="absolute -top-2 -right-2 bg-white text-green-950 text-[11px] font-black px-3 py-1 rounded-full animate-bounce shadow-xl uppercase border-2 border-lime-400">
                     S-Rank 😇
                   </div>
                 </div>
@@ -91,6 +91,20 @@ export default async function Home() {
                   <p className="text-lime-400/80 text-sm font-bold uppercase tracking-widest mb-4">
                     {myProfile.city} • Kindred Guardian
                   </p>
+
+                  {/* Dave: Hero Profile Tag Display */}
+                  {myProfile.tags && myProfile.tags.length > 0 && (
+                    <div className="flex flex-wrap justify-center md:justify-start gap-2 mb-6">
+                      {myProfile.tags.map((tag, idx) => (
+                        <span
+                          key={`hero-tag-${idx}`}
+                          className="bg-lime-400/10 border border-lime-400/30 text-lime-400 text-[9px] font-black px-3 py-1 rounded-full uppercase tracking-tighter"
+                        >
+                          {tag.label}
+                        </span>
+                      ))}
+                    </div>
+                  )}
 
                   <div className="flex flex-wrap justify-center md:justify-start gap-4 items-center">
                     <div className="bg-white/10 border border-white/20 px-4 py-2 rounded-full flex items-center gap-2 backdrop-blur-md">
@@ -194,7 +208,7 @@ export default async function Home() {
                 className="bg-white/5 p-6 rounded-3xl border border-white/10 hover:border-lime-400/50 hover:bg-white/10 transition-all group shadow-2xl relative overflow-hidden flex flex-col"
               >
                 <div className="absolute top-0 right-0 w-32 h-32 bg-lime-400/5 blur-3xl rounded-full opacity-0 group-hover:opacity-100 transition-opacity"></div>
-                <div className="flex justify-between items-start mb-6 relative z-10">
+                <div className="flex justify-between items-start mb-4 relative z-10">
                   <div>
                     <h3 className="text-xl font-black text-white group-hover:text-lime-400 transition-colors">
                       {profile.full_name}
@@ -210,6 +224,25 @@ export default async function Home() {
                     </span>
                   </div>
                 </div>
+
+                {/* Dave: Community Card Tag Display */}
+                {profile.tags && profile.tags.length > 0 && (
+                  <div className="flex flex-wrap gap-1.5 mb-6 relative z-10">
+                    {profile.tags.slice(0, 4).map((tag, idx) => (
+                      <span
+                        key={`${profile.clerk_id}-tag-${idx}`}
+                        className="bg-white/5 text-white/60 text-[8px] font-black px-2 py-0.5 rounded-md uppercase tracking-tighter border border-white/5"
+                      >
+                        {tag.label}
+                      </span>
+                    ))}
+                    {profile.tags.length > 4 && (
+                      <span className="text-[8px] font-black text-lime-400/50 self-center">
+                        +{profile.tags.length - 4} more
+                      </span>
+                    )}
+                  </div>
+                )}
 
                 {userId ? (
                   <form

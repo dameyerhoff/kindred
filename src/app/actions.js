@@ -28,26 +28,20 @@ export async function saveProfile(formData) {
   const full_name = formData.get("full_name");
   const city = formData.get("city");
   const postcode = formData.get("postcode");
-  const skills =
-    formData
-      .get("skills")
-      ?.split(",")
-      .map((s) => s.trim()) || [];
-  const interests =
-    formData
-      .get("interests")
-      ?.split(",")
-      .map((s) => s.trim()) || [];
+
+  // Dave: Critical fix - parsing the new unified tags JSON from the form
+  const tagsRaw = formData.get("tags");
+  const tags = tagsRaw ? JSON.parse(tagsRaw) : [];
 
   console.log("DEBUG: Attempting Supabase Upsert for:", full_name);
+  console.log("DEBUG: Tags being saved:", tags);
 
   const { error } = await supabase.from("profiles").upsert({
     clerk_id: userId,
     full_name,
     city,
     postcode,
-    skills,
-    interests,
+    tags, // Dave: Saving the unified array to the tags column
     updated_at: new Date(),
   });
 
