@@ -13,6 +13,15 @@ import { createClient } from "@supabase/supabase-js";
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
+// Dave: Helper function to determine Saintly Rank based on Halos
+const getSaintlyRank = (halos = 0) => {
+  if (halos >= 50) return { title: "Kindred Legend", icon: "👑" };
+  if (halos >= 25) return { title: "Arch-Guardian", icon: "🕊️" };
+  if (halos >= 10) return { title: "S-Rank Guardian", icon: "✨" };
+  if (halos >= 5) return { title: "Kindred Guardian", icon: "🛡️" };
+  return { title: "Level 1 Saint", icon: "🌱" };
+};
+
 export default async function Home() {
   const { userId } = await auth();
 
@@ -53,7 +62,15 @@ export default async function Home() {
           />
         </div>
 
-        <div className="flex items-center gap-6">
+        <div className="flex items-center gap-4">
+          {/* Dave: Notice Board Entry Point */}
+          <Link
+            href="/notice-board"
+            className="hidden md:flex bg-white/5 hover:bg-white/10 border border-white/10 px-6 py-2.5 rounded-full text-[10px] font-black uppercase tracking-widest transition-all items-center gap-2"
+          >
+            The Notice Board 📜
+          </Link>
+
           {!userId ? (
             <SignUpButton mode="modal">
               <button className="bg-lime-400 hover:bg-white text-green-950 px-6 py-2.5 rounded-full text-[10px] font-black uppercase tracking-widest transition-all shadow-[0_0_20px_rgba(163,230,53,0.4)]">
@@ -61,7 +78,7 @@ export default async function Home() {
               </button>
             </SignUpButton>
           ) : (
-            <div className="scale-125">
+            <div className="scale-125 ml-2">
               <UserButton afterSignOutUrl="/" />
             </div>
           )}
@@ -80,7 +97,7 @@ export default async function Home() {
                     {myProfile.full_name.charAt(0)}
                   </div>
                   <div className="absolute -top-2 -right-2 bg-white text-green-950 text-[11px] font-black px-3 py-1 rounded-full animate-bounce shadow-xl uppercase border-2 border-lime-400">
-                    S-Rank 😇
+                    {getSaintlyRank(myProfile.halos).icon} Rank
                   </div>
                 </div>
 
@@ -88,9 +105,16 @@ export default async function Home() {
                   <h2 className="text-4xl font-black text-white tracking-tighter mb-1">
                     {myProfile.full_name}
                   </h2>
-                  <p className="text-lime-400/80 text-sm font-bold uppercase tracking-widest mb-4">
-                    {myProfile.city} • Kindred Guardian
-                  </p>
+                  <div className="flex flex-wrap items-center justify-center md:justify-start gap-2 mb-4">
+                    <p className="text-lime-400/80 text-sm font-bold uppercase tracking-widest">
+                      {myProfile.city} • {getSaintlyRank(myProfile.halos).title}
+                    </p>
+                    {myProfile.postcode && (
+                      <span className="bg-white/5 border border-white/10 text-[9px] text-white/40 px-2 py-0.5 rounded-md font-black uppercase tracking-tighter">
+                        {myProfile.postcode.split(" ")[0]}
+                      </span>
+                    )}
+                  </div>
 
                   {/* Dave: Hero Profile Tag Display */}
                   {myProfile.tags && myProfile.tags.length > 0 && (
@@ -130,7 +154,10 @@ export default async function Home() {
                         <span className="text-sm font-black text-emerald-400">
                           {myRequests.length}
                         </span>
-                        <span className="absolute -top-8 left-1/2 -translate-x-1/2 bg-white text-green-950 text-[8px] px-2 py-1 rounded font-black opacity-0 group-hover:opacity-100 uppercase transition-opacity whitespace-nowrap">
+                        <span
+                          className="absolute -top-8 left-1/2 -translate-x-1/2 bg-white text-green-950 text-[8px] px-2 py-1 rounded font-black opacity-0 group-hover:opacity-100 uppercase transition-opacity whitespace-nowrap"
+                          style={{ zIndex: 50 }}
+                        >
                           Open Inbox
                         </span>
                       </Link>
@@ -143,7 +170,10 @@ export default async function Home() {
                         <span className="text-sm font-black text-blue-400">
                           {mySentRequests.length}
                         </span>
-                        <span className="absolute -top-8 left-1/2 -translate-x-1/2 bg-white text-green-950 text-[8px] px-2 py-1 rounded font-black opacity-0 group-hover:opacity-100 uppercase transition-opacity whitespace-nowrap">
+                        <span
+                          className="absolute -top-8 left-1/2 -translate-x-1/2 bg-white text-green-950 text-[8px] px-2 py-1 rounded font-black opacity-0 group-hover:opacity-100 uppercase transition-opacity whitespace-nowrap"
+                          style={{ zIndex: 50 }}
+                        >
                           View Sent
                         </span>
                       </Link>
@@ -209,15 +239,22 @@ export default async function Home() {
               >
                 <div className="absolute top-0 right-0 w-32 h-32 bg-lime-400/5 blur-3xl rounded-full opacity-0 group-hover:opacity-100 transition-opacity"></div>
                 <div className="flex justify-between items-start mb-4 relative z-10">
-                  <div>
+                  <div className="flex-1">
                     <h3 className="text-xl font-black text-white group-hover:text-lime-400 transition-colors">
                       {profile.full_name}
                     </h3>
-                    <p className="text-xs font-bold text-white/40 uppercase tracking-widest mt-1">
-                      {profile.city}
-                    </p>
+                    <div className="flex items-center gap-2 mt-1">
+                      <p className="text-[10px] font-bold text-white/40 uppercase tracking-widest">
+                        {profile.city} • {getSaintlyRank(profile.halos).title}
+                      </p>
+                      {profile.postcode && (
+                        <span className="bg-white/5 border border-white/10 text-[8px] text-white/30 px-1.5 py-0.5 rounded font-black uppercase">
+                          {profile.postcode.split(" ")[0]}
+                        </span>
+                      )}
+                    </div>
                   </div>
-                  <div className="flex items-center bg-white/10 px-3 py-1.5 rounded-full border border-white/10">
+                  <div className="flex items-center bg-white/10 px-3 py-1.5 rounded-full border border-white/10 self-start">
                     <span className="text-sm">😇</span>
                     <span className="text-xs font-black text-lime-400 ml-2">
                       {profile.halos || 0}
@@ -254,6 +291,40 @@ export default async function Home() {
                       name="receiverId"
                       value={profile.clerk_id}
                     />
+
+                    <div className="mb-3">
+                      <label className="block text-[8px] font-black uppercase tracking-widest mb-1.5 text-white/30 ml-1">
+                        Select Category
+                      </label>
+                      <select
+                        name="favourCategory"
+                        required
+                        defaultValue=""
+                        className="w-full bg-black/40 border border-white/10 rounded-xl p-3 text-[10px] font-bold text-white focus:outline-none focus:border-lime-400/50 transition-all cursor-pointer appearance-none"
+                      >
+                        {profile.tags && profile.tags.length > 0 ? (
+                          <>
+                            <option value="" disabled>
+                              Select a skill...
+                            </option>
+                            {profile.tags.map((tag, idx) => (
+                              <option
+                                key={idx}
+                                value={tag.label}
+                                className="bg-[#061a06]"
+                              >
+                                {tag.label}
+                              </option>
+                            ))}
+                          </>
+                        ) : (
+                          <option value="General Favour">
+                            General Kindred Favour
+                          </option>
+                        )}
+                      </select>
+                    </div>
+
                     <textarea
                       name="favourText"
                       placeholder="What favour do you need?..."

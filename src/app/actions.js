@@ -5,7 +5,7 @@ import { auth } from "@clerk/nextjs/server";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
-// Dave: We're moving the client creation into a function to keep it fresh for every request.
+// Dave: Fresh client for every request
 function getSupabase() {
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
@@ -13,66 +13,81 @@ function getSupabase() {
 }
 
 export async function saveProfile(formData) {
-  // Dave: Diagnostic Tracers to pinpoint the "Unauthorized" error
-  const authData = await auth();
-  const userId = authData.userId;
-
-  if (!userId) {
-    console.error(
-      "DEBUG: FAILURE - No UserID. Clerk session did not cross to server.",
-    );
-    throw new Error("Unauthorized");
-  }
+  const { userId } = await auth();
+  if (!userId) throw new Error("Unauthorized");
 
   const supabase = getSupabase();
   const full_name = formData.get("full_name");
   const city = formData.get("city");
   const postcode = formData.get("postcode");
-
-  // Dave: Critical fix - parsing the new unified tags JSON from the form
   const tagsRaw = formData.get("tags");
   const tags = tagsRaw ? JSON.parse(tagsRaw) : [];
-
-  console.log("DEBUG: Attempting Supabase Upsert for:", full_name);
-  console.log("DEBUG: Tags being saved:", tags);
 
   const { error } = await supabase.from("profiles").upsert({
     clerk_id: userId,
     full_name,
     city,
     postcode,
-    tags, // Dave: Saving the unified array to the tags column
+    tags,
     updated_at: new Date(),
   });
 
-  if (error) {
-    console.error("DEBUG: Supabase Error:", error.message);
-    throw error;
-  }
-
-  console.log("DEBUG: SUCCESS - Redirecting to Home");
+  if (error) throw error;
   revalidatePath("/");
   redirect("/");
 }
 
 export async function getProfiles() {
   const supabase = getSupabase();
-  console.log("DEBUG: Action fetching profiles...");
-
-  // Dave: Fixed column name from created_at to updated_at to match your database schema
-  const { data, error, count } = await supabase
+  const { data, error } = await supabase
     .from("profiles")
-    .select("*", { count: "exact" })
+    .select("*")
     .order("updated_at", { ascending: false });
 
+  if (error) return [];
+  return data;
+}
+
+// Dave: New Action for the Notice Board to see all pending missions
+export async function getPublicNoticeBoard() {
+  const supabase = getSupabase();
+  const { data, error } = await supabase
+    .from("favours")
+    .select(
+      `
+      *,
+      profiles:sender_id (full_name, city, halos)
+    `,
+    )
+    .eq("status", "pending")
+    .order("created_at", { ascending: false });
+
   if (error) {
-    console.error("DEBUG: Fetch error in getProfiles:", error.message);
+    console.error("Notice Board Fetch Error:", error.message);
     return [];
   }
-
-  console.log("DEBUG: Action found profiles count:", data?.length || 0);
-  console.log("DEBUG: Supabase explicit count:", count);
   return data;
+}
+
+// Dave: Action to allow a Guardian to claim an open favour
+export async function claimFavour(formData) {
+  const { userId } = await auth();
+  if (!userId) throw new Error("Unauthorized");
+
+  const supabase = getSupabase();
+  const favourId = formData.get("favourId");
+
+  const { error } = await supabase
+    .from("favours")
+    .update({
+      receiver_id: userId,
+      status: "pending", // Dave: Keep as pending but now assigned to a specific receiver
+    })
+    .eq("id", favourId);
+
+  if (error) throw error;
+  revalidatePath("/notice-board");
+  revalidatePath("/");
 }
 
 export async function awardHalo(targetUserId) {
@@ -91,18 +106,25 @@ export async function sendFavourRequest(formData) {
   const supabase = getSupabase();
   const receiver_id = formData.get("receiverId");
   const favour_text = formData.get("favourText");
+  const category = formData.get("favourCategory");
+
+  const { data: senderProfile } = await supabase
+    .from("profiles")
+    .select("postcode")
+    .eq("clerk_id", userId)
+    .single();
 
   const { error } = await supabase.from("favours").insert({
     sender_id: userId,
     receiver_id,
     favour_text,
+    category,
+    location_tag: senderProfile?.postcode || "Unknown",
     status: "pending",
   });
 
   if (error) throw error;
-
   revalidatePath("/");
-  // Dave: Redirecting back to home. We've removed the success flag from the URL in page.js
   redirect("/");
 }
 
@@ -121,7 +143,6 @@ export async function getMyRequests() {
   return data;
 }
 
-// Dave: New action to fetch favours sent BY me
 export async function getMySentRequests() {
   const { userId } = await auth();
   if (!userId) return [];
@@ -157,7 +178,6 @@ export async function completeFavour(formData) {
     });
     if (haloError) throw haloError;
   }
-
   revalidatePath("/");
 }
 
@@ -172,6 +192,5 @@ export async function declineFavour(formData) {
     .eq("id", favourId);
 
   if (error) throw error;
-
   revalidatePath("/");
 }
