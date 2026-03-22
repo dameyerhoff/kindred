@@ -2,12 +2,11 @@ import { getPublicNoticeBoard } from "../actions";
 import { auth } from "@clerk/nextjs/server";
 import { UserButton } from "@clerk/nextjs";
 import Link from "next/link";
-import NoticeBoardGrid from "./NoticeBoardGrid";
+import FavourMapClient from "./FavourMapClient";
 
 export const dynamic = "force-dynamic";
-export const revalidate = 0;
 
-export default async function NoticeBoard() {
+export default async function FavourMapPage() {
   const { userId } = await auth();
   const openMissions = await getPublicNoticeBoard();
 
@@ -29,7 +28,7 @@ export default async function NoticeBoard() {
         <div className="flex items-center gap-3">
           <Link
             href="/favour-map"
-            className="hidden md:flex bg-white/5 hover:bg-white/10 border border-white/10 px-4 py-2 rounded-full text-[9px] font-black uppercase tracking-widest transition-all items-center gap-2"
+            className="hidden md:flex bg-lime-400 text-green-950 border border-lime-400 px-4 py-2 rounded-full text-[9px] font-black uppercase tracking-widest transition-all items-center gap-2 shadow-[0_0_15px_rgba(163,230,53,0.4)]"
           >
             Favour Map 🗺️
           </Link>
@@ -41,7 +40,7 @@ export default async function NoticeBoard() {
           </Link>
           <Link
             href="/notice-board"
-            className="hidden md:flex bg-lime-400 text-green-950 border border-lime-400 px-4 py-2 rounded-full text-[9px] font-black uppercase tracking-widest transition-all items-center gap-2 shadow-[0_0_15px_rgba(163,230,53,0.4)]"
+            className="hidden md:flex bg-white/5 hover:bg-white/10 border border-white/10 px-4 py-2 rounded-full text-[9px] font-black uppercase tracking-widest transition-all items-center gap-2"
           >
             The Notice Board 📜
           </Link>
@@ -69,14 +68,18 @@ export default async function NoticeBoard() {
             ← Back to your Profile
           </Link>
           <h1 className="text-5xl font-black tracking-tighter mb-2 text-white">
-            Notice Board
+            Favour Map
           </h1>
           <p className="text-lime-400/60 text-sm font-bold uppercase tracking-widest">
-            Active Missions in the Kindred Network
+            Visualise Kindred Deeds across the UK
           </p>
         </header>
 
-        <NoticeBoardGrid openMissions={openMissions} userId={userId} />
+        <FavourMapClient
+          openMissions={openMissions}
+          userId={userId}
+          apiKey={process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}
+        />
       </section>
     </main>
   );
