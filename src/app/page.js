@@ -84,6 +84,14 @@ export default async function Home() {
             Profile 👤
           </Link>
 
+          {/* About Us */}
+          <Link
+            href="/about-us"
+            className="hidden md:flex bg-white/5 hover:bg-white/10 border border-white/10 px-4 py-2 rounded-full text-[9px] font-black uppercase tracking-widest transition-all items-center gap-2"
+          >
+            About Us 💚
+          </Link>
+
           {!userId ? (
             <SignUpButton mode="modal">
               {/* Dave: Keeping it to one clean child element to fix the Runtime Error */}
