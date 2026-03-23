@@ -18,22 +18,30 @@ async function checkAdminStatus() {
 }
 
 export async function banUserAction(targetUserId, currentStatus) {
+  const { userId: adminId } = await auth();
   const isAdmin = await checkAdminStatus();
 
-  if (!isAdmin) {
-    throw new Error("Unauthorised: Admin role required");
-  }
+  if (!isAdmin) throw new Error("Unauthorised: Admin role required");
 
-  const { error } = await supabase
+  const { error: updateError } = await supabase
     .from("accounts")
     .update({ is_banned: !currentStatus })
     .eq("user_id", targetUserId);
-  if (error) throw new Error(error.message);
+
+  if (updateError) throw new Error(updateError.message);
+
+  await supabase.from("admin_logs").insert({
+    admin_id: adminId,
+    target_user_id: targetUserId,
+    action_type: currentStatus ? "UNBAN" : "BAN",
+  });
+
   revalidatePath("/(admin)/admin");
 }
 
 export async function deleteContestAction(contestId) {
   const isAdmin = await checkAdminStatus();
+
   if (!isAdmin) throw new Error("Unauthorised: Admin role required");
 
   const { error } = await supabase
