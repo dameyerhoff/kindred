@@ -17,6 +17,69 @@ async function checkAdminStatus() {
   return !!isAdmin;
 }
 
+export async function restrictTalentAction(targetUserId, talentName) {
+  const isAdmin = await checkAdminStatus();
+  if (!isAdmin) throw new Error("Unauthorised");
+
+  const { data: account } = await supabase
+    .from("accounts")
+    .select("restricted_talents")
+    .eq("user_id", targetUserId)
+    .single();
+
+  const currentTalents = account?.restricted_talents || [];
+  if (!currentTalents.includes(talentName)) {
+    const { error } = await supabase
+      .from("accounts")
+      .update({ restricted_talents: [...currentTalents, talentName] })
+      .eq("user_id", targetUserId);
+
+    if (error) throw new Error(error.message);
+  }
+
+  revalidatePath("/(admin)/admin");
+}
+
+export async function warnUserAction(targetUserId, reason) {
+  const { userId: adminId } = await auth();
+  const isAdmin = await checkAdminStatus();
+  if (!isAdmin) throw new Error("Unauthorised");
+
+  const { data: previousWarnings } = await supabase
+    .from("admin_logs")
+    .select("id")
+    .eq("target_user_id", targetUserId)
+    .eq("action_type", "WARNING");
+
+  if (previousWarnings && previousWarnings.length > 0) {
+    return await banUserAction(targetUserId, false);
+  }
+
+  await supabase.from("admin_logs").insert({
+    admin_id: adminId,
+    target_user_id: targetUserId,
+    action_type: "WARNING",
+    reason: reason,
+  });
+
+  revalidatePath("/(admin)/admin");
+}
+
+export async function resolveReportsAction(targetUserId) {
+  const isAdmin = await checkAdminStatus();
+  if (!isAdmin) throw new Error("Unauthorised");
+
+  const { error } = await supabase
+    .from("reports")
+    .update({ status: "resolved" })
+    .eq("target_user_id", targetUserId)
+    .eq("status", "pending");
+
+  if (error) throw new Error(error.message);
+
+  revalidatePath("/(admin)/admin");
+}
+
 export async function banUserAction(targetUserId, currentStatus) {
   const { userId: adminId } = await auth();
   const isAdmin = await checkAdminStatus();

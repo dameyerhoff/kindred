@@ -1,6 +1,8 @@
 import BanButton from "./BanButton";
+import WarnButton from "./WarnButton";
+import ResolveButton from "./ResolveButton";
 
-export default function ModerationTable({ users }) {
+export default function ModerationTable({ users, flaggedIds = [] }) {
   if (!users || users.length === 0) {
     return (
       <div className="p-10 text-center bg-gray-50 border border-dashed rounded-xl">
@@ -39,12 +41,11 @@ export default function ModerationTable({ users }) {
                   <span className="text-xs text-gray-500">{user.email}</span>
                 </div>
               </td>
-              <td className="px-6 py-4 whitespace-nowrap">
-                <code className="text-[10px] bg-gray-100 px-2 py-1 rounded text-gray-600 font-mono">
-                  {user.clerk_id}
-                </code>
+              <td className="px-6 py-4 whitespace-nowrap font-mono text-[10px] text-gray-400">
+                {user.clerk_id}
               </td>
               <td className="px-6 py-4 whitespace-nowrap">
+                {" "}
                 {user.is_banned ? (
                   <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase bg-red-100 text-red-700">
                     Banned
@@ -55,7 +56,11 @@ export default function ModerationTable({ users }) {
                   </span>
                 )}
               </td>
-              <td className="px-6 py-4 whitespace-nowrap text-right">
+              <td className="px-6 py-4 whitespace-nowrap text-right space-x-2">
+                {flaggedIds.includes(user.clerk_id) && (
+                  <ResolveButton userId={user.clerk_id} />
+                )}
+                <WarnButton userId={user.clerk_id} />
                 <BanButton userId={user.clerk_id} isBanned={user.is_banned} />
               </td>
             </tr>
