@@ -1,6 +1,7 @@
 import BanButton from "./BanButton";
 import WarnButton from "./WarnButton";
 import ResolveButton from "./ResolveButton";
+import RestrictButton from "./RestrictButton";
 
 export default function ModerationTable({ users, flaggedIds = [] }) {
   if (!users || users.length === 0) {
@@ -62,6 +63,7 @@ export default function ModerationTable({ users, flaggedIds = [] }) {
                 )}
                 <WarnButton userId={user.clerk_id} />
                 <BanButton userId={user.clerk_id} isBanned={user.is_banned} />
+                <RestrictButton userId={user.clerk_id} />
               </td>
             </tr>
           ))}
