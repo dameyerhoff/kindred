@@ -1,0 +1,47 @@
+"use server";
+
+import { auth } from "@clerk/nextjs/server";
+import { revalidatePath } from "next/cache";
+import { supabase } from "./db";
+
+async function checkAdminStatus() {
+  const { userId } = await auth();
+  if (!userId) return false;
+
+  const { data: isAdmin } = await supabase
+    .from("admin_users")
+    .select("user_id")
+    .eq("user_id", userId)
+    .single();
+
+  return !!isAdmin;
+}
+
+export async function banUserAction(targetUserId, currentStatus) {
+  const isAdmin = await checkAdminStatus();
+
+  if (!isAdmin) {
+    throw new Error("Unauthorised: Admin role required");
+  }
+
+  const { error } = await supabase
+    .from("accounts")
+    .update({ is_banned: !currentStatus })
+    .eq("user_id", targetUserId);
+  if (error) throw new Error(error.message);
+  revalidatePath("/(admin)/admin");
+}
+
+export async function deleteContestAction(contestId) {
+  const isAdmin = await checkAdminStatus();
+  if (!isAdmin) throw new Error("Unauthorised: Admin role required");
+
+  const { error } = await supabase
+    .from("contests")
+    .delete()
+    .eq("id", contestId);
+
+  if (error) throw new Error(error.message);
+
+  revalidatePath("/(admin)/admin");
+}
