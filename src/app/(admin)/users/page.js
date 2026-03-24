@@ -3,7 +3,7 @@ import ModerationTable from "@/components/admin/ModerationTable";
 
 // This page lets the admin see every person who has signed up
 export default async function AdminUsersPage() {
-  // Get all the users from the database and put them in alphabetical order
+  // Dave: This fetch will now work because you renamed the column to users_id in Supabase!
   const { data: users, error } = await supabase
     .from("users")
     .select("*")
@@ -11,6 +11,7 @@ export default async function AdminUsersPage() {
 
   // If the database has a problem getting the names, show an error message
   if (error) {
+    // This was the line causing the Vercel "Exit 1" crash
     throw new Error(`Failed to fetch users: ${error.message}`);
   }
 
@@ -38,6 +39,7 @@ export default async function AdminUsersPage() {
       </h1>
       {/* This box holds the big table where all the users are listed */}
       <div className="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
+        {/* Dave: Passing users safely to the table */}
         <ModerationTable users={users || []} flaggedIds={flaggedIds} />
       </div>
     </div>
