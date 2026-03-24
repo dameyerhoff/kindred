@@ -1,25 +1,37 @@
-import { getMyRequests, completeFavour, declineFavour } from "../actions";
+import {
+  getMyRequests,
+  completeFavour,
+  declineFavour,
+  getMySentRequests,
+} from "../actions";
 import Link from "next/link";
+import { auth } from "@clerk/nextjs/server";
+import NavBar from "@/components/NavBar";
 
 // This page shows you a list of people who have asked you for a favour
 export default async function InboxPage() {
+  const { userId } = await auth();
   // Go to the database and find all the requests sent to me
   const myRequests = (await getMyRequests()) || [];
+  const mySentRequests = userId ? (await getMySentRequests()) || [] : [];
 
   return (
-    <main className="min-h-screen bg-[#061a06] p-8 text-white relative">
+    <main className="min-h-screen bg-kindred-dark p-4 md:p-8 text-white relative overflow-hidden isolate">
       {/* This adds the pretty green light in the background */}
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[1000px] h-[400px] bg-emerald-500/10 blur-[120px] pointer-events-none"></div>
-
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[1000px] h-[400px] bg-kindred-lime/10 blur-[120px] pointer-events-none -z-10"></div>
+      <NavBar
+        userId={userId}
+        inboxCount={myRequests.length}
+        outboxCount={mySentRequests.length}
+      />
+      {/* This button takes you back to your main profile page */}
       <div className="max-w-4xl mx-auto relative z-10">
-        {/* This button takes you back to your main profile page */}
         <Link
           href="/"
-          className="inline-block text-[10px] font-black uppercase tracking-[0.3em] text-lime-400 hover:text-white transition-all mb-12 border border-lime-400/20 px-4 py-2 rounded-full hover:bg-lime-400/10"
+          className="inline-block text-[10px] font-black uppercase tracking-[0.3em] text-kindred-lime hover:text-white transition-all mb-12 border border-kindred-lime/20 px-4 py-2 rounded-full hover:bg-kindred-lime/10"
         >
           ← Back to Dashboard
         </Link>
-
         <h1 className="text-5xl font-black tracking-tighter mb-12">
           Kindred Inbox 📬
         </h1>
@@ -30,14 +42,14 @@ export default async function InboxPage() {
             {myRequests.map((req) => (
               <div
                 key={req.id}
-                className="bg-white/5 backdrop-blur-xl p-6 rounded-[2rem] border border-white/10 flex justify-between items-center shadow-2xl group hover:border-lime-400/30 transition-all"
+                className="bg-white/5 backdrop-blur-xl p-6 rounded-[2rem] border border-white/10 flex justify-between items-center shadow-2xl group hover:border-kindred-lime/30 hover:shadow-kindred transition-all"
               >
                 <div>
                   {/* This is the message the person sent you */}
                   <p className="text-xl font-bold italic group-hover:text-lime-400 transition-colors">
                     &ldquo;{req.favour_text}&rdquo;
                   </p>
-                  <p className="text-[10px] text-emerald-400 uppercase font-black tracking-widest mt-2">
+                  <p className="text-[10px] text-kindred-lime uppercase font-black tracking-widest mt-2">
                     Community Favour
                   </p>
                 </div>
@@ -65,7 +77,7 @@ export default async function InboxPage() {
                     />
                     <button
                       type="submit"
-                      className="bg-white text-emerald-700 px-6 py-3 rounded-xl font-black text-xs hover:bg-lime-400 hover:text-green-900 transition-all shadow-2xl uppercase"
+                      className="bg-white text-kindred-dark px-6 py-3 rounded-xl font-black text-xs hover:bg-kindred-lime hover:text-kindred-dark transition-all shadow-2xl uppercase hover:shadow-kindred"
                     >
                       Help & Earn 😇
                     </button>

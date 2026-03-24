@@ -2,14 +2,28 @@
 import AboutUsAnimation from "@/components/AboutUsAnimation";
 // import BackButton from "@/components/BackButton";
 // import Link from "next/link";
+import { getMyRequests, getMySentRequests } from "../actions";
+import { auth } from "@clerk/nextjs/server";
+import NavBar from "@/components/NavBar";
 
 // This page tells people what Kindred is all about
-export default function AboutUsPage() {
+export default async function AboutUsPage() {
+  const { userId } = await auth();
+  const myRequests = userId ? (await getMyRequests()) || [] : [];
+  const mySentRequests = userId ? (await getMySentRequests()) || [] : [];
+
   return (
     <div
       className="min-h-screen bg-[#FAFAD6]"
       style={{ backgroundColor: "#FAFAD6" }}
     >
+      <div className="bg-kindred-dark w-full">
+        <NavBar
+          userId={userId}
+          inboxCount={myRequests.length}
+          outboxCount={mySentRequests.length}
+        />
+      </div>
       {/* <BackButton href="/" label="← Back to your Profile" /> */}
       {/* <Link
         href="/"
