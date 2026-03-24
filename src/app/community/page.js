@@ -1,4 +1,9 @@
-import { getProfiles, sendFavourRequest } from "../actions";
+import {
+  getProfiles,
+  sendFavourRequest,
+  getMyRequests,
+  getMySentRequests,
+} from "../actions";
 import { UserButton } from "@clerk/nextjs";
 import { auth } from "@clerk/nextjs/server";
 import Link from "next/link";
@@ -11,8 +16,11 @@ export const revalidate = 0;
 export default async function CommunityGridPage() {
   // Check who is logged in right now
   const { userId } = await auth();
-  // Get all the member profiles from the database
+
+  // Get all the member profiles and request counts from the database
   const profiles = (await getProfiles()) || [];
+  const myRequests = userId ? (await getMyRequests()) || [] : [];
+  const mySentRequests = userId ? (await getMySentRequests()) || [] : [];
 
   // This makes sure you do not see your own name in the list of people to help
   const communityProfiles = profiles.filter((p) => p.clerk_id !== userId);
@@ -54,6 +62,31 @@ export default async function CommunityGridPage() {
           >
             The Notice Board 📜
           </Link>
+
+          {/* Added Inbox and Outbox specifically to the header for this tab */}
+          {userId && (
+            <>
+              <Link
+                href="/inbox"
+                className="flex items-center gap-2 bg-emerald-500/20 border border-emerald-500/30 px-3 py-2 rounded-xl hover:bg-emerald-500/40 transition-all"
+              >
+                <span className="text-sm">📬</span>
+                <span className="text-[10px] font-black text-emerald-400 uppercase">
+                  {myRequests.length}
+                </span>
+              </Link>
+
+              <Link
+                href="/outbox"
+                className="flex items-center gap-2 bg-blue-500/20 border border-blue-500/30 px-3 py-2 rounded-xl hover:bg-blue-500/40 transition-all"
+              >
+                <span className="text-sm">📤</span>
+                <span className="text-[10px] font-black text-blue-400 uppercase">
+                  {mySentRequests.length}
+                </span>
+              </Link>
+            </>
+          )}
 
           <Link
             href="/"
