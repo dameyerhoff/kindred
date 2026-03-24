@@ -3,16 +3,17 @@
 import { useState, useEffect } from "react";
 import { claimFavour } from "../actions";
 
+// This builds the big list of help requests that everyone can see
 export default function NoticeBoardGrid({ openMissions = [], userId }) {
   const [searchTerm, setSearchTerm] = useState("");
   const [mounted, setMounted] = useState(false);
 
-  // Dave: Handle hydration by waiting for mount before rendering locale-sensitive dates
+  // This makes sure the clock and dates match up correctly when the page loads
   useEffect(() => {
     setMounted(true);
   }, []);
 
-  // Dave: Filter logic covering Mission Text, Category, and City
+  // This part looks through the help requests to find what you typed in the search box
   const filteredMissions = openMissions.filter((mission) => {
     const search = searchTerm.toLowerCase();
     const inText = mission.favour_text?.toLowerCase().includes(search) || false;
@@ -26,7 +27,7 @@ export default function NoticeBoardGrid({ openMissions = [], userId }) {
 
   return (
     <>
-      {/* Dave: Search Bar styled for the Kindred aesthetic */}
+      {/* This is the search bar at the top of the notice board */}
       <div className="mb-12 relative max-w-2xl">
         <div className="absolute inset-y-0 left-5 flex items-center pointer-events-none text-white/20">
           🔍
@@ -40,6 +41,7 @@ export default function NoticeBoardGrid({ openMissions = [], userId }) {
         />
       </div>
 
+      {/* If no help requests match your search, show this message */}
       {filteredMissions.length === 0 ? (
         <div className="bg-white/5 border border-white/10 rounded-[2.5rem] p-20 text-center backdrop-blur-3xl">
           <p className="text-white/40 italic text-lg font-medium">
@@ -47,33 +49,33 @@ export default function NoticeBoardGrid({ openMissions = [], userId }) {
           </p>
         </div>
       ) : (
+        /* This is the grid that holds all the different help request cards */
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredMissions.map((mission) => (
             <div
               key={mission.id}
               className="bg-white/5 p-6 rounded-3xl border border-white/10 hover:border-lime-400/50 hover:bg-white/10 transition-all group flex flex-col h-full shadow-2xl overflow-hidden relative"
             >
-              {/* Status Tag */}
+              {/* This shows what kind of help is needed and when it was posted */}
               <div className="flex justify-between items-start mb-6">
                 <span className="bg-lime-400/10 border border-lime-400/30 text-lime-400 text-[9px] font-black px-3 py-1 rounded-full uppercase tracking-widest">
                   {mission.category || "General Favour"}
                 </span>
                 <span className="text-[9px] font-black text-white/30 uppercase tracking-tighter">
-                  {/* Dave: Prevent hydration mismatch by only showing date on client mount */}
                   {mounted
                     ? new Date(mission.created_at).toLocaleDateString()
                     : ""}
                 </span>
               </div>
 
-              {/* Mission Text */}
+              {/* This is the main message describing the help needed */}
               <div className="flex-1 mb-8">
                 <p className="text-lg font-medium text-white/90 leading-tight italic">
                   &ldquo;{mission.favour_text}&rdquo;
                 </p>
               </div>
 
-              {/* Requester Info */}
+              {/* This shows who asked for help and where they are located */}
               <div className="pt-6 border-t border-white/10 flex items-center justify-between">
                 <div>
                   <p className="text-[10px] font-black text-white uppercase tracking-widest">
@@ -91,7 +93,7 @@ export default function NoticeBoardGrid({ openMissions = [], userId }) {
                   </div>
                 </div>
 
-                {/* Claim Button Logic */}
+                {/* This button lets you volunteer to help if it is not your own post */}
                 {userId && userId !== mission.sender_id ? (
                   <form action={claimFavour}>
                     <input type="hidden" name="favourId" value={mission.id} />
@@ -103,6 +105,7 @@ export default function NoticeBoardGrid({ openMissions = [], userId }) {
                     </button>
                   </form>
                 ) : (
+                  /* If it is your own post, you just see a label saying so */
                   <div className="bg-white/5 px-4 py-2 rounded-xl border border-white/5">
                     <span className="text-[10px] font-black text-white/20 uppercase tracking-widest">
                       Your Post

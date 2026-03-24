@@ -4,7 +4,7 @@ import { useAuth, SignInButton } from "@clerk/nextjs";
 import { useState, useEffect } from "react";
 import Link from "next/link";
 
-// Dave: Master List with Slugs for perfect database filtering
+// This is a big list of all the different jobs and hobbies people can choose from
 const KINDRED_BANK = [
   { label: "Admin Support", slug: "admin-support" },
   { label: "Animal Care", slug: "animal-care" },
@@ -42,6 +42,7 @@ const KINDRED_BANK = [
   { label: "Yoga Instruction", slug: "yoga-instruction" },
 ].sort((a, b) => a.label.localeCompare(b.label));
 
+// This page lets you set up your own profile so people know who you are
 export default function SetupPage() {
   const { userId, isLoaded } = useAuth();
   const [myProfile, setMyProfile] = useState(null);
@@ -49,6 +50,7 @@ export default function SetupPage() {
   const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(true);
 
+  // This part runs when the page opens to find your information in the database
   useEffect(() => {
     async function loadData() {
       if (userId) {
@@ -57,7 +59,7 @@ export default function SetupPage() {
         if (found) {
           setMyProfile(found);
 
-          // Dave: Safety Bridge - Ensure tags are parsed correctly from Supabase
+          // This makes sure your skills are loaded correctly from the database
           let savedTags = found.tags || [];
           if (typeof savedTags === "string") {
             try {
@@ -74,6 +76,7 @@ export default function SetupPage() {
     loadData();
   }, [userId]);
 
+  // This adds a new skill to your list
   const addTag = (item) => {
     if (!tags.find((t) => t.slug === item.slug)) {
       setTags([...tags, item]);
@@ -81,10 +84,12 @@ export default function SetupPage() {
     setSearch("");
   };
 
+  // This takes a skill away from your list if you click the X
   const removeTag = (slugToRemove) => {
     setTags(tags.filter((t) => t.slug !== slugToRemove));
   };
 
+  // This lets you type in a new skill that is not on the big list
   const createCustomTag = (name) => {
     const slug = name
       .toLowerCase()
@@ -94,7 +99,7 @@ export default function SetupPage() {
     addTag({ label: name, slug: slug });
   };
 
-  // Dave: Force-sync logic to ensure tags are current when the form submits
+  // This saves all your skills right before the form is sent to the database
   const handleSubmit = (e) => {
     const hiddenInput = e.currentTarget.querySelector('input[name="tags"]');
     if (hiddenInput) {
@@ -105,6 +110,7 @@ export default function SetupPage() {
 
   if (!isLoaded || loading) return null;
 
+  // If you are not logged in, it shows a button to sign in
   if (!userId) {
     return (
       <main className="min-h-screen bg-[#061a06] flex items-center justify-center p-6 text-white text-center">
@@ -127,6 +133,7 @@ export default function SetupPage() {
       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[1000px] h-[400px] bg-green-500/10 blur-[120px] pointer-events-none"></div>
 
       <div className="w-full max-w-xl relative z-10">
+        {/* This button takes you back to your main screen */}
         <Link
           href="/"
           className="inline-block text-[10px] font-black uppercase tracking-[0.3em] text-lime-400 hover:text-white transition-all mb-8 border border-lime-400/20 px-4 py-2 rounded-full hover:bg-lime-400/10"
@@ -134,6 +141,7 @@ export default function SetupPage() {
           ← Back to Dashboard
         </Link>
 
+        {/* This is the main box for the profile form */}
         <div className="bg-white/5 backdrop-blur-3xl border border-white/10 p-8 md:p-12 rounded-[3rem] shadow-2xl">
           <h2 className="text-4xl font-black mb-2 tracking-tighter uppercase text-white">
             {myProfile ? "Manage Profile" : "Create Profile"}
@@ -149,7 +157,7 @@ export default function SetupPage() {
             onSubmit={handleSubmit}
             className="space-y-6"
           >
-            {/* Dave: Hidden input synced by the handleSubmit function */}
+            {/* This hidden part keeps your list of skills ready to save */}
             <input type="hidden" name="tags" value={JSON.stringify(tags)} />
 
             <div>
@@ -194,6 +202,7 @@ export default function SetupPage() {
                 Skills & Interests (Your Offerings)
               </label>
 
+              {/* This shows the skills you have already picked */}
               <div className="flex flex-wrap gap-2 mb-4">
                 {tags
                   .filter((tag) => tag && tag.slug)
@@ -212,6 +221,7 @@ export default function SetupPage() {
                   ))}
               </div>
 
+              {/* This is the box where you type to find new skills */}
               <input
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
@@ -219,6 +229,7 @@ export default function SetupPage() {
                 className="w-full p-4 rounded-2xl bg-black/40 border border-white/10 focus:border-lime-400/50 outline-none text-white font-bold transition-all"
               />
 
+              {/* This shows the list of skills that match what you typed */}
               {search && (
                 <div className="absolute z-20 w-full mt-2 bg-[#0a240a] border border-white/10 rounded-2xl overflow-hidden shadow-2xl max-h-48 overflow-y-auto">
                   {KINDRED_BANK.filter(
@@ -235,6 +246,7 @@ export default function SetupPage() {
                       + {item.label}
                     </button>
                   ))}
+                  {/* If you type something new, this button lets you add it as a custom skill */}
                   {search.length > 2 &&
                     !KINDRED_BANK.some(
                       (i) => i.label.toLowerCase() === search.toLowerCase(),
@@ -251,6 +263,7 @@ export default function SetupPage() {
               )}
             </div>
 
+            {/* This is the big button to save your profile */}
             <button
               type="submit"
               className="w-full mt-6 bg-white text-green-900 hover:bg-lime-400 font-black py-5 rounded-[2rem] shadow-2xl transition-all active:scale-95 uppercase tracking-widest text-sm"

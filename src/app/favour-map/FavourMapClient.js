@@ -9,17 +9,19 @@ import {
 } from "@react-google-maps/api";
 import Link from "next/link";
 
-// Dave: Expanded height to fill the screen properly
+// This sets how big the map looks on your screen
 const containerStyle = {
   width: "100%",
   height: "85vh",
 };
 
+// This tells the map to start looking at the middle of the UK
 const center = {
   lat: 54.5,
   lng: -2.5,
 };
 
+// These are the rules for how the map looks, like using dark green colors
 const mapOptions = {
   styles: [
     { elementType: "geometry", stylers: [{ color: "#061a06" }] },
@@ -45,6 +47,7 @@ const mapOptions = {
   zoomControl: true,
 };
 
+// This is the main part that builds the interactive map
 export default function FavourMapClient({ openMissions = [], apiKey }) {
   const [mounted, setMounted] = useState(false);
 
@@ -52,6 +55,7 @@ export default function FavourMapClient({ openMissions = [], apiKey }) {
     setMounted(true);
   }, []);
 
+  // This talks to Google to get the map ready to show
   const { isLoaded } = useJsApiLoader({
     id: "google-map-script",
     googleMapsApiKey: apiKey,
@@ -59,12 +63,12 @@ export default function FavourMapClient({ openMissions = [], apiKey }) {
 
   const [selectedMission, setSelectedMission] = useState(null);
 
-  // Dave: Logic to turn Supabase data into visible pins
+  // This part takes the list of favours and gives them a spot on the map
   const missionsWithPositions = useMemo(() => {
     if (!openMissions || openMissions.length === 0) return [];
 
     return openMissions.map((mission) => {
-      // Dave: We use the mission ID as a seed so the marker stays in the same place on refresh
+      // This uses a clever trick to make sure each favour stays in the same place
       const seed = mission.id
         .split("")
         .reduce((acc, char) => acc + char.charCodeAt(0), 0);
@@ -73,7 +77,7 @@ export default function FavourMapClient({ openMissions = [], apiKey }) {
       return {
         ...mission,
         position: {
-          // Spread them across the UK based on the seed
+          // This spreads the pins out across different parts of the country
           lat: 51.5 + pseudoRandom(1) * 4,
           lng: -0.1 + pseudoRandom(2) * 3,
         },
@@ -81,6 +85,7 @@ export default function FavourMapClient({ openMissions = [], apiKey }) {
     });
   }, [openMissions]);
 
+  // If the map is still warming up, show a loading message
   if (!isLoaded || !mounted)
     return (
       <div className="h-[85vh] w-full flex items-center justify-center bg-white/5 rounded-[2.5rem] border border-white/10">
@@ -92,12 +97,14 @@ export default function FavourMapClient({ openMissions = [], apiKey }) {
 
   return (
     <div className="rounded-[2.5rem] overflow-hidden border border-white/10 shadow-2xl relative z-10 bg-black">
+      {/* This is the actual Google Map being drawn */}
       <GoogleMap
         mapContainerStyle={containerStyle}
         center={center}
         zoom={6}
         options={mapOptions}
       >
+        {/* This loops through all the favours and puts a pin on the map for each one */}
         {missionsWithPositions.map((mission) => (
           <Marker
             key={mission.id}
@@ -114,6 +121,7 @@ export default function FavourMapClient({ openMissions = [], apiKey }) {
           />
         ))}
 
+        {/* If you click a pin, this shows a little bubble with information about the favour */}
         {selectedMission && (
           <InfoWindow
             position={selectedMission.position}
@@ -132,6 +140,7 @@ export default function FavourMapClient({ openMissions = [], apiKey }) {
                 <span className="text-[9px] font-black uppercase">
                   {selectedMission.profiles?.full_name?.split(" ")[0]}
                 </span>
+                {/* This button takes you to the notice board to see more details */}
                 <Link
                   href="/notice-board"
                   className="text-[8px] bg-green-900 text-white px-2 py-1 rounded font-black uppercase tracking-tighter"
