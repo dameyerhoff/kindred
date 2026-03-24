@@ -15,6 +15,7 @@ export const revalidate = 0;
 export default async function NoticeBoard() {
   // Check to see who is currently logged in
   const { userId } = await auth();
+
   // Go and get all the active help missions and message counts
   const openMissions = await getPublicNoticeBoard();
   const myRequests = userId ? (await getMyRequests()) || [] : [];
