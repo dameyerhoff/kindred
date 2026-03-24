@@ -14,7 +14,7 @@ const getSaintlyRank = (halos = 0) => {
 
 // This builds the grid where we see everyone in the community
 export default function CommunityGrid({
-  communityProfiles = [], // Dave: Fallback to empty array to prevent .filter() errors
+  communityProfiles = [],
   userId,
   sendFavourRequest,
 }) {

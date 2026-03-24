@@ -64,3 +64,49 @@ export async function deleteContestAction(contestId) {
   // This refreshes the admin dashboard to show the contest is gone
   revalidatePath("/(admin)/admin");
 }
+
+export async function sendMessageAction(receiverId, content, subject = null) {
+  const { userId: senderId } = await auth();
+
+  if (!senderId) {
+    throw new Error("You must be logged in to send messages.");
+  }
+
+  if (!content || content.trim() === "") {
+    throw new Error("Message content cannot be empty");
+  }
+
+  const { data, error } = await supabase
+    .from("messages")
+    .insert([
+      {
+        sender_id: senderId,
+        receiver_id: receiverId,
+        subject: subject,
+        content: content,
+      },
+    ])
+    .select();
+
+  if (error) {
+    throw new Error(error.message);
+  }
+
+  revalidatePath("/messages");
+
+  return data;
+}
+
+export async function getInboxAction() {
+  const { userId } = await auth();
+  if (!userId) throw new Error("Unauthorised");
+
+  const { data, error } = await supabase
+    .from("messages")
+    .select("*")
+    .or(`sender_id.eq.${userId},receiver_id.eq.${userId}`)
+    .order("created_at", { ascending: false });
+
+  if (error) throw new Error(error.message);
+  return data;
+}
