@@ -3,9 +3,11 @@ import Link from "next/link";
 import { motion } from "framer-motion";
 import { useState, useEffect } from "react";
 
+// This is the animation part for the About Us page
 export default function AboutUsAnimation() {
   const [showHeart, setShowHeart] = useState(false);
 
+  // This wait for a few seconds before showing the heart
   useEffect(() => {
     const timer = setTimeout(() => {
       setShowHeart(true);
@@ -20,6 +22,7 @@ export default function AboutUsAnimation() {
       style={{ backgroundColor: "#FAFAD6" }}
     >
       <div className="relative flex flex-col items-center justify-center">
+        {/* This button takes you back to your main profile screen */}
         <Link
           href="/"
           className="fixed top-6 left-6 z-50 text-lime-400 text-xs font-black uppercase tracking-[0.3em] hover:text-black transition-colors flex items-center gap-2 mb-8"
@@ -27,7 +30,7 @@ export default function AboutUsAnimation() {
           ← Back to your Profile
         </Link>
         <div className="relative w-75 h-75 flex items-center justify-center">
-          {/* Right Hand */}
+          {/* This is the right hand moving into the middle */}
           <motion.div
             className="absolute z-10"
             initial={{ x: 500, y: -500, opacity: 0 }}
@@ -42,7 +45,7 @@ export default function AboutUsAnimation() {
               opacity: { duration: 0.3 },
             }}
           >
-            {/* SVG Rhand */}
+            {/* SVG drawing of the right hand */}
             <svg
               width="165"
               height="166"
@@ -59,7 +62,7 @@ export default function AboutUsAnimation() {
             </svg>
           </motion.div>
 
-          {/* Left Hand */}
+          {/* This is the left hand moving into the middle */}
           <motion.div
             className="absolute z-20"
             initial={{ x: -500, y: -500, opacity: 0 }}
@@ -74,7 +77,7 @@ export default function AboutUsAnimation() {
               opacity: { duration: 0.3 },
             }}
           >
-            {/* SVG LHand */}
+            {/* SVG drawing of the left hand */}
             <svg
               width="166"
               height="164"
@@ -91,7 +94,7 @@ export default function AboutUsAnimation() {
             </svg>
           </motion.div>
 
-          {/* Heart */}
+          {/* This is the heart that appears when the hands meet */}
           <motion.div
             className="absolute z-30"
             initial={{ scale: 0, opacity: 0 }}
@@ -104,7 +107,7 @@ export default function AboutUsAnimation() {
               opacity: { duration: 0.3 },
             }}
           >
-            {/* SVG heart */}
+            {/* SVG heart drawing that beats like a real heart */}
             <motion.svg
               width="172"
               height="154"
@@ -142,14 +145,14 @@ export default function AboutUsAnimation() {
           </motion.div>
         </div>
 
-        {/* Kindred */}
+        {/* This is the part that shows the Kindred title name */}
         <motion.div
           className="mt-8 relative"
           initial={{ opacity: 0, y: 50 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 1, delay: 1.8 }}
         >
-          {/* h1 */}
+          {/* Large shiny title text */}
           <motion.h1
             className="text-7xl font-bold text-transparent bg-clip-text"
             style={{
@@ -169,7 +172,7 @@ export default function AboutUsAnimation() {
             Kindred
           </motion.h1>
 
-          {/* effect */}
+          {/* This adds a glow effect behind the title */}
           <motion.div
             className="absolute inset-0 text-7xl font-bold blur-xl opacity-40"
             style={{
@@ -187,7 +190,7 @@ export default function AboutUsAnimation() {
             Kindred
           </motion.div>
 
-          {/* because we're better together */}
+          {/* Small message at the bottom of the logo */}
           <motion.p
             className="text-sm font-medium text-transparent bg-clip-text text-center mt-2"
             style={{

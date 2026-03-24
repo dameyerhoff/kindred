@@ -1,6 +1,8 @@
 {
   "compilerOptions": {
+    /* This part creates "short-cuts" for your folder names */
     "paths": {
+      /* This means whenever you type "@/", the computer knows to look inside the "src" folder */
       "@/*": ["./src/*"]
     }
   }

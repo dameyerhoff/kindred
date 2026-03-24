@@ -3,6 +3,7 @@ import AboutUsAnimation from "@/components/AboutUsAnimation";
 // import BackButton from "@/components/BackButton";
 // import Link from "next/link";
 
+// This page tells people what Kindred is all about
 export default function AboutUsPage() {
   return (
     <div
@@ -16,12 +17,18 @@ export default function AboutUsPage() {
       >
         ← Back to your Profile
       </Link> */}
+
+      {/* This shows the moving picture at the top of the page */}
       <AboutUsAnimation />
+
+      {/* This box holds all the writing about our mission */}
       <div
         className="max-w-2xl mx-auto px-6 py-16 text-center"
         // style={{ backgroundColor: "#FAFAD6" }}
       >
         <h2 className="text-3xl font-bold text-green-900 mb-4">Our Mission</h2>
+
+        {/* These paragraphs explain that we want everyone to help each other and be kind */}
         <p className="text-green-800 text-lg leading-relaxed">
           Kindred is a community built on connection, support, and shared
           growth. We believe people thrive when they come together.

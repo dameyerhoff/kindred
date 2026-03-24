@@ -5,13 +5,14 @@ import { auth } from "@clerk/nextjs/server";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
-// Dave: Fresh client for every request
+// This part connects us to the database where all the information is stored
 function getSupabase() {
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
   return createClient(supabaseUrl, supabaseKey);
 }
 
+// This saves your name, city, and skills into your profile
 export async function saveProfile(formData) {
   const { userId } = await auth();
   if (!userId) throw new Error("Unauthorized");
@@ -23,6 +24,7 @@ export async function saveProfile(formData) {
   const tagsRaw = formData.get("tags");
   const tags = tagsRaw ? JSON.parse(tagsRaw) : [];
 
+  // This updates your existing info or adds it if you are new
   const { error } = await supabase.from("profiles").upsert({
     clerk_id: userId,
     full_name,
@@ -37,6 +39,7 @@ export async function saveProfile(formData) {
   redirect("/");
 }
 
+// This gets a list of everyone who has a profile
 export async function getProfiles() {
   const supabase = getSupabase();
   const { data, error } = await supabase
@@ -48,7 +51,7 @@ export async function getProfiles() {
   return data;
 }
 
-// Dave: New Action for the Notice Board to see all pending missions
+// This gets all the help requests that are still waiting for someone to say yes
 export async function getPublicNoticeBoard() {
   const supabase = getSupabase();
   const { data, error } = await supabase
@@ -69,7 +72,7 @@ export async function getPublicNoticeBoard() {
   return data;
 }
 
-// Dave: Action to allow a Guardian to claim an open favour
+// This lets a person volunteer to take on a help request from the board
 export async function claimFavour(formData) {
   const { userId } = await auth();
   if (!userId) throw new Error("Unauthorized");
@@ -77,11 +80,12 @@ export async function claimFavour(formData) {
   const supabase = getSupabase();
   const favourId = formData.get("favourId");
 
+  // This puts your name on the request so the owner knows you are helping
   const { error } = await supabase
     .from("favours")
     .update({
       receiver_id: userId,
-      status: "pending", // Dave: Keep as pending but now assigned to a specific receiver
+      status: "pending",
     })
     .eq("id", favourId);
 
@@ -90,6 +94,7 @@ export async function claimFavour(formData) {
   revalidatePath("/");
 }
 
+// This adds a shiny halo point to someone who did a good deed
 export async function awardHalo(targetUserId) {
   const supabase = getSupabase();
   const { error } = await supabase.rpc("increment_halos", {
@@ -99,6 +104,7 @@ export async function awardHalo(targetUserId) {
   revalidatePath("/");
 }
 
+// This sends a message to someone asking them for a specific favour
 export async function sendFavourRequest(formData) {
   const { userId } = await auth();
   if (!userId) throw new Error("Unauthorized");
@@ -108,12 +114,14 @@ export async function sendFavourRequest(formData) {
   const favour_text = formData.get("favourText");
   const category = formData.get("favourCategory");
 
+  // This finds where you live so it can show up on the map
   const { data: senderProfile } = await supabase
     .from("profiles")
     .select("postcode")
     .eq("clerk_id", userId)
     .single();
 
+  // This puts the new request into the database
   const { error } = await supabase.from("favours").insert({
     sender_id: userId,
     receiver_id,
@@ -125,11 +133,11 @@ export async function sendFavourRequest(formData) {
 
   if (error) throw error;
 
-  // Dave: Removed redirect("/") to keep you on the Community Grid page
   revalidatePath("/");
   revalidatePath("/community");
 }
 
+// This finds all the favours people have asked you to do
 export async function getMyRequests() {
   const { userId } = await auth();
   if (!userId) return [];
@@ -145,6 +153,7 @@ export async function getMyRequests() {
   return data;
 }
 
+// This finds all the favours you have asked other people to do
 export async function getMySentRequests() {
   const { userId } = await auth();
   if (!userId) return [];
@@ -160,6 +169,7 @@ export async function getMySentRequests() {
   return data;
 }
 
+// This marks a job as finished once the help has been given
 export async function completeFavour(formData) {
   const supabase = getSupabase();
   const favourId =
@@ -167,7 +177,7 @@ export async function completeFavour(formData) {
 
   if (!favourId) return;
 
-  // 1. Update the status
+  // This changes the status to completed
   const { error: favourError } = await supabase
     .from("favours")
     .update({ status: "completed" })
@@ -178,15 +188,15 @@ export async function completeFavour(formData) {
     throw favourError;
   }
 
-  // 2. Clear the cache so Dashboard sees the new Halo
+  // This refreshes the pages so the new halo point shows up
   revalidatePath("/");
   revalidatePath("/inbox");
 
-  // 3. THE FIX: Only redirect if the update was successful.
-  // Next.js redirect() throws an error by design, so it must be the very last line.
+  // This takes you back to the main dashboard
   redirect("/");
 }
 
+// This lets you say no to a help request if you cannot do it
 export async function declineFavour(formData) {
   const supabase = getSupabase();
   const favourId =

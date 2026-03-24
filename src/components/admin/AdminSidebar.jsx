@@ -1,9 +1,12 @@
 import Link from "next/link";
 
+// This is the sidebar menu for the admin section
 export default function AdminSidebar() {
   return (
+    // This part makes a dark green box that stays on the left side of the screen
     <aside className="w-64 bg-[#061a06] text-white p-8 flex flex-col gap-8 shadow-xl min-h-screen sticky top-0">
       <div className="border-b border-white/10 pb-4">
+        {/* This is the big Kindred title at the top of the menu */}
         <h2 className="text-lime-400 font-black tracking-tighter text-xl italic underline decoration-lime-400/30">
           Kindred
         </h2>
@@ -12,6 +15,7 @@ export default function AdminSidebar() {
         </p>
       </div>
       <nav className="flex flex-col gap-6">
+        {/* This link takes the admin back to the main admin dashboard */}
         <Link
           href="/admin"
           className="text-[10px] font-black uppercase tracking-widest hover:text-lime-400 transition-all flex items-center gap-3 group"
@@ -20,6 +24,7 @@ export default function AdminSidebar() {
             Home
           </span>
         </Link>
+        {/* This link opens the list of all the community members */}
         <Link
           href="/admin/users"
           className="text-[10px] font-black uppercase tracking-widest hover:text-lime-400 transition-all flex items-center gap-3 group"
@@ -29,6 +34,7 @@ export default function AdminSidebar() {
           </span>
         </Link>
         <div className="mt-12 pt-6 border-t border-white/5">
+          {/* This button lets the admin leave the control center and go back to the normal website */}
           <Link
             href="/"
             className="text-[9px] font-black uppercase tracking-widest text-white/30 hover:text-white transition-all flex items-center gap-3"
