@@ -1,6 +1,7 @@
 import { auth } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 import { supabase } from "@/lib/db";
+import AdminSidebar from "@/components/admin/AdminSidebar";
 
 export default async function AdminLayout({ children }) {
   const { userId } = await auth();
@@ -17,5 +18,10 @@ export default async function AdminLayout({ children }) {
     redirect("/");
   }
 
-  return <div className="admin-layout">{children}</div>;
+  return (
+    <div className="flex min-h-screen">
+      <AdminSidebar />
+      <main className="flex-1 bg-gray-50 overflow-y-auto">{children}</main>
+    </div>
+  );
 }

@@ -4,7 +4,7 @@ import ContestRow from "@/components/admin/ContestRow";
 
 export default async function AdminDashboard() {
   const { data: users } = await supabase
-    .from("accounts")
+    .from("users")
     .select("*")
     .order("created_at", { ascending: false })
     .limit(5);
@@ -13,6 +13,33 @@ export default async function AdminDashboard() {
     .from("contests")
     .select("*")
     .order("id", { ascending: false });
+
+  const { count: totalUsers } = await supabase
+    .from("users")
+    .select("*", { count: "exact", head: true });
+  const { count: bannedUsers } = await supabase
+    .from("users")
+    .select("*", { count: "exact", head: true })
+    .eq("is_banned", true);
+  const { data: logs } = await supabase
+    .from("admin_logs")
+    .select("*")
+    .order("created_at", { ascending: false })
+    .limit(5);
+
+  const { data: atRiskUsers } = await supabase
+    .from("reports")
+    .select("target_user_id")
+    .eq("status", "pending");
+
+  const reportCounts = atRiskUsers?.reduce((acc, report) => {
+    acc[report.target_user_id] = (acc[report.target_user_id] || 0) + 1;
+    return acc;
+  }, {});
+
+  const flaggedIds = Object.keys(reportCounts || {}).filter(
+    (id) => reportCounts[id] >= 5,
+  );
 
   return (
     <div className="p-8 space-y-12 bg-gray-50 min-h-screen">
@@ -24,11 +51,87 @@ export default async function AdminDashboard() {
           Kindred Community Control
         </p>
       </header>
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-200">
+          <p className="text-[10px] font-black uppercase text-gray-400 tracking-widest">
+            Total Members
+          </p>
+          <h3 className="text-3xl font-black text-gray-900">
+            {totalUsers || 0}
+          </h3>
+        </div>
+        <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-200 border-l-4 border-l-gray-100">
+          <p className="text-[10px] font-black uppercase text-gray-400 tracking-widest">
+            Active Contests
+          </p>
+          <h3 className="text-3xl font-black text-gray-900">
+            {contests?.length || 0}
+          </h3>
+        </div>
+        <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-200 border-l-4 border-l-red-500">
+          <p className="text-[10px] font-black uppercase text-red-400 tracking-widest">
+            Banned Members
+          </p>
+          <h3 className="text-3xl font-black text-red-600">
+            {bannedUsers || 0}
+          </h3>
+        </div>
+      </div>
+      {flaggedIds.length > 0 && (
+        <div className="bg-red-50 border-l-4 border-red-500 p-6 rounded-r-2xl shadow-sm animate-pulse">
+          <div className="flex items-center gap-4">
+            <span className="text-3xl"></span>
+            <div>
+              <h3 className="text-red-800 font-black uppercase tracking-tight">
+                Urgent
+              </h3>
+              <p className="text-red-700 text-sm">
+                {flaggedIds.length}users that have 5 or more reports and need
+                reviewing
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
       <section className="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
-        <div className="p-6 border-b border-gray-100">
+        <div className="p-6 border-b border-gray-100 flex justify-between items-center">
           <h2 className="text-xl font-bold text-gray-800">Recent Members</h2>
         </div>
-        <ModerationTable users={users || []} />
+        <ModerationTable users={users || []} flaggedIds={flaggedIds} />
+      </section>
+      <section className="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
+        <div className="p-6 border-b border-gray-100">
+          <h2 className="text-xl font-bold text-gray-800">
+            Recent Admin Actions
+          </h2>
+        </div>
+        <div className="p-6">
+          {logs?.length > 0 ? (
+            <ul className="space-y-4">
+              {logs.map((log) => (
+                <li
+                  key={log.id}
+                  className="text-sm text-gray-600 border-b border-gray-50 pb-2 flex justify-between"
+                >
+                  <span>
+                    <strong className="text-gray-900">{log.action_type}</strong>{" "}
+                    on user{" "}
+                    <code className="bg-gray-100 px-1 rounded">
+                      {log.target_user_id.substring(0, 8)}...
+                    </code>
+                  </span>
+                  <span className="text-gray-400 text-xs">
+                    {new Date(log.created_at).toLocaleDateString()}
+                  </span>
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p className="text-gray-400 text-sm italic">
+              No recent actions recorded.
+            </p>
+          )}
+        </div>
       </section>
       <section className="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
         <div className="p-6 border-b border-gray-100">

@@ -34,14 +34,14 @@ export default function ModerationTable({ users }) {
               <td className="px-6 py-4 whitespace-nowrap">
                 <div className="flex flex-col">
                   <span className="text-sm font-bold text-gray-900">
-                    {user.username || "Anonymous"}
+                    {user.name || "Anonymous"}
                   </span>
                   <span className="text-xs text-gray-500">{user.email}</span>
                 </div>
               </td>
               <td className="px-6 py-4 whitespace-nowrap">
                 <code className="text-[10px] bg-gray-100 px-2 py-1 rounded text-gray-600 font-mono">
-                  {user.user_id}
+                  {user.clerk_id}
                 </code>
               </td>
               <td className="px-6 py-4 whitespace-nowrap">
@@ -56,7 +56,7 @@ export default function ModerationTable({ users }) {
                 )}
               </td>
               <td className="px-6 py-4 whitespace-nowrap text-right">
-                <BanButton userId={user.user_id} isBanned={user.is_banned} />
+                <BanButton userId={user.clerk_id} isBanned={user.is_banned} />
               </td>
             </tr>
           ))}
