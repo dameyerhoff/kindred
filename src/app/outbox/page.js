@@ -17,7 +17,7 @@ export default async function OutboxPage() {
   // Check to see who is currently logged in
   const { userId } = await auth();
 
-  // Get all the active help missions and message counts
+  // Go and get all the active help missions and message counts
   const openMissions = await getPublicNoticeBoard();
   const myRequests = userId ? (await getMyRequests()) || [] : [];
   const mySentRequests = userId ? (await getMySentRequests()) || [] : [];
