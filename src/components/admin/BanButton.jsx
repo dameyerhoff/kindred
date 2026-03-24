@@ -3,25 +3,31 @@
 import { useTransition } from "react";
 import { banUserAction } from "@/lib/actions";
 
+// This is the button admins use to stop or allow someone from using the site
 export default function BanButton({ userId, isBanned }) {
   const [isPending, startTransition] = useTransition();
 
+  // This part runs when the admin clicks the button
   const handleToggle = () => {
+    // This asks the admin if they are really sure before they click
     const message = isBanned
       ? "Unban this user?"
       : "Are you sure you want to ban this user?";
     if (!confirm(message)) return;
 
+    // This tells the database to change whether the person is banned or not
     startTransition(async () => {
       try {
         await banUserAction(userId, isBanned);
       } catch (err) {
+        // If the computer has a problem, this shows a message saying it failed
         alert("Action failed:" + err.message);
       }
     });
   };
 
   return (
+    // This draws the actual button and changes its color to red for ban or green for unban
     <button
       onClick={handleToggle}
       disabled={isPending}
@@ -31,6 +37,7 @@ export default function BanButton({ userId, isBanned }) {
           : "bg-red-100 text-red-700 hover:bg-red-200"
       } ${isPending ? "opacity-50 cursor-not-allowed" : ""}`}
     >
+      {/* This shows the text on the button and changes it to say processing while it works */}
       {isPending ? "Processing..." : isBanned ? "Unban" : "Ban User"}
     </button>
   );
