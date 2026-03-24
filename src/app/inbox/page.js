@@ -1,15 +1,106 @@
-import { getMyRequests, completeFavour, declineFavour } from "../actions";
+import {
+  getMyRequests,
+  completeFavour,
+  declineFavour,
+  getMySentRequests,
+} from "../actions";
+import { UserButton } from "@clerk/nextjs";
+import { auth } from "@clerk/nextjs/server";
 import Link from "next/link";
 
 // This page shows you a list of people who have asked you for a favour
 export default async function InboxPage() {
+  // Check who is logged in right now
+  const { userId } = await auth();
+
   // Go to the database and find all the requests sent to me
   const myRequests = (await getMyRequests()) || [];
+  // Also get sent requests for the header count
+  const mySentRequests = userId ? (await getMySentRequests()) || [] : [];
 
   return (
-    <main className="min-h-screen bg-[#061a06] p-8 text-white relative">
+    <main className="min-h-screen bg-[#061a06] p-4 md:p-8 text-white relative overflow-hidden isolate">
       {/* This adds the pretty green light in the background */}
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[1000px] h-[400px] bg-emerald-500/10 blur-[120px] pointer-events-none"></div>
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[1000px] h-[400px] bg-emerald-500/10 blur-[120px] pointer-events-none -z-10"></div>
+
+      {/* This is the top bar with the logo and all the navigation buttons */}
+      <header className="max-w-6xl mx-auto flex justify-between items-center mb-16 relative z-10 border-b border-white/10 pb-8">
+        <div>
+          <Link href="/">
+            <img
+              src="/kindred-logo.png"
+              alt="Kindred Logo"
+              className="h-20 w-auto object-contain drop-shadow-[0_0_15px_rgba(255,255,255,0.2)]"
+            />
+          </Link>
+        </div>
+
+        {/* These links let you click between the Map, Grid, and Notice Board */}
+        <div className="flex items-center gap-3">
+          <Link
+            href="/favour-map"
+            className="hidden md:flex bg-white/5 hover:bg-white/10 border border-white/10 px-4 py-2 rounded-full text-[9px] font-black uppercase tracking-widest transition-all items-center gap-2"
+          >
+            Favour Map 🗺️
+          </Link>
+          <Link
+            href="/community"
+            className="hidden md:flex bg-white/5 hover:bg-white/10 border border-white/10 px-4 py-2 rounded-full text-[9px] font-black uppercase tracking-widest transition-all items-center gap-2"
+          >
+            Community Grid 🌐
+          </Link>
+          <Link
+            href="/notice-board"
+            className="hidden md:flex bg-white/5 hover:bg-white/10 border border-white/10 px-4 py-2 rounded-full text-[9px] font-black uppercase tracking-widest transition-all items-center gap-2"
+          >
+            The Notice Board 📜
+          </Link>
+
+          {/* Added Inbox and Outbox specifically to the header for this tab */}
+          {userId && (
+            <>
+              <Link
+                href="/inbox"
+                className="flex items-center gap-2 bg-emerald-500/20 border border-emerald-500/30 px-3 py-2 rounded-xl hover:bg-emerald-500/40 transition-all shadow-[0_0_15px_rgba(16,185,129,0.4)]"
+              >
+                <span className="text-sm">📬</span>
+                <span className="text-[10px] font-black text-emerald-400 uppercase">
+                  {myRequests.length}
+                </span>
+              </Link>
+
+              <Link
+                href="/outbox"
+                className="flex items-center gap-2 bg-blue-500/20 border border-blue-500/30 px-3 py-2 rounded-xl hover:bg-blue-500/40 transition-all"
+              >
+                <span className="text-sm">📤</span>
+                <span className="text-[10px] font-black text-blue-400 uppercase">
+                  {mySentRequests.length}
+                </span>
+              </Link>
+            </>
+          )}
+
+          <Link
+            href="/"
+            className="bg-white/10 hover:bg-white/20 border border-white/10 px-4 py-2 rounded-full text-[9px] font-black uppercase tracking-widest transition-all items-center gap-2 ml-2"
+          >
+            Profile 👤
+          </Link>
+
+          <Link
+            href="/about-us"
+            className="hidden md:flex bg-white/5 hover:bg-white/10 border border-white/10 px-4 py-2 rounded-full text-[9px] font-black uppercase tracking-widest transition-all items-center gap-2"
+          >
+            About Us 💚
+          </Link>
+
+          {/* This is the button for your user account and signing out */}
+          <div className="scale-125 ml-2">
+            <UserButton afterSignOutUrl="/" />
+          </div>
+        </div>
+      </header>
 
       <div className="max-w-4xl mx-auto relative z-10">
         {/* This button takes you back to your main profile page */}
