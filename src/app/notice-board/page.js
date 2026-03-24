@@ -1,4 +1,8 @@
-import { getPublicNoticeBoard } from "../actions";
+import {
+  getPublicNoticeBoard,
+  getMyRequests,
+  getMySentRequests,
+} from "../actions";
 import { auth } from "@clerk/nextjs/server";
 import { UserButton } from "@clerk/nextjs";
 import Link from "next/link";
@@ -11,8 +15,11 @@ export const revalidate = 0;
 export default async function NoticeBoard() {
   // Check to see who is currently logged in
   const { userId } = await auth();
-  // Go and get all the active help missions from our database
+
+  // Go and get all the active help missions and message counts
   const openMissions = await getPublicNoticeBoard();
+  const myRequests = userId ? (await getMyRequests()) || [] : [];
+  const mySentRequests = userId ? (await getMySentRequests()) || [] : [];
 
   return (
     <main className="min-h-screen bg-[#061a06] p-4 md:p-8 text-white relative overflow-hidden isolate">
@@ -31,7 +38,6 @@ export default async function NoticeBoard() {
           </Link>
         </div>
         <div className="flex items-center gap-3">
-          {/* These links let you jump between the Map, the Community Grid, and the Board */}
           <Link
             href="/favour-map"
             className="hidden md:flex bg-white/5 hover:bg-white/10 border border-white/10 px-4 py-2 rounded-full text-[9px] font-black uppercase tracking-widest transition-all items-center gap-2"
@@ -51,6 +57,31 @@ export default async function NoticeBoard() {
             The Notice Board 📜
           </Link>
 
+          {/* Inbox and Outbox added specifically to the header for this tab */}
+          {userId && (
+            <>
+              <Link
+                href="/inbox"
+                className="flex items-center gap-2 bg-emerald-500/20 border border-emerald-500/30 px-3 py-2 rounded-xl hover:bg-emerald-500/40 transition-all"
+              >
+                <span className="text-sm">📬</span>
+                <span className="text-[10px] font-black text-emerald-400 uppercase">
+                  {myRequests.length}
+                </span>
+              </Link>
+
+              <Link
+                href="/outbox"
+                className="flex items-center gap-2 bg-blue-500/20 border border-blue-500/30 px-3 py-2 rounded-xl hover:bg-blue-500/40 transition-all"
+              >
+                <span className="text-sm">📤</span>
+                <span className="text-[10px] font-black text-blue-400 uppercase">
+                  {mySentRequests.length}
+                </span>
+              </Link>
+            </>
+          )}
+
           <Link
             href="/"
             className="bg-white/10 hover:bg-white/20 border border-white/10 px-4 py-2 rounded-full text-[9px] font-black uppercase tracking-widest transition-all items-center gap-2 ml-2"
@@ -65,17 +96,15 @@ export default async function NoticeBoard() {
             About Us 💚
           </Link>
 
-          {/* This is the button for your user account and signing out */}
           <div className="scale-125 ml-2">
             <UserButton afterSignOutUrl="/" />
           </div>
         </div>
       </header>
 
-      {/* This section holds the main title and the grid where missions are displayed */}
+      {/* Main Content Sections Below... */}
       <section className="max-w-6xl mx-auto relative z-10">
         <header className="mb-12">
-          {/* This button takes you back to your own profile page */}
           <Link
             href="/"
             className="text-lime-400 text-xs font-black uppercase tracking-[0.3em] hover:text-white transition-colors flex items-center gap-2 mb-8"
@@ -90,7 +119,6 @@ export default async function NoticeBoard() {
           </p>
         </header>
 
-        {/* This puts the actual list of help missions onto the page */}
         <NoticeBoardGrid openMissions={openMissions} userId={userId} />
       </section>
     </main>
