@@ -22,11 +22,11 @@ export default function AboutUsAnimation() {
       <div className="relative flex flex-col items-center justify-center">
         <Link
           href="/"
-          className="text-lime-400 text-xs font-black uppercase tracking-[0.3em] hover:text-white transition-colors flex items-center gap-2 mb-8"
+          className="fixed top-6 left-6 z-50 text-lime-400 text-xs font-black uppercase tracking-[0.3em] hover:text-black transition-colors flex items-center gap-2 mb-8"
         >
           ← Back to your Profile
         </Link>
-        <div className="relative w-[300px] h-[300px] flex items-center justify-center">
+        <div className="relative w-75 h-75 flex items-center justify-center">
           {/* Right Hand */}
           <motion.div
             className="absolute z-10"
@@ -49,7 +49,7 @@ export default function AboutUsAnimation() {
               viewBox="0 0 165 166"
               fill="none"
               xmlns="http://www.w3.org/2000/svg"
-              className="w-[200px] h-[200px] "
+              className="w-50 h-50"
             >
               <path
                 d="M69.5 164.5L150.5 80.5L153.5 77L156.5 73.5L158.5 70L160.5 66L162 61.5L163.5 57.5L164 54.5L164.5 49.5V45.5V40.5L163.5 36L162.5 32.5L161 28L159.5 25.5L157.5 22.5L156 19.5L154 17L151 14L148 11L145.5 9L143.5 7.5L141 6L137.5 5L133.5 3L128.5 1.5L123.5 0.5H119.5H114.5L112 1H107L98.5 1.5L85.5 2L74 2.5L66 3L34 8L30.5 10.5L27.5 13.5L26 18L26.5 23L28.5 25.5L31.5 28L37 29L66 24L73 23V27.5L3.5 93L1.5 95L1 97.5L0.5 100.5V103L1 105L3 107.5L5 109L9 111L15 110.5L17 109.5L67 60H68.5L69 60.5L69.5 61.5V62.5L49.5 83L20.5 112L18.5 115V118.5L19 121.5L20 124L22 126L23.5 127L25.5 128L28 128.5L31 129L33.5 128L35 127.5L63 100L85 78.5L86 78L87 78.5L87.5 79L88 80V80.5L67.5 101L38 130.5L36.5 133V136V138.5L37 141L38.5 143.5L41 145.5L44.5 147H47H49.5L53.5 145L82.5 116.5L92 107L102 97.5L103 97L104 97.5L104.5 98.5V99.5L84.5 120L56.5 147.5L55 150L54.5 152.5V156L55 157.5L56 161L60.5 164L63 164.5L66.5 165L69.5 164.5Z"
@@ -81,7 +81,7 @@ export default function AboutUsAnimation() {
               viewBox="0 0 166 164"
               fill="none"
               xmlns="http://www.w3.org/2000/svg"
-              className="w-[200px] h-[200px]"
+              className="w-50 h-50"
             >
               <path
                 d="M38 103L95.5 162.5L99 163H102.5L105 162L107.5 160.5L109.5 159L110.5 156L111 154V151V148.5L109 145.5L79.5 117.5L61 98L60.5 96.5L62.5 95.5L64 96L82.5 115L106 137.5L112 143.5L116 145.5H121L124 144L127 142L128.5 139.5L129 136V131L127.5 128.5L117 117.5L115 115L110 110L101.5 101.5L81.5 81.5L79 79L78.5 77.5L79 76.5L80 75.5H81.5L83.5 78L90.5 84.5L99 93L110.5 105L118 112.5L120.5 116L124.5 120L130 125.5L135.5 127L140 126L143 125L145.5 122.5L146.5 119.5L147.5 116.5L146.5 112.5L145 110.5L132 97.5L115 80.5L97.5 63L95.5 61V59.5L96.5 58.5L97.5 58L99 58.5L105 64.5L122 81.5L136.5 96L147.5 107L150.5 109H156L160 107L162 105.5L164 103.5L165 100.5V98L164 93.5L160 89L155 84.5L151 81L127.5 58.5L102.5 34L92 25.5V21L128 27L134 26L139 21V15.5L138 12L134.5 8L131 6L120.5 4L99.5 1L90.5 0.5H70.5H58H48.5H41L36.5 1.5L29 4L23.5 6.5L19 9.5L14.5 13.5L11.5 16.5L7.5 22L5 27L3.5 31C3.33333 31.3333 2.9 32.1 2.5 32.5C2.1 32.9 2.33333 33.3333 2.5 33.5L2 35L1.5 36.5L1 39.5L0.5 44V47L1 52L1.5 55.5L3 60L4.5 64.5L6.5 68.5L8.5 71.5L11 75.5L15.5 79.5L38 103Z"
@@ -111,7 +111,7 @@ export default function AboutUsAnimation() {
               viewBox="0 0 172 154"
               fill="none"
               xmlns="http://www.w3.org/2000/svg"
-              className="w-[220px] h-[220px] drop-shadow-2xl"
+              className="w-55 h-55 drop-shadow-2xl"
               animate={{
                 scale: showHeart ? [1, 1.15, 1.05, 1.15, 1.05, 1] : 1,
               }}
