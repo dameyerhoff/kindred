@@ -47,7 +47,7 @@ export default function Navbar({ inboxCount = 0, outboxCount = 0, userId }) {
   const linkStyles =
     "px-3 py-2 rounded-full text-[9px] font-black uppercase tracking-widest transition-all items-center gap-1.5 flex whitespace-nowrap flex-nowrap shrink-0";
   const inactiveStyles =
-    "bg-black/5 dark:bg-white/5 hover:bg-black/10 dark:hover:bg-white/10 border border-black/10 dark:border-white/10 text-kindred-text dark:text-white/80";
+    "bg-black/5 dark:bg-white/5 hover:bg-kindred-dark/10 dark:hover:bg-white/10 border border-kindred-dark/10 dark:border-white/10 text-kindred-dark dark:text-white/80 hover:text-kindred-dark dark:hover:text-white";
   const activeStyles =
     "bg-kindred-lime text-kindred-dark border border-kindred-lime shadow-kindred";
 

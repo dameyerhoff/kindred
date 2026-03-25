@@ -1,10 +1,14 @@
 import * as Accordion from "@radix-ui/react-accordion";
 import Link from "next/link";
+import { useTheme } from "@/components/ThemeProvider";
 
 export default function DiaryAccordion({
   myRequests = [],
   mySentRequests = [],
 }) {
+  const { isDark } = useTheme();
+  const textColor = isDark ? "text-white" : "text-kindred-dark";
+
   const diaryItems = [
     ...myRequests.map((r) => ({ ...r, type: "inbox" })),
     ...mySentRequests.map((r) => ({ ...r, type: "outbox" })),
@@ -16,10 +20,12 @@ export default function DiaryAccordion({
         <Accordion.Item
           key={item.id}
           value={item.id}
-          className={`bg-white/5 border rounded-2xl overflow-hidden transition-all ${item.type === "inbox" ? "border-kindred-lime/20" : "border-kindred-blue-glow/20"}`}
+          className={`bg-white/5 border rounded-2xl overflow-hidden transition-all ${isDark ? (item.type === "inbox" ? "border-kindred-lime/20" : "border-kindred-blue-glow/20") : item.type === "inbox" ? "border-kindred-lime/60" : "border-kindred-blue-glow/60"}`}
         >
           <Accordion.Header>
-            <Accordion.Trigger className="w-full flex items-center justify-between p-6 hover:bg-white/5 transition-all text-left group">
+            <Accordion.Trigger
+              className={`w-full flex items-center justify-between p-6 transition-all text-left group ${isDark ? "hover:bg-white/5" : "hover:bg-kindred-dark/5"}`}
+            >
               <div className="flex items-center gap-4">
                 <span
                   className={`text-xl ${item.type === "inbox" ? "text-kindred-lime" : "text-kindred-blue-glow"}`}
@@ -31,7 +37,9 @@ export default function DiaryAccordion({
                   <p className="text-[10px] font-black uppercase tracking-widest opacity-40 mb-1">
                     {new Date(item.created_at).toLocaleDateString()}
                   </p>
-                  <h3 className="font-bold text-white group-hover:text-white/100 transition-colors">
+                  <h3
+                    className={`font-bold transition-colors ${textColor} ${isDark ? "group-hover:text-white" : "group-hover:text-black"}`}
+                  >
                     {item.category || "General Favour"}
                   </h3>
                 </div>
@@ -43,13 +51,19 @@ export default function DiaryAccordion({
               </div>
             </Accordion.Trigger>
           </Accordion.Header>
-          <Accordion.Content className="px-6 pb-6 text-white/70 italic bg-black/10 animate-slide-down overflow-hidden">
-            <div className="pt-4 border-t border-white/5">
+          <Accordion.Content
+            className={`px-6 pb-6 italic animate-slide-down overflow-hidden ${isDark ? "bg-black/10 text-white/70" : "bg-kindred-dark/5 text-kindred-dark/80"}`}
+          >
+            <div
+              className={`pt-4 border-t ${isDark ? "border-white/5" : "border-kindred-dark/10"}`}
+            >
               <p className="mb-4 leading-relaxed">
                 &ldquo;{item.favour_text}&rdquo;
               </p>
               <div className="flex justify-between items-center">
-                <span className="text-[9px] font-bold text-white/30 uppercase">
+                <span
+                  className={`text-[9px] font-bold uppercase ${isDark ? "text-white/30" : "text-kindred-dark/40"}`}
+                >
                   Location: {item.location_tag || "Community Hub"}
                 </span>
                 <Link
