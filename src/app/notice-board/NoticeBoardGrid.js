@@ -37,7 +37,7 @@ export default function NoticeBoardGrid({ openMissions = [], userId }) {
           placeholder="Filter missions by skill, city, or description..."
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
-          className="w-full bg-white/5 border border-white/10 rounded-2xl py-4 pl-12 pr-6 text-sm text-white focus:outline-none focus:border-lime-400/50 transition-all placeholder:text-white/20"
+          className="w-full bg-white/5 border border-white/10 rounded-2xl py-4 pl-12 pr-6 text-sm text-white focus:outline-none focus:border-kindred-lime/50 transition-all placeholder:text-white/20"
         />
       </div>
 
@@ -54,11 +54,11 @@ export default function NoticeBoardGrid({ openMissions = [], userId }) {
           {filteredMissions.map((mission) => (
             <div
               key={mission.id}
-              className="bg-white/5 p-6 rounded-3xl border border-white/10 hover:border-lime-400/50 hover:bg-white/10 transition-all group flex flex-col h-full shadow-2xl overflow-hidden relative"
+              className="bg-white/5 p-6 rounded-3xl border border-white/10 hover:border-kindred-lime/50 hover:bg-white/10 transition-all group flex flex-col h-full hover:shadow-kindred overflow-hidden relative"
             >
               {/* This shows what kind of help is needed and when it was posted */}
               <div className="flex justify-between items-start mb-6">
-                <span className="bg-lime-400/10 border border-lime-400/30 text-lime-400 text-[9px] font-black px-3 py-1 rounded-full uppercase tracking-widest">
+                <span className="bg-kindred-lime/10 border border-kindred-lime/30 text-kindred-lime text-[9px] font-black px-3 py-1 rounded-full uppercase tracking-widest">
                   {mission.category || "General Favour"}
                 </span>
                 <span className="text-[9px] font-black text-white/30 uppercase tracking-tighter">
@@ -99,7 +99,7 @@ export default function NoticeBoardGrid({ openMissions = [], userId }) {
                     <input type="hidden" name="favourId" value={mission.id} />
                     <button
                       type="submit"
-                      className="bg-white text-green-950 px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-lime-400 transition-all shadow-xl"
+                      className="bg-white text-kindred-dark px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-kindred-lime hover:text-kindred-dark transition-all shadow-xl hover:shadow-kindred"
                     >
                       Claim 🤝
                     </button>

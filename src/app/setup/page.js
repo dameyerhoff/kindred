@@ -1,5 +1,10 @@
 "use client";
-import { saveProfile, getProfiles } from "../actions";
+import {
+  saveProfile,
+  getProfiles,
+  getMyRequests,
+  getMySentRequests,
+} from "../actions";
 import { useAuth, SignInButton } from "@clerk/nextjs";
 import { useState, useEffect } from "react";
 import Link from "next/link";
@@ -129,14 +134,14 @@ export default function SetupPage() {
   }
 
   return (
-    <main className="min-h-screen bg-[#061a06] p-4 md:p-8 text-white relative overflow-hidden flex items-center justify-center">
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[1000px] h-[400px] bg-green-500/10 blur-[120px] pointer-events-none"></div>
+    <main className="min-h-screen bg-kindred-dark p-4 md:p-8 text-white relative overflow-hidden flex items-center justify-center">
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[1000px] h-[400px] bg-kindred-lime/10 blur-[120px] pointer-events-none"></div>
 
       <div className="w-full max-w-xl relative z-10">
         {/* This button takes you back to your main screen */}
         <Link
           href="/"
-          className="inline-block text-[10px] font-black uppercase tracking-[0.3em] text-lime-400 hover:text-white transition-all mb-8 border border-lime-400/20 px-4 py-2 rounded-full hover:bg-lime-400/10"
+          className="inline-block text-[10px] font-black uppercase tracking-[0.3em] text-kindred-lime hover:text-white transition-all mb-8 border border-kindred-lime/20 px-4 py-2 rounded-full hover:bg-kindred-dark/10"
         >
           ← Back to Dashboard
         </Link>
@@ -146,7 +151,7 @@ export default function SetupPage() {
           <h2 className="text-4xl font-black mb-2 tracking-tighter uppercase text-white">
             {myProfile ? "Manage Profile" : "Create Profile"}
           </h2>
-          <p className="text-lime-400/60 text-xs font-bold uppercase tracking-[0.2em] mb-10">
+          <p className="text-kindred-lime/60 text-xs font-bold uppercase tracking-[0.2em] mb-10">
             {myProfile
               ? "Update your kindred spirit details"
               : "Join the kindred guardian network"}
@@ -167,7 +172,7 @@ export default function SetupPage() {
               <input
                 name="full_name"
                 defaultValue={myProfile?.full_name || ""}
-                className="w-full p-4 rounded-2xl bg-black/40 border border-white/10 focus:border-lime-400/50 outline-none text-white font-bold"
+                className="w-full p-4 rounded-2xl bg-black/40 border border-white/10 focus:border-kindred-lime/50 outline-none text-white font-bold transition-colors"
                 required
               />
             </div>
@@ -180,7 +185,7 @@ export default function SetupPage() {
                 <input
                   name="city"
                   defaultValue={myProfile?.city || ""}
-                  className="w-full p-4 rounded-2xl bg-black/40 border border-white/10 focus:border-lime-400/50 outline-none text-white font-bold"
+                  className="w-full p-4 rounded-2xl bg-black/40 border border-white/10 focus:border-kindred-lime/50 outline-none text-white font-bold transition-colors"
                   required
                 />
               </div>
@@ -191,7 +196,7 @@ export default function SetupPage() {
                 <input
                   name="postcode"
                   defaultValue={myProfile?.postcode || ""}
-                  className="w-full p-4 rounded-2xl bg-black/40 border border-white/10 focus:border-lime-400/50 outline-none text-white font-bold"
+                  className="w-full p-4 rounded-2xl bg-black/40 border border-white/10 focus:border-kindred-lime/50 outline-none text-white font-bold transition-colors"
                   required
                 />
               </div>
@@ -211,7 +216,7 @@ export default function SetupPage() {
                       key={`${tag.slug}-${index}`}
                       type="button"
                       onClick={() => removeTag(tag.slug)}
-                      className="bg-lime-400 text-green-950 text-[10px] font-black px-3 py-1.5 rounded-full hover:bg-red-500 hover:text-white transition-all uppercase flex items-center gap-2 group"
+                      className="bg-kindred-lime text-kindred-dark text-[10px] font-black px-3 py-1.5 rounded-full hover:bg-red-500 hover:text-white transition-all uppercase flex items-center gap-2 group"
                     >
                       {tag.label}{" "}
                       <span className="opacity-50 group-hover:opacity-100">
@@ -226,12 +231,12 @@ export default function SetupPage() {
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 placeholder="Search (e.g. Gardening, Baking...)"
-                className="w-full p-4 rounded-2xl bg-black/40 border border-white/10 focus:border-lime-400/50 outline-none text-white font-bold transition-all"
+                className="w-full p-4 rounded-2xl bg-black/40 border border-white/10 focus:border-kindred-lime/50 outline-none text-white font-bold transition-all"
               />
 
               {/* This shows the list of skills that match what you typed */}
               {search && (
-                <div className="absolute z-20 w-full mt-2 bg-[#0a240a] border border-white/10 rounded-2xl overflow-hidden shadow-2xl max-h-48 overflow-y-auto">
+                <div className="absolute z-20 w-full mt-2 bg-kindred-dark border border-white/10 rounded-2xl overflow-hidden shadow-2xl max-h-48 overflow-y-auto">
                   {KINDRED_BANK.filter(
                     (item) =>
                       item.label.toLowerCase().includes(search.toLowerCase()) &&
@@ -241,7 +246,7 @@ export default function SetupPage() {
                       key={item.slug}
                       type="button"
                       onClick={() => addTag(item)}
-                      className="w-full text-left p-4 hover:bg-lime-400 hover:text-green-950 font-bold text-sm transition-colors border-b border-white/5 last:border-0"
+                      className="w-full text-left p-4 hover:bg-kindred-lime hover:text-kindred-dark font-bold text-sm transition-colors border-b border-white/5 last:border-0"
                     >
                       + {item.label}
                     </button>
@@ -254,7 +259,7 @@ export default function SetupPage() {
                       <button
                         type="button"
                         onClick={() => createCustomTag(search)}
-                        className="w-full text-left p-4 bg-white/5 hover:bg-lime-400 hover:text-green-950 font-bold text-xs italic transition-colors"
+                        className="w-full text-left p-4 bg-white/5 hover:bg-kindred-lime hover:text-kindred-dark font-bold text-xs italic transition-colors"
                       >
                         Add custom: "{search}"
                       </button>
@@ -266,7 +271,7 @@ export default function SetupPage() {
             {/* This is the big button to save your profile */}
             <button
               type="submit"
-              className="w-full mt-6 bg-white text-green-900 hover:bg-lime-400 font-black py-5 rounded-[2rem] shadow-2xl transition-all active:scale-95 uppercase tracking-widest text-sm"
+              className="w-full mt-6 bg-white text-kindred-dark hover:bg-kindred-lime font-black py-5 rounded-[2rem] shadow-2xl transition-all active:scale-95 uppercase tracking-widest text-sm"
             >
               {myProfile
                 ? "Update Guardian Details 😇"

@@ -23,4 +23,9 @@
 
   --color-kindred-dark: #061a06;
   --color-kindred-lime: #a3e635;
+  --box-shadow-kindred: 0 0 15px rgba(163, 230, 53, 0.4);
+  --drop-shadow-kindred: 0 0 15px rgba(163, 230, 53, 0.4);
+  --color-kindred-dark-blue: #040c1a;
+  --color-kindred-blue-glow: #3b82f6;
+  --box-shadow-kindred-blue: 0 0 15px rgba(59, 130, 246, 0.4);
 }

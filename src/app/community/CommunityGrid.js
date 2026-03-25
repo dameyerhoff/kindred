@@ -44,7 +44,7 @@ export default function CommunityGrid({
           placeholder="Search by name, city, or skill..."
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
-          className="w-full bg-white/5 border border-white/10 rounded-2xl py-4 pl-12 pr-6 text-sm text-white focus:outline-none focus:border-lime-400/50 transition-all placeholder:text-white/20"
+          className="w-full bg-white/5 border border-white/10 rounded-2xl py-4 pl-12 pr-6 text-sm text-white focus:outline-none focus:border-kindred-lime/50 transition-all placeholder:text-white/20"
         />
       </div>
 
@@ -53,13 +53,13 @@ export default function CommunityGrid({
         {filteredProfiles.map((profile) => (
           <div
             key={profile.clerk_id}
-            className="bg-white/5 p-6 rounded-3xl border border-white/10 hover:border-lime-400/50 hover:bg-white/10 transition-all group shadow-2xl relative overflow-hidden flex flex-col"
+            className="bg-white/5 p-6 rounded-3xl border border-white/10 hover:border-kindred-lime/50 hover:bg-white/10 transition-all group hover:shadow-kindred relative overflow-hidden flex flex-col"
           >
-            <div className="absolute top-0 right-0 w-32 h-32 bg-lime-400/5 blur-3xl rounded-full opacity-0 group-hover:opacity-100 transition-opacity"></div>
+            <div className="absolute top-0 right-0 w-32 h-32 bg-kindred-lime/5 blur-3xl rounded-full opacity-0 group-hover:opacity-100 transition-opacity"></div>
             <div className="flex justify-between items-start mb-4 relative z-10">
               <div className="flex-1">
                 {/* Shows the person name */}
-                <h3 className="text-xl font-black text-white group-hover:text-lime-400 transition-colors">
+                <h3 className="text-xl font-black text-white group-hover:text-kindred-lime transition-colors">
                   {profile.full_name}
                 </h3>
                 <div className="flex items-center gap-2 mt-1">
@@ -78,7 +78,7 @@ export default function CommunityGrid({
               {/* Shows how many halo points they have earned */}
               <div className="flex items-center bg-white/10 px-3 py-1.5 rounded-full border border-white/10 self-start">
                 <span className="text-sm">😇</span>
-                <span className="text-xs font-black text-lime-400 ml-2">
+                <span className="text-xs font-black text-kindred-lime ml-2">
                   {profile.halos || 0}
                 </span>
               </div>
@@ -118,7 +118,7 @@ export default function CommunityGrid({
                     name="favourCategory"
                     required
                     defaultValue=""
-                    className="w-full bg-black/40 border border-white/10 rounded-xl p-3 text-[10px] font-bold text-white focus:outline-none focus:border-lime-400/50 transition-all cursor-pointer appearance-none"
+                    className="w-full bg-black/40 border border-white/10 rounded-xl p-3 text-[10px] font-bold text-white focus:outline-none focus:border-kindred-lime/50 transition-all cursor-pointer appearance-none"
                   >
                     {profile.tags && profile.tags.length > 0 ? (
                       <>
@@ -129,7 +129,7 @@ export default function CommunityGrid({
                           <option
                             key={idx}
                             value={tag.label}
-                            className="bg-[#061a06]"
+                            className="bg-kindred-dark"
                           >
                             {tag.label}
                           </option>
@@ -147,12 +147,12 @@ export default function CommunityGrid({
                   name="favourText"
                   placeholder="What favour do you need?..."
                   required
-                  className="w-full bg-black/40 border border-white/10 rounded-xl p-3 text-xs text-white placeholder:text-white/20 focus:outline-none focus:border-lime-400/50 transition-all resize-none h-20 mb-3"
+                  className="w-full bg-black/40 border border-white/10 rounded-xl p-3 text-xs text-white placeholder:text-white/20 focus:outline-none focus:border-kindred-lime/50 transition-all resize-none h-20 mb-3"
                 />
                 {/* The button to send the favour request */}
                 <button
                   type="submit"
-                  className="w-full bg-white/10 hover:bg-lime-400 text-white hover:text-green-950 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all border border-white/10 hover:border-lime-400"
+                  className="w-full bg-white/10 hover:bg-kindred-lime text-white hover:text-kindred-dark py-3 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all border border-white/10 hover:border-kindred-lime hover:shadow-kindred"
                 >
                   Send Favour Request 😇
                 </button>

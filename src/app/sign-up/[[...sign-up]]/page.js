@@ -4,7 +4,7 @@ import { SignUp } from "@clerk/nextjs";
 export default function SignUpPage() {
   return (
     /* This part makes the background dark green and puts the join box in the middle */
-    <div className="flex items-center justify-center min-h-screen bg-[#061a06] p-4">
+    <div className="flex items-center justify-center min-h-screen bg-kindred-dark p-4">
       <SignUp
         path="/sign-up"
         routing="path"

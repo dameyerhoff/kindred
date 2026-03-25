@@ -7,6 +7,7 @@ import { auth } from "@clerk/nextjs/server";
 import { UserButton } from "@clerk/nextjs";
 import Link from "next/link";
 import FavourMapClient from "./FavourMapClient";
+import NavBar from "@/components/NavBar";
 
 export const dynamic = "force-dynamic";
 
@@ -20,11 +21,16 @@ export default async function FavourMapPage() {
   const mySentRequests = userId ? (await getMySentRequests()) || [] : [];
 
   return (
-    <main className="min-h-screen bg-[#061a06] p-4 md:p-8 text-white relative overflow-hidden isolate">
+    <main className="min-h-screen bg-kindred-dark p-4 md:p-8 text-white relative overflow-hidden isolate">
       {/* This adds a soft green light to the background */}
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[1000px] h-[400px] bg-green-500/10 blur-[120px] pointer-events-none -z-10"></div>
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[1000px] h-[400px] bg-kindred-lime/10 blur-[120px] pointer-events-none -z-10"></div>
 
       {/* This is the top section with the logo and all the navigation links */}
+      <NavBar
+        userId={userId}
+        inboxCount={myRequests.length}
+        outboxCount={mySentRequests.length}
+      />
       <header className="max-w-6xl mx-auto flex justify-between items-center mb-16 relative z-10 border-b border-white/10 pb-8">
         <div>
           <Link href="/">
@@ -107,14 +113,14 @@ export default async function FavourMapPage() {
         <header className="mb-12">
           <Link
             href="/"
-            className="text-lime-400 text-xs font-black uppercase tracking-[0.3em] hover:text-white transition-colors flex items-center gap-2 mb-8"
+            className="text-kindred-lime text-xs font-black uppercase tracking-[0.3em] hover:text-white transition-colors flex items-center gap-2 mb-8"
           >
             ← Back to your Profile
           </Link>
           <h1 className="text-5xl font-black tracking-tighter mb-2 text-white">
             Favour Map
           </h1>
-          <p className="text-lime-400/60 text-sm font-bold uppercase tracking-widest">
+          <p className="text-kindred-lime/60 text-sm font-bold uppercase tracking-widest">
             Visualise Kindred Deeds across the UK
           </p>
         </header>
