@@ -11,6 +11,7 @@ export default function Navbar({ inboxCount = 0, outboxCount = 0, userId }) {
     { href: "/favour-map", label: "Favour Map 🗺️" },
     { href: "/community", label: "Community Grid 🌐" },
     { href: "/notice-board", label: "Notice Board 📜" },
+    { href: "/diary", label: "My Diary 🗓️" },
     { href: "/about-us", label: "About Us 💚" },
   ];
 
