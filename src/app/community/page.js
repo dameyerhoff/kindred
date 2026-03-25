@@ -17,8 +17,11 @@ export const revalidate = 0;
 export default async function CommunityGridPage() {
   // Check who is logged in right now
   const { userId } = await auth();
-  // Get all the member profiles from the database
+
+  // Get all the member profiles and request counts from the database
   const profiles = (await getProfiles()) || [];
+  const myRequests = userId ? (await getMyRequests()) || [] : [];
+  const mySentRequests = userId ? (await getMySentRequests()) || [] : [];
 
   const myRequests = userId ? (await getMyRequests()) || [] : [];
   const mySentRequests = userId ? (await getMySentRequests()) || [] : [];

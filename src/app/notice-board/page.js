@@ -16,7 +16,8 @@ export const revalidate = 0;
 export default async function NoticeBoard() {
   // Check to see who is currently logged in
   const { userId } = await auth();
-  // Go and get all the active help missions from our database
+
+  // Go and get all the active help missions and message counts
   const openMissions = await getPublicNoticeBoard();
   const myRequests = userId ? (await getMyRequests()) || [] : [];
   const mySentRequests = userId ? (await getMySentRequests()) || [] : [];
@@ -33,10 +34,9 @@ export default async function NoticeBoard() {
         outboxCount={mySentRequests.length}
       />
 
-      {/* This section holds the main title and the grid where missions are displayed */}
+      {/* Main Content Sections Below... */}
       <section className="max-w-6xl mx-auto relative z-10">
         <header className="mb-12">
-          {/* This button takes you back to your own profile page */}
           <Link
             href="/"
             className="text-kindred-lime text-xs font-black uppercase tracking-[0.3em] hover:text-white transition-colors flex items-center gap-2 mb-8"
@@ -51,7 +51,6 @@ export default async function NoticeBoard() {
           </p>
         </header>
 
-        {/* This puts the actual list of help missions onto the page */}
         <NoticeBoardGrid openMissions={openMissions} userId={userId} />
       </section>
     </main>

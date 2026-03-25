@@ -29,6 +29,8 @@ export default function RootLayout({ children }) {
         <body
           className={`${geistSans.variable} ${geistMono.variable} antialiased`}
         >
+          {/* The global header was removed from here to prevent the "double header" effect */}
+
           {/* This is where the content for each different page is placed */}
           {children}
         </body>

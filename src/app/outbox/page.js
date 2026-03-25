@@ -6,7 +6,10 @@ import NavBar from "@/components/NavBar";
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
-// This page shows a list of all the help requests you have sent to other people
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
+// This builds the main page for the Outbox
 export default async function OutboxPage() {
   const { userId } = await auth();
   // Go to the database and find all the requests I have sent out
@@ -31,9 +34,17 @@ export default async function OutboxPage() {
           &larr; Back to Dashboard
         </Link>
 
-        <h1 className="text-5xl font-black tracking-tighter mb-12 italic">
-          Sent Requests 📤
-        </h1>
+          {userId && (
+            <>
+              <Link
+                href="/inbox"
+                className="flex items-center gap-2 bg-emerald-500/20 border border-emerald-500/30 px-3 py-2 rounded-xl hover:bg-emerald-500/40 transition-all"
+              >
+                <span className="text-sm">📬</span>
+                <span className="text-[10px] font-black text-emerald-400 uppercase">
+                  {myRequests.length}
+                </span>
+              </Link>
 
         {/* If there are requests you sent, show them in a list */}
         {mySentRequests.length > 0 ? (
@@ -68,8 +79,27 @@ export default async function OutboxPage() {
               Outbox Empty
             </p>
           </div>
-        )}
-      </div>
+        </div>
+      </header>
+
+      <section className="max-w-6xl mx-auto relative z-10">
+        <header className="mb-12">
+          <Link
+            href="/"
+            className="text-lime-400 text-xs font-black uppercase tracking-[0.3em] hover:text-white transition-colors flex items-center gap-2 mb-8"
+          >
+            ← Back to your Profile
+          </Link>
+          <h1 className="text-5xl font-black tracking-tighter mb-2 text-white">
+            Sent Requests
+          </h1>
+          <p className="text-blue-400/60 text-sm font-bold uppercase tracking-widest">
+            Track the help you have offered to the community
+          </p>
+        </header>
+
+        <NoticeBoardGrid openMissions={openMissions} userId={userId} />
+      </section>
     </main>
   );
 }
