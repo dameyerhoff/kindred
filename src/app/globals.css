@@ -21,11 +21,35 @@
   --animate-slide-down: slideDown 300ms cubic-bezier(0.87, 0, 0.13, 1);
   --animate-slide-up: slideUp 300ms cubic-bezier(0.87, 0, 0.13, 1);
 
-  --color-kindred-dark: #061a06;
+  --color-kindred-dark: var(--kindred-bg);
+  --color-kindred-text: var(--kindred-text);
   --color-kindred-lime: #a3e635;
   --box-shadow-kindred: 0 0 15px rgba(163, 230, 53, 0.4);
   --drop-shadow-kindred: 0 0 15px rgba(163, 230, 53, 0.4);
   --color-kindred-dark-blue: #040c1a;
   --color-kindred-blue-glow: #3b82f6;
   --box-shadow-kindred-blue: 0 0 15px rgba(59, 130, 246, 0.4);
+}
+
+:root {
+  --kindred-bg: #fafad6; /* Matches About Us background */
+  --kindred-text: #064e3b; /* Deep green text for light mode */
+  --kindred-card-bg: rgba(6, 78, 59, 0.05);
+  --kindred-card-border: rgba(6, 78, 59, 0.1);
+}
+
+.dark {
+  --kindred-bg: #061a06;
+  --kindred-text: #ffffff;
+  --kindred-card-bg: rgba(255, 255, 255, 0.05);
+  --kindred-card-border: rgba(255, 255, 255, 0.1);
+}
+
+/* Ensure the body uses these variables */
+body {
+  background-color: var(--kindred-bg);
+  color: var(--kindred-text);
+  transition:
+    background-color 0.3s ease,
+    color 0.3s ease;
 }

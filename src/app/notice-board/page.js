@@ -4,7 +4,6 @@ import {
   getMySentRequests,
 } from "../actions";
 import { auth } from "@clerk/nextjs/server";
-import { UserButton } from "@clerk/nextjs";
 import Link from "next/link";
 import NoticeBoardGrid from "./NoticeBoardGrid";
 import NavBar from "@/components/NavBar";
@@ -12,43 +11,58 @@ import NavBar from "@/components/NavBar";
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
-// This builds the main page for the Notice Board where all help requests live
 export default async function NoticeBoard() {
-  // Check to see who is currently logged in
   const { userId } = await auth();
 
-  // Go and get all the active help missions and message counts
   const openMissions = await getPublicNoticeBoard();
   const myRequests = userId ? (await getMyRequests()) || [] : [];
   const mySentRequests = userId ? (await getMySentRequests()) || [] : [];
 
   return (
-    <main className="min-h-screen bg-kindred-dark p-4 md:p-8 text-white relative overflow-hidden isolate">
-      {/* This adds a pretty green glow at the top of the screen */}
+    <main className="min-h-screen bg-kindred-bg p-4 md:p-8 text-kindred-text relative overflow-hidden isolate transition-colors duration-300">
       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[1000px] h-[400px] bg-kindred-lime/10 blur-[120px] pointer-events-none -z-10"></div>
 
-      {/* This is the top bar with the logo and all our navigation buttons */}
       <NavBar
         userId={userId}
         inboxCount={myRequests.length}
         outboxCount={mySentRequests.length}
       />
 
-      {/* Main Content Sections Below... */}
       <section className="max-w-6xl mx-auto relative z-10">
         <header className="mb-12">
           <Link
             href="/"
-            className="text-kindred-lime text-xs font-black uppercase tracking-[0.3em] hover:text-white transition-colors flex items-center gap-2 mb-8"
+            className="text-kindred-lime text-xs font-black uppercase tracking-[0.3em] hover:opacity-70 transition-all flex items-center gap-2 mb-8"
           >
             ← Back to your Profile
           </Link>
-          <h1 className="text-5xl font-black tracking-tighter mb-2 text-white">
-            Notice Board
-          </h1>
-          <p className="text-kindred-lime/60 text-sm font-bold uppercase tracking-widest">
-            Active Missions in the Kindred Network
-          </p>
+
+          <div className="flex flex-col md:flex-row md:items-center gap-6 md:gap-10">
+            <div className="flex-shrink-0">
+              <h1 className="text-4xl md:text-5xl font-black tracking-tighter mb-2 text-kindred-text leading-none">
+                Notice Board
+              </h1>
+              <p className="text-kindred-lime/60 text-[10px] font-bold uppercase tracking-widest">
+                Active Missions in the Kindred Network
+              </p>
+            </div>
+
+            <div className="relative flex-1 w-full">
+              <div className="absolute inset-y-0 left-5 flex items-center pointer-events-none text-kindred-text/40 dark:text-white/20">
+                🔍
+              </div>
+              <input
+                type="text"
+                placeholder="Filter missions..."
+                id="header-search-notice"
+                /* THE NUCLEAR FIX: Explicit 2px border using your lime color */
+                style={{
+                  border: "2px solid var(--kindred-card-border, #a3e635)",
+                }}
+                className="w-full bg-kindred-bg dark:bg-white/5 rounded-2xl py-4 pl-12 pr-6 text-sm text-kindred-text dark:text-white placeholder:text-kindred-text/50 dark:placeholder:text-white/40 focus:outline-none focus:border-kindred-lime transition-all shadow-sm dark:shadow-kindred"
+              />
+            </div>
+          </div>
         </header>
 
         <NoticeBoardGrid openMissions={openMissions} userId={userId} />

@@ -47,7 +47,7 @@ export default async function Home() {
   const myProfile = profiles.find((p) => p.clerk_id === userId);
 
   return (
-    <main className="min-h-screen bg-kindred-dark p-4 md:p-8 text-white relative overflow-hidden isolate">
+    <main className="min-h-screen bg-kindred-bg p-4 md:p-8 text-kindred-text relative overflow-hidden isolate transition-colors duration-300">
       {/* This adds a pretty green glow at the top of the screen */}
       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[1000px] h-[400px] bg-kindred-lime/10 blur-[120px] pointer-events-none -z-10"></div>
 
@@ -64,21 +64,21 @@ export default async function Home() {
           <div className="space-y-6">
             <div className="relative group">
               <div className="absolute -inset-1 bg-gradient-to-r from-kindred-lime via-emerald-400 to-kindred-blue-glow rounded-[2.5rem] blur-xl opacity-20 group-hover:opacity-50 transition duration-1000"></div>
-              <div className="relative bg-white/5 backdrop-blur-3xl border border-white/10 p-8 rounded-[2.5rem] flex flex-col md:flex-row gap-8 items-center">
+              <div className="relative bg-black/5 dark:bg-white/5 backdrop-blur-3xl border border-black/10 dark:border-white/10 p-8 rounded-[2.5rem] flex flex-col md:flex-row gap-8 items-center">
                 <div className="relative">
                   {/* Shows the first letter of the name in a circle */}
-                  <div className="w-24 h-24 rounded-full border-4 border-kindred-lime flex items-center justify-center bg-kindred-dark text-4xl font-black text-white shadow-kindred">
+                  <div className="w-24 h-24 rounded-full border-4 border-kindred-lime flex items-center justify-center bg-kindred-bg text-4xl font-black text-kindred-text shadow-kindred">
                     {myProfile.full_name.charAt(0)}
                   </div>
                   {/* Shows the rank icon */}
-                  <div className="absolute -top-2 -right-2 bg-white text-kindred-dark text-[11px] font-black px-3 py-1 rounded-full animate-bounce shadow-xl uppercase border-2 border-kindred-lime">
+                  <div className="absolute -top-2 -right-2 bg-kindred-lime text-kindred-dark text-[11px] font-black px-3 py-1 rounded-full animate-bounce shadow-xl uppercase border-2 border-white dark:border-kindred-dark">
                     {getSaintlyRank(myProfile.halos).icon} Rank
                   </div>
                 </div>
 
                 <div className="flex-1 text-center md:text-left">
                   {/* Shows the full name */}
-                  <h2 className="text-4xl font-black text-white tracking-tighter mb-1">
+                  <h2 className="text-4xl font-black text-kindred-text tracking-tighter mb-1">
                     {myProfile.full_name}
                   </h2>
                   <div className="flex flex-wrap items-center justify-center md:justify-start gap-2 mb-4">
@@ -87,7 +87,7 @@ export default async function Home() {
                       {myProfile.city} • {getSaintlyRank(myProfile.halos).title}
                     </p>
                     {myProfile.postcode && (
-                      <span className="bg-white/5 border border-white/10 text-[9px] text-white/40 px-2 py-0.5 rounded-md font-black uppercase tracking-tighter">
+                      <span className="bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 text-[9px] text-kindred-text/40 px-2 py-0.5 rounded-md font-black uppercase tracking-tighter">
                         {myProfile.postcode.split(" ")[0]}
                       </span>
                     )}
@@ -109,16 +109,16 @@ export default async function Home() {
 
                   <div className="flex flex-wrap justify-center md:justify-start gap-4 items-center">
                     {/* Shows how many halo points have been earned */}
-                    <div className="bg-white/10 border border-white/20 px-4 py-2 rounded-full flex items-center gap-2 backdrop-blur-md">
+                    <div className="bg-black/5 dark:bg-white/10 border border-black/10 dark:border-white/20 px-4 py-2 rounded-full flex items-center gap-2 backdrop-blur-md">
                       <span className="text-lg">😇</span>
-                      <span className="text-xs font-black text-white uppercase tracking-widest">
+                      <span className="text-xs font-black text-kindred-text uppercase tracking-widest">
                         {myProfile.halos || 0} HALOS
                       </span>
                     </div>
 
                     <Link
                       href="/setup"
-                      className="bg-white/5 hover:bg-white/10 text-white px-5 py-2 rounded-full text-xs font-black transition border border-white/20 uppercase tracking-widest"
+                      className="bg-black/5 dark:bg-white/5 hover:bg-black/10 dark:hover:bg-white/10 text-kindred-text px-5 py-2 rounded-full text-xs font-black transition border border-black/10 dark:border-white/20 uppercase tracking-widest"
                     >
                       Manage Profile
                     </Link>
@@ -134,7 +134,7 @@ export default async function Home() {
                           {myRequests.length}
                         </span>
                         <span
-                          className="absolute -top-8 left-1/2 -translate-x-1/2 bg-white text-kindred-dark text-[8px] px-2 py-1 rounded font-black opacity-0 group-hover:opacity-100 uppercase transition-opacity whitespace-nowrap"
+                          className="absolute -top-8 left-1/2 -translate-x-1/2 bg-white text-kindred-dark text-[8px] px-2 py-1 rounded font-black opacity-0 group-hover:opacity-100 uppercase transition-opacity whitespace-nowrap shadow-xl"
                           style={{ zIndex: 50 }}
                         >
                           Open Inbox
@@ -150,7 +150,7 @@ export default async function Home() {
                           {mySentRequests.length}
                         </span>
                         <span
-                          className="absolute -top-8 left-1/2 -translate-x-1/2 bg-white text-kindred-dark text-[8px] px-2 py-1 rounded font-black opacity-0 group-hover:opacity-100 uppercase transition-opacity whitespace-nowrap"
+                          className="absolute -top-8 left-1/2 -translate-x-1/2 bg-white text-kindred-dark text-[8px] px-2 py-1 rounded font-black opacity-0 group-hover:opacity-100 uppercase transition-opacity whitespace-nowrap shadow-xl"
                           style={{ zIndex: 50 }}
                         >
                           View Sent
@@ -162,9 +162,9 @@ export default async function Home() {
               </div>
             </div>
 
-            {/* If there are good deeds finished recently, they show up here in a list */}
+            {/* Recent Deeds List */}
             {myDeeds && myDeeds.length > 0 && (
-              <div className="bg-white/5 rounded-[2rem] p-6 border border-white/5 backdrop-blur-sm">
+              <div className="bg-black/5 dark:bg-white/5 rounded-[2rem] p-6 border border-black/5 dark:border-white/5 backdrop-blur-sm">
                 <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-kindred-lime/50 mb-4">
                   Recent Kindred Deeds
                 </h3>
@@ -172,7 +172,7 @@ export default async function Home() {
                   {myDeeds.map((deed) => (
                     <div
                       key={deed.id}
-                      className="flex items-center gap-3 text-sm text-white/40 border-b border-white/5 last:border-0 last:pb-0 pb-2"
+                      className="flex items-center gap-3 text-sm text-kindred-text/40 border-b border-black/5 dark:border-white/5 last:border-0 last:pb-0 pb-2"
                     >
                       <span className="text-kindred-lime">✨</span>
                       <span className="italic flex-1">
@@ -188,10 +188,10 @@ export default async function Home() {
             )}
           </div>
         ) : (
-          /* If someone is logged in but has no profile yet, this shows the start button */
+          /* If someone is logged in but has no profile yet */
           userId && (
-            <div className="bg-white/5 backdrop-blur-md border border-white/10 p-10 rounded-[2.5rem] text-center">
-              <p className="text-white/60 text-lg mb-8 font-medium italic">
+            <div className="bg-black/5 dark:bg-white/5 backdrop-blur-md border border-black/10 dark:border-white/10 p-10 rounded-[2.5rem] text-center">
+              <p className="text-kindred-text/60 text-lg mb-8 font-medium italic">
                 Preparing your spirit... 😇
               </p>
               <Link
