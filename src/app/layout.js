@@ -27,10 +27,15 @@ export default function RootLayout({ children }) {
               __html: `
                 (function() {
                   try {
-                    if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
-                      document.documentElement.classList.add('dark')
+                    // If no theme is set at all, default to dark and save it
+                    if (!localStorage.theme) {
+                      localStorage.theme = 'dark';
+                    }
+
+                    if (localStorage.theme === 'dark') {
+                      document.documentElement.classList.add('dark');
                     } else {
-                      document.documentElement.classList.remove('dark')
+                      document.documentElement.classList.remove('dark');
                     }
                   } catch (_) {}
                 })()

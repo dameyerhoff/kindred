@@ -8,21 +8,31 @@ import { usePathname } from "next/navigation";
 export default function Navbar({ inboxCount = 0, outboxCount = 0, userId }) {
   const pathname = usePathname();
   const [mounted, setMounted] = useState(false);
-  const [isDark, setIsDark] = useState(false);
+  const [isDark, setIsDark] = useState(true);
 
   useEffect(() => {
     setMounted(true);
-    setIsDark(document.documentElement.classList.contains("dark"));
+
+    // Sync logic: If localStorage is empty or set to dark, we are in dark mode
+    const theme = localStorage.getItem("theme");
+    if (theme === "light") {
+      setIsDark(false);
+      document.documentElement.classList.remove("dark");
+    } else {
+      setIsDark(true);
+      document.documentElement.classList.add("dark");
+      localStorage.setItem("theme", "dark");
+    }
   }, []);
 
   const toggleTheme = () => {
     if (isDark) {
       document.documentElement.classList.remove("dark");
-      localStorage.theme = "light";
+      localStorage.setItem("theme", "light");
       setIsDark(false);
     } else {
       document.documentElement.classList.add("dark");
-      localStorage.theme = "dark";
+      localStorage.setItem("theme", "dark");
       setIsDark(true);
     }
   };
@@ -40,7 +50,6 @@ export default function Navbar({ inboxCount = 0, outboxCount = 0, userId }) {
 
   return (
     <div className="max-w-7xl mx-auto px-4">
-      {/* Logo Container */}
       <div className="flex justify-start mb-4">
         <Link href="/">
           <img
@@ -56,7 +65,6 @@ export default function Navbar({ inboxCount = 0, outboxCount = 0, userId }) {
       </div>
 
       <header className="flex flex-row justify-between items-center mb-16 relative z-50 border-2 border-black/10 dark:border-kindred-lime bg-black/[0.02] dark:bg-kindred-dark/40 backdrop-blur-md py-3 px-4 md:px-6 rounded-[2rem] flex-nowrap shadow-xl transition-all duration-300">
-        {/* AREA 1: THEME TOGGLE (Left) */}
         <div className="flex items-center gap-2">
           <button
             onClick={toggleTheme}
@@ -77,7 +85,6 @@ export default function Navbar({ inboxCount = 0, outboxCount = 0, userId }) {
 
         <Divider />
 
-        {/* AREA 2: CORE NAV (Middle - Desktop Only) */}
         <nav className="hidden md:flex flex-row items-center gap-3 flex-nowrap px-4">
           <Link
             href="/favour-map"
@@ -101,11 +108,9 @@ export default function Navbar({ inboxCount = 0, outboxCount = 0, userId }) {
 
         <Divider />
 
-        {/* AREA 3: USER (Right) */}
         <div className="flex flex-row items-center gap-2 flex-nowrap">
           {userId && (
             <div className="flex flex-row gap-2 flex-nowrap items-center">
-              {/* Inbox/Outbox - Hidden on Mobile */}
               <div className="hidden md:flex flex-row gap-2 items-center">
                 <Link
                   href="/inbox"
@@ -141,7 +146,6 @@ export default function Navbar({ inboxCount = 0, outboxCount = 0, userId }) {
             </div>
           )}
 
-          {/* Mobile Menu (Hamburger) */}
           <div className="md:hidden">
             <DropdownMenu.Root>
               <DropdownMenu.Trigger asChild>
@@ -183,9 +187,7 @@ export default function Navbar({ inboxCount = 0, outboxCount = 0, userId }) {
                       Favour Map 🗺️
                     </Link>
                   </DropdownMenu.Item>
-
                   <div className="h-[1px] bg-kindred-text/10 my-2" />
-
                   <DropdownMenu.Item asChild>
                     <Link
                       href="/inbox"
