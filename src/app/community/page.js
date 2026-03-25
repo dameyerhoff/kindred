@@ -1,18 +1,24 @@
+"use client";
+
+import { useState, useEffect } from "react";
 import {
   getProfiles,
   sendFavourRequest,
   getMyRequests,
   getMySentRequests,
 } from "../actions";
-import { UserButton } from "@clerk/nextjs";
-import { auth } from "@clerk/nextjs/server";
+import { useAuth } from "@clerk/nextjs";
 import Link from "next/link";
 import CommunityGrid from "./CommunityGrid";
 import NavBar from "@/components/NavBar";
 
-export const dynamic = "force-dynamic";
-export const revalidate = 0;
+export default function CommunityGridPage() {
+  const { userId } = useAuth(); // Client-side hook for auth
+  const [communityProfiles, setCommunityProfiles] = useState([]);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [counts, setCounts] = useState({ inbox: 0, outbox: 0 });
 
+<<<<<<< HEAD
 export default async function CommunityGridPage() {
   const { userId } = await auth();
 
@@ -21,6 +27,25 @@ export default async function CommunityGridPage() {
   const mySentRequests = userId ? (await getMySentRequests()) || [] : [];
 
   const communityProfiles = profiles.filter((p) => p.clerk_id !== userId);
+=======
+  useEffect(() => {
+    async function loadData() {
+      const allProfiles = (await getProfiles()) || [];
+      // Filter out current user from the grid
+      setCommunityProfiles(allProfiles.filter((p) => p.clerk_id !== userId));
+
+      if (userId) {
+        const inbox = await getMyRequests();
+        const outbox = await getMySentRequests();
+        setCounts({
+          inbox: inbox?.length || 0,
+          outbox: outbox?.length || 0,
+        });
+      }
+    }
+    loadData();
+  }, [userId]);
+>>>>>>> 3043e6331505cd056bbc4d545a288bfbade3acc5
 
   return (
     <main className="min-h-screen bg-kindred-bg p-4 md:p-8 text-kindred-text relative overflow-hidden isolate transition-colors duration-300">
@@ -28,8 +53,8 @@ export default async function CommunityGridPage() {
 
       <NavBar
         userId={userId}
-        inboxCount={myRequests.length}
-        outboxCount={mySentRequests.length}
+        inboxCount={counts.inbox}
+        outboxCount={counts.outbox}
       />
 
       <section className="max-w-6xl mx-auto relative z-10">
@@ -52,18 +77,31 @@ export default async function CommunityGridPage() {
             </div>
 
             <div className="relative flex-1 w-full">
+<<<<<<< HEAD
               <div className="absolute inset-y-0 left-5 flex items-center pointer-events-none text-kindred-text/40 dark:text-white/20">
+=======
+              <div className="absolute inset-y-0 left-5 flex items-center pointer-events-none text-kindred-text/40">
+>>>>>>> 3043e6331505cd056bbc4d545a288bfbade3acc5
                 🔍
               </div>
               <input
                 type="text"
                 placeholder="Search community members..."
+<<<<<<< HEAD
                 id="header-search-community"
                 /* THE NUCLEAR FIX: Using a CSS variable for the border color to force the lime in dark mode */
                 style={{
                   border: "2px solid var(--kindred-card-border, #a3e635)",
                 }}
                 className="w-full bg-kindred-bg dark:bg-white/5 rounded-2xl py-4 pl-12 pr-6 text-sm text-kindred-text dark:text-white placeholder:text-kindred-text/50 dark:placeholder:text-white/40 focus:outline-none focus:border-kindred-lime transition-all shadow-sm dark:shadow-kindred"
+=======
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                style={{
+                  border: "2px solid var(--kindred-card-border, #a3e635)",
+                }}
+                className="w-full bg-kindred-bg dark:bg-white/5 rounded-2xl py-4 pl-12 pr-6 text-sm text-kindred-text dark:text-white placeholder:text-kindred-text/50 focus:outline-none focus:border-kindred-lime transition-all shadow-sm"
+>>>>>>> 3043e6331505cd056bbc4d545a288bfbade3acc5
               />
             </div>
           </div>
@@ -73,6 +111,7 @@ export default async function CommunityGridPage() {
           communityProfiles={communityProfiles}
           userId={userId}
           sendFavourRequest={sendFavourRequest}
+          searchTerm={searchTerm}
         />
       </section>
     </main>

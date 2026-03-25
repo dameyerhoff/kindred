@@ -1,7 +1,7 @@
 "use client";
 
-import { useState } from "react";
 import { SignInButton } from "@clerk/nextjs";
+import Link from "next/link";
 
 const getSaintlyRank = (halos = 0) => {
   if (halos >= 50) return { title: "Kindred Legend", icon: "👑" };
@@ -15,17 +15,8 @@ export default function CommunityGrid({
   communityProfiles = [],
   userId,
   sendFavourRequest,
+  searchTerm = "",
 }) {
-  const [searchTerm, setSearchTerm] = useState("");
-
-  // Search Listener - Restored to pure logic
-  if (typeof document !== "undefined") {
-    const input = document.getElementById("header-search-community");
-    if (input) {
-      input.oninput = (e) => setSearchTerm(e.target.value);
-    }
-  }
-
   const filteredProfiles = communityProfiles.filter((profile) => {
     const search = searchTerm.toLowerCase();
     const inName = profile.full_name?.toLowerCase().includes(search) || false;
@@ -56,11 +47,20 @@ export default function CommunityGrid({
                 </p>
               </div>
             </div>
-            <div className="flex items-center bg-kindred-text/5 px-3 py-1.5 rounded-full border border-kindred-text/10 self-start">
-              <span className="text-sm">😇</span>
-              <span className="text-xs font-black text-kindred-lime ml-2">
-                {profile.halos || 0}
-              </span>
+
+            <div className="flex flex-col items-end gap-2">
+              <div className="flex items-center bg-kindred-text/5 px-3 py-1.5 rounded-full border border-kindred-text/10">
+                <span className="text-sm">😇</span>
+                <span className="text-xs font-black text-kindred-lime ml-2">
+                  {profile.halos || 0}
+                </span>
+              </div>
+              <Link
+                href={`/profile/${profile.clerk_id}`}
+                className="text-[8px] font-black uppercase tracking-tighter bg-kindred-lime text-kindred-dark px-2 py-1 rounded-lg hover:scale-105 transition-transform shadow-sm"
+              >
+                View Profile 👤
+              </Link>
             </div>
           </div>
 
@@ -97,18 +97,14 @@ export default function CommunityGrid({
                   }}
                   className="w-full border border-kindred-text/10 rounded-xl p-3 text-[10px] font-bold appearance-none cursor-pointer"
                 >
-                  {profile.tags && profile.tags.length > 0 ? (
-                    <>
-                      <option value="" disabled>
-                        Select a skill...
-                      </option>
-                      {profile.tags.map((tag, idx) => (
-                        <option key={idx} value={tag.label}>
-                          {tag.label}
-                        </option>
-                      ))}
-                    </>
-                  ) : (
+                  <option value="" disabled>
+                    Select a skill...
+                  </option>
+                  {profile.tags?.map((tag, idx) => (
+                    <option key={idx} value={tag.label}>
+                      {tag.label}
+                    </option>
+                  )) || (
                     <option value="General Favour">
                       General Kindred Favour
                     </option>

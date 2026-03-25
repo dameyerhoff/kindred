@@ -1,5 +1,6 @@
 import { ClerkProvider } from "@clerk/nextjs";
 import { Geist, Geist_Mono } from "next/font/google";
+import Script from "next/script";
 import "./globals.css";
 import { ThemeProvider } from "@/components/ThemeProvider";
 
@@ -22,32 +23,27 @@ export default function RootLayout({ children }) {
   return (
     <ClerkProvider>
       <html lang="en" suppressHydrationWarning>
-        <head>
-          <script
-            dangerouslySetInnerHTML={{
-              __html: `
-                (function() {
-                  try {
-                    // If no theme is set at all, default to dark and save it
-                    if (!localStorage.theme) {
-                      localStorage.theme = 'dark';
-                    }
-
-                    if (localStorage.theme === 'dark') {
-                      document.documentElement.classList.add('dark');
-                    } else {
-                      document.documentElement.classList.remove('dark');
-                    }
-                  } catch (_) {}
-                })()
-              `,
-            }}
-          />
-        </head>
+        <head />
         <body
           className={`${geistSans.variable} ${geistMono.variable} antialiased transition-colors duration-300`}
         >
-          <ThemeProvider>{children}</ThemeProvider>
+          <Script id="theme-logic" strategy="beforeInteractive">
+            {`
+              (function() {
+                try {
+                  if (!localStorage.theme) {
+                    localStorage.theme = 'dark';
+                  }
+                  if (localStorage.theme === 'dark') {
+                    document.documentElement.classList.add('dark');
+                  } else {
+                    document.documentElement.classList.remove('dark');
+                  }
+                } catch (_) {}
+              })()
+            `}
+          </Script>
+          {children}
         </body>
       </html>
     </ClerkProvider>

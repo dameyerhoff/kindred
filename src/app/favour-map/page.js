@@ -4,7 +4,6 @@ import {
   getMySentRequests,
 } from "../actions";
 import { auth } from "@clerk/nextjs/server";
-import { UserButton } from "@clerk/nextjs";
 import Link from "next/link";
 import FavourMapClient from "./FavourMapClient";
 import NavBar from "@/components/NavBar";
@@ -43,6 +42,7 @@ export default async function FavourMapPage() {
           </p>
         </header>
 
+        {/* FIXED: Added userId={userId} prop below */}
         <FavourMapClient
           openMissions={openMissions}
           userId={userId}
