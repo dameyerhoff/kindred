@@ -1,22 +1,38 @@
+"use client";
+
+import { useEffect, useState } from "react";
 import {
   getPublicNoticeBoard,
   getMyRequests,
   getMySentRequests,
 } from "../actions";
-import { auth } from "@clerk/nextjs/server";
+import { useAuth } from "@clerk/nextjs";
 import Link from "next/link";
 import NoticeBoardGrid from "./NoticeBoardGrid";
 import NavBar from "@/components/NavBar";
 
-export const dynamic = "force-dynamic";
-export const revalidate = 0;
+export default function NoticeBoard() {
+  const { userId } = useAuth(); // Client-side hook for auth
+  const [openMissions, setOpenMissions] = useState([]);
+  const [counts, setCounts] = useState({ inbox: 0, outbox: 0 });
+  const [searchTerm, setSearchTerm] = useState("");
 
-export default async function NoticeBoard() {
-  const { userId } = await auth();
+  useEffect(() => {
+    async function loadData() {
+      const missions = await getPublicNoticeBoard();
+      setOpenMissions(missions);
 
-  const openMissions = await getPublicNoticeBoard();
-  const myRequests = userId ? (await getMyRequests()) || [] : [];
-  const mySentRequests = userId ? (await getMySentRequests()) || [] : [];
+      if (userId) {
+        const inbox = await getMyRequests();
+        const outbox = await getMySentRequests();
+        setCounts({
+          inbox: inbox?.length || 0,
+          outbox: outbox?.length || 0,
+        });
+      }
+    }
+    loadData();
+  }, [userId]);
 
   return (
     <main className="min-h-screen bg-kindred-bg p-4 md:p-8 text-kindred-text relative overflow-hidden isolate transition-colors duration-300">
@@ -24,8 +40,8 @@ export default async function NoticeBoard() {
 
       <NavBar
         userId={userId}
-        inboxCount={myRequests.length}
-        outboxCount={mySentRequests.length}
+        inboxCount={counts.inbox}
+        outboxCount={counts.outbox}
       />
 
       <section className="max-w-6xl mx-auto relative z-10">
@@ -48,24 +64,28 @@ export default async function NoticeBoard() {
             </div>
 
             <div className="relative flex-1 w-full">
-              <div className="absolute inset-y-0 left-5 flex items-center pointer-events-none text-kindred-text/40 dark:text-white/20">
+              <div className="absolute inset-y-0 left-5 flex items-center pointer-events-none text-kindred-text/40">
                 🔍
               </div>
               <input
                 type="text"
                 placeholder="Filter missions..."
-                id="header-search-notice"
-                /* THE NUCLEAR FIX: Explicit 2px border using your lime color */
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
                 style={{
                   border: "2px solid var(--kindred-card-border, #a3e635)",
                 }}
-                className="w-full bg-kindred-bg dark:bg-white/5 rounded-2xl py-4 pl-12 pr-6 text-sm text-kindred-text dark:text-white placeholder:text-kindred-text/50 dark:placeholder:text-white/40 focus:outline-none focus:border-kindred-lime transition-all shadow-sm dark:shadow-kindred"
+                className="w-full bg-kindred-bg dark:bg-white/5 rounded-2xl py-4 pl-12 pr-6 text-sm text-kindred-text dark:text-white placeholder:text-kindred-text/50 focus:outline-none focus:border-kindred-lime transition-all shadow-sm"
               />
             </div>
           </div>
         </header>
 
-        <NoticeBoardGrid openMissions={openMissions} userId={userId} />
+        <NoticeBoardGrid
+          openMissions={openMissions}
+          userId={userId}
+          searchTerm={searchTerm}
+        />
       </section>
     </main>
   );

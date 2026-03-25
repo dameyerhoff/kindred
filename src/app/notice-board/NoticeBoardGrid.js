@@ -1,18 +1,13 @@
 "use client";
 
-import { useState } from "react";
 import { claimFavour } from "../actions";
 
-export default function NoticeBoardGrid({ openMissions = [], userId }) {
-  const [searchTerm, setSearchTerm] = useState("");
-
-  if (typeof document !== "undefined") {
-    const input = document.getElementById("header-search-notice");
-    if (input) {
-      input.oninput = (e) => setSearchTerm(e.target.value);
-    }
-  }
-
+export default function NoticeBoardGrid({
+  openMissions = [],
+  userId,
+  searchTerm = "",
+}) {
+  // Filter logic happens here based on the prop passed from the page
   const filteredMissions = openMissions.filter((mission) => {
     const search = searchTerm.toLowerCase();
     const inText = mission.favour_text?.toLowerCase().includes(search) || false;
