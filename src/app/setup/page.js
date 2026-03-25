@@ -118,13 +118,13 @@ export default function SetupPage() {
   // If you are not logged in, it shows a button to sign in
   if (!userId) {
     return (
-      <main className="min-h-screen bg-[#061a06] flex items-center justify-center p-6 text-white text-center">
-        <div className="w-full max-w-md bg-white/5 backdrop-blur-3xl p-8 rounded-[2.5rem] border border-white/10">
-          <h2 className="text-2xl font-black mb-6 uppercase tracking-tighter text-white">
+      <main className="min-h-screen bg-kindred-bg flex items-center justify-center p-6 text-kindred-text text-center transition-colors duration-300">
+        <div className="w-full max-w-md bg-black/5 dark:bg-white/5 backdrop-blur-3xl p-8 rounded-[2.5rem] border border-black/10 dark:border-white/10">
+          <h2 className="text-2xl font-black mb-6 uppercase tracking-tighter">
             Identity Required
           </h2>
           <SignInButton mode="modal">
-            <button className="w-full bg-lime-400 hover:bg-white text-green-950 font-black py-4 rounded-2xl transition-all uppercase tracking-widest text-sm shadow-[0_0_30px_rgba(163,230,53,0.3)]">
+            <button className="w-full bg-kindred-lime hover:bg-kindred-text dark:hover:bg-white text-kindred-dark dark:hover:text-kindred-dark font-black py-4 rounded-2xl transition-all uppercase tracking-widest text-sm shadow-kindred">
               Log In to Kindred
             </button>
           </SignInButton>
@@ -134,21 +134,21 @@ export default function SetupPage() {
   }
 
   return (
-    <main className="min-h-screen bg-kindred-dark p-4 md:p-8 text-white relative overflow-hidden flex items-center justify-center">
+    <main className="min-h-screen bg-kindred-bg p-4 md:p-8 text-kindred-text relative overflow-hidden flex items-center justify-center transition-colors duration-300">
       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[1000px] h-[400px] bg-kindred-lime/10 blur-[120px] pointer-events-none"></div>
 
       <div className="w-full max-w-xl relative z-10">
         {/* This button takes you back to your main screen */}
         <Link
           href="/"
-          className="inline-block text-[10px] font-black uppercase tracking-[0.3em] text-kindred-lime hover:text-white transition-all mb-8 border border-kindred-lime/20 px-4 py-2 rounded-full hover:bg-kindred-dark/10"
+          className="inline-block text-[10px] font-black uppercase tracking-[0.3em] text-kindred-lime hover:opacity-70 transition-all mb-8 border border-kindred-lime/20 px-4 py-2 rounded-full hover:bg-kindred-lime/10"
         >
-          ← Back to Dashboard
+          &larr; Back to Dashboard
         </Link>
 
         {/* This is the main box for the profile form */}
-        <div className="bg-white/5 backdrop-blur-3xl border border-white/10 p-8 md:p-12 rounded-[3rem] shadow-2xl">
-          <h2 className="text-4xl font-black mb-2 tracking-tighter uppercase text-white">
+        <div className="bg-black/5 dark:bg-white/5 backdrop-blur-3xl border border-black/10 dark:border-white/10 p-8 md:p-12 rounded-[3rem] shadow-2xl">
+          <h2 className="text-4xl font-black mb-2 tracking-tighter uppercase">
             {myProfile ? "Manage Profile" : "Create Profile"}
           </h2>
           <p className="text-kindred-lime/60 text-xs font-bold uppercase tracking-[0.2em] mb-10">
@@ -166,44 +166,44 @@ export default function SetupPage() {
             <input type="hidden" name="tags" value={JSON.stringify(tags)} />
 
             <div>
-              <label className="block text-[10px] font-black uppercase tracking-widest mb-2 text-white/40">
+              <label className="block text-[10px] font-black uppercase tracking-widest mb-2 opacity-40">
                 Full Name
               </label>
               <input
                 name="full_name"
                 defaultValue={myProfile?.full_name || ""}
-                className="w-full p-4 rounded-2xl bg-black/40 border border-white/10 focus:border-kindred-lime/50 outline-none text-white font-bold transition-colors"
+                className="w-full p-4 rounded-2xl bg-black/5 dark:bg-black/40 border border-black/10 dark:border-white/10 focus:border-kindred-lime/50 outline-none text-kindred-text font-bold transition-colors"
                 required
               />
             </div>
 
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="block text-[10px] font-black uppercase tracking-widest mb-2 text-white/40">
+                <label className="block text-[10px] font-black uppercase tracking-widest mb-2 opacity-40">
                   City
                 </label>
                 <input
                   name="city"
                   defaultValue={myProfile?.city || ""}
-                  className="w-full p-4 rounded-2xl bg-black/40 border border-white/10 focus:border-kindred-lime/50 outline-none text-white font-bold transition-colors"
+                  className="w-full p-4 rounded-2xl bg-black/5 dark:bg-black/40 border border-black/10 dark:border-white/10 focus:border-kindred-lime/50 outline-none text-kindred-text font-bold transition-colors"
                   required
                 />
               </div>
               <div>
-                <label className="block text-[10px] font-black uppercase tracking-widest mb-2 text-white/40">
+                <label className="block text-[10px] font-black uppercase tracking-widest mb-2 opacity-40">
                   Postcode
                 </label>
                 <input
                   name="postcode"
                   defaultValue={myProfile?.postcode || ""}
-                  className="w-full p-4 rounded-2xl bg-black/40 border border-white/10 focus:border-kindred-lime/50 outline-none text-white font-bold transition-colors"
+                  className="w-full p-4 rounded-2xl bg-black/5 dark:bg-black/40 border border-black/10 dark:border-white/10 focus:border-kindred-lime/50 outline-none text-kindred-text font-bold transition-colors"
                   required
                 />
               </div>
             </div>
 
             <div className="relative">
-              <label className="block text-[10px] font-black uppercase tracking-widest mb-2 text-white/40">
+              <label className="block text-[10px] font-black uppercase tracking-widest mb-2 opacity-40">
                 Skills & Interests (Your Offerings)
               </label>
 
@@ -220,7 +220,7 @@ export default function SetupPage() {
                     >
                       {tag.label}{" "}
                       <span className="opacity-50 group-hover:opacity-100">
-                        ×
+                        &times;
                       </span>
                     </button>
                   ))}
@@ -231,12 +231,12 @@ export default function SetupPage() {
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 placeholder="Search (e.g. Gardening, Baking...)"
-                className="w-full p-4 rounded-2xl bg-black/40 border border-white/10 focus:border-kindred-lime/50 outline-none text-white font-bold transition-all"
+                className="w-full p-4 rounded-2xl bg-black/5 dark:bg-black/40 border border-black/10 dark:border-white/10 focus:border-kindred-lime/50 outline-none text-kindred-text font-bold transition-all placeholder:opacity-30"
               />
 
               {/* This shows the list of skills that match what you typed */}
               {search && (
-                <div className="absolute z-20 w-full mt-2 bg-kindred-dark border border-white/10 rounded-2xl overflow-hidden shadow-2xl max-h-48 overflow-y-auto">
+                <div className="absolute z-20 w-full mt-2 bg-kindred-bg dark:bg-kindred-dark border border-black/10 dark:border-white/10 rounded-2xl overflow-hidden shadow-2xl max-h-48 overflow-y-auto">
                   {KINDRED_BANK.filter(
                     (item) =>
                       item.label.toLowerCase().includes(search.toLowerCase()) &&
@@ -246,7 +246,7 @@ export default function SetupPage() {
                       key={item.slug}
                       type="button"
                       onClick={() => addTag(item)}
-                      className="w-full text-left p-4 hover:bg-kindred-lime hover:text-kindred-dark font-bold text-sm transition-colors border-b border-white/5 last:border-0"
+                      className="w-full text-left p-4 hover:bg-kindred-lime hover:text-kindred-dark font-bold text-sm transition-colors border-b border-black/5 dark:border-white/5 last:border-0"
                     >
                       + {item.label}
                     </button>
@@ -259,7 +259,7 @@ export default function SetupPage() {
                       <button
                         type="button"
                         onClick={() => createCustomTag(search)}
-                        className="w-full text-left p-4 bg-white/5 hover:bg-kindred-lime hover:text-kindred-dark font-bold text-xs italic transition-colors"
+                        className="w-full text-left p-4 bg-black/5 dark:bg-white/5 hover:bg-kindred-lime hover:text-kindred-dark font-bold text-xs italic transition-colors"
                       >
                         Add custom: "{search}"
                       </button>
@@ -271,7 +271,7 @@ export default function SetupPage() {
             {/* This is the big button to save your profile */}
             <button
               type="submit"
-              className="w-full mt-6 bg-white text-kindred-dark hover:bg-kindred-lime font-black py-5 rounded-[2rem] shadow-2xl transition-all active:scale-95 uppercase tracking-widest text-sm"
+              className="w-full mt-6 bg-kindred-text dark:bg-white text-kindred-bg dark:text-kindred-dark hover:bg-kindred-lime dark:hover:bg-kindred-lime font-black py-5 rounded-[2rem] shadow-2xl transition-all active:scale-95 uppercase tracking-widest text-sm"
             >
               {myProfile
                 ? "Update Guardian Details 😇"

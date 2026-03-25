@@ -1,4 +1,5 @@
 "use client";
+import { useEffect, useState } from "react";
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
 import { UserButton } from "@clerk/nextjs";
 import Link from "next/link";
@@ -6,101 +7,233 @@ import { usePathname } from "next/navigation";
 
 export default function Navbar({ inboxCount = 0, outboxCount = 0, userId }) {
   const pathname = usePathname();
+  const [mounted, setMounted] = useState(false);
+  const [isDark, setIsDark] = useState(false);
 
-  const navLinks = [
-    { href: "/favour-map", label: "Favour Map 🗺️" },
-    { href: "/community", label: "Community Grid 🌐" },
-    { href: "/notice-board", label: "Notice Board 📜" },
-    { href: "/about-us", label: "About Us 💚" },
-  ];
+  useEffect(() => {
+    setMounted(true);
+    setIsDark(document.documentElement.classList.contains("dark"));
+  }, []);
+
+  const toggleTheme = () => {
+    if (isDark) {
+      document.documentElement.classList.remove("dark");
+      localStorage.theme = "light";
+      setIsDark(false);
+    } else {
+      document.documentElement.classList.add("dark");
+      localStorage.theme = "dark";
+      setIsDark(true);
+    }
+  };
 
   const linkStyles =
-    "px-4 py-2 rounded-full text-[9px] font-black uppercase tracking-widest transition-all items-center gap-2 flex";
+    "px-3 py-2 rounded-full text-[9px] font-black uppercase tracking-widest transition-all items-center gap-1.5 flex whitespace-nowrap flex-nowrap shrink-0";
   const inactiveStyles =
-    "bg-white/5 hover:bg-white/10 border border-white/10 text-white";
+    "bg-black/5 dark:bg-white/5 hover:bg-black/10 dark:hover:bg-white/10 border border-black/10 dark:border-white/10 text-kindred-text dark:text-white/80";
   const activeStyles =
     "bg-kindred-lime text-kindred-dark border border-kindred-lime shadow-kindred";
 
+  const Divider = () => (
+    <div className="h-6 w-[1.5px] bg-black/10 dark:bg-white/10 mx-1 hidden md:block" />
+  );
+
   return (
-    <header className="max-w-6xl mx-auto flex justify-between items-center mb-16 relative z-50 border-b border-white/10 pb-8 px-4">
-      <div>
+    <div className="max-w-7xl mx-auto px-4">
+      {/* Logo Container */}
+      <div className="flex justify-start mb-4">
         <Link href="/">
           <img
             src="/kindred-logo.png"
             alt="Logo"
-            className="h-16 md:h-20 w-auto object-contain drop-shadow-kindred"
+            className="h-10 md:h-16 w-auto object-contain drop-shadow-kindred transition-all"
+            style={{
+              filter:
+                mounted && !isDark ? "brightness(0.8) contrast(1.2)" : "none",
+            }}
           />
         </Link>
       </div>
-      <nav className="hidden md:flex items-center gap-3">
-        {userId && (
-          <div className="flex gap-2 mr-4 border-r border-white/10 pr-4">
-            <Link
-              href="/inbox"
-              className={`flex items-center gap-2 bg-white/5 border px-3 py-2 rounded-xl transition-all hover:shadow-kindred ${inboxCount > 0 ? "border-kindred-lime shadow-kindred animate-pulse" : "border-white/10"}`}
-            >
-              <span className="text-sm">📬</span>
-              <span className="text-[10px] font-black text-white/60 uppercase">
-                {inboxCount}
-              </span>
-            </Link>
-            <Link
-              href="/outbox"
-              className="flex items-center gap-2 bg-white/5 border border-white/10 px-3 py-2 rounded-xl hover:border-kindred-lime/50 transition-all hover:shadow-kindred"
-            >
-              <span className="text-sm">📤</span>
-              <span className="text-[10px] font-black text-white/60 uppercase">
-                {outboxCount}
-              </span>
-            </Link>
-          </div>
-        )}
-      </nav>
-      <nav className="hidden md:flex items-center gap-3">
-        {navLinks.map((link) => (
-          <Link
-            key={link.href}
-            href={link.href}
-            className={`${linkStyles} ${pathname === link.href ? activeStyles : inactiveStyles}`}
-          >
-            {link.label}
-          </Link>
-        ))}
-        <div className="scale-125 ml-4">
-          <UserButton afterSignOutUrl="/" />
-        </div>
-      </nav>
 
-      <div className="md:hidden flex items-center gap-4">
-        <div className="scale-110 mr-2">
-          <UserButton afterSignOutUrl="/" />
+      <header className="flex flex-row justify-between items-center mb-16 relative z-50 border-2 border-black/10 dark:border-kindred-lime bg-black/[0.02] dark:bg-kindred-dark/40 backdrop-blur-md py-3 px-4 md:px-6 rounded-[2rem] flex-nowrap shadow-xl transition-all duration-300">
+        {/* AREA 1: THEME TOGGLE (Left) */}
+        <div className="flex items-center gap-2">
+          <button
+            onClick={toggleTheme}
+            type="button"
+            className="p-2 rounded-xl bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 hover:border-kindred-lime transition-all text-lg cursor-pointer min-w-[40px] min-h-[40px]"
+            title="Toggle Theme"
+          >
+            {mounted ? (isDark ? "☀️" : "🌙") : null}
+          </button>
+
+          <Link
+            href="/about-us"
+            className={`${linkStyles} hidden md:flex ${pathname === "/about-us" ? activeStyles : inactiveStyles}`}
+          >
+            About 💚
+          </Link>
         </div>
-        <DropdownMenu.Root>
-          <DropdownMenu.Trigger asChild>
-            <button className="bg-white/10 border border-white/10 p-3 rounded-2xl text-white outline-none hover:bg-white/20 transition-all">
-              <span className="text-xl">☰</span>
-            </button>
-          </DropdownMenu.Trigger>
-          <DropdownMenu.Portal>
-            <DropdownMenu.Content
-              className="min-w-[200px] bg-kindred-dark/95 backdrop-blur-xl border border-white/10 p-2 rounded-3xl shadow-2xl z-[100] animate-slide-down"
-              sideOffset={10}
-              align="end"
-            >
-              {navLinks.map((link) => (
-                <DropdownMenu.Item key={link.href} asChild>
-                  <Link
-                    href={link.href}
-                    className={`block w-full px-4 py-4 mb-1 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all ${pathname === link.href ? "bg-kindred-lime text-kindred-dark" : "text-white/60 hover:bg-white/10 hover:text-white"}`}
-                  >
-                    {link.label}
-                  </Link>
-                </DropdownMenu.Item>
-              ))}
-            </DropdownMenu.Content>
-          </DropdownMenu.Portal>
-        </DropdownMenu.Root>
-      </div>
-    </header>
+
+        <Divider />
+
+        {/* AREA 2: CORE NAV (Middle - Desktop Only) */}
+        <nav className="hidden md:flex flex-row items-center gap-3 flex-nowrap px-4">
+          <Link
+            href="/favour-map"
+            className={`${linkStyles} ${pathname === "/favour-map" ? activeStyles : inactiveStyles}`}
+          >
+            Favour Map 🗺️
+          </Link>
+          <Link
+            href="/community"
+            className={`${linkStyles} ${pathname === "/community" ? activeStyles : inactiveStyles}`}
+          >
+            Community 🌐
+          </Link>
+          <Link
+            href="/notice-board"
+            className={`${linkStyles} ${pathname === "/notice-board" ? activeStyles : inactiveStyles}`}
+          >
+            Notice Board 📜
+          </Link>
+        </nav>
+
+        <Divider />
+
+        {/* AREA 3: USER (Right) */}
+        <div className="flex flex-row items-center gap-2 flex-nowrap">
+          {userId && (
+            <div className="flex flex-row gap-2 flex-nowrap items-center">
+              {/* Inbox/Outbox - Hidden on Mobile */}
+              <div className="hidden md:flex flex-row gap-2 items-center">
+                <Link
+                  href="/inbox"
+                  className={`flex items-center gap-1.5 bg-black/5 dark:bg-white/5 border px-2.5 py-2 rounded-xl transition-all hover:shadow-kindred ${inboxCount > 0 ? "border-kindred-lime shadow-kindred animate-pulse" : "border-black/10 dark:border-white/10"}`}
+                >
+                  <span className="text-sm">📬</span>
+                  <span className="text-[10px] font-black opacity-60 dark:text-white">
+                    {inboxCount}
+                  </span>
+                </Link>
+
+                <Link
+                  href="/outbox"
+                  className="flex items-center gap-1.5 bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 px-2.5 py-2 rounded-xl hover:border-kindred-lime/50 transition-all hover:shadow-kindred"
+                >
+                  <span className="text-sm">📤</span>
+                  <span className="text-[10px] font-black opacity-60 dark:text-white">
+                    {outboxCount}
+                  </span>
+                </Link>
+              </div>
+
+              <Link
+                href="/"
+                className={`${linkStyles} hidden lg:flex ${pathname === "/" ? activeStyles : inactiveStyles}`}
+              >
+                Profile 👤
+              </Link>
+
+              <div className="scale-110 lg:scale-125 ml-1 md:ml-2">
+                <UserButton afterSignOutUrl="/" />
+              </div>
+            </div>
+          )}
+
+          {/* Mobile Menu (Hamburger) */}
+          <div className="md:hidden">
+            <DropdownMenu.Root>
+              <DropdownMenu.Trigger asChild>
+                <button className="bg-kindred-lime text-kindred-dark p-3 rounded-2xl border border-kindred-lime shadow-kindred outline-none active:scale-95 transition-transform">
+                  <span className="text-xl leading-none">☰</span>
+                </button>
+              </DropdownMenu.Trigger>
+              <DropdownMenu.Portal>
+                <DropdownMenu.Content
+                  sideOffset={15}
+                  align="end"
+                  style={{ backgroundColor: "var(--kindred-bg)" }}
+                  className="min-w-[220px] border-2 border-kindred-lime p-2 rounded-[2rem] shadow-[0_20px_50px_rgba(0,0,0,0.3)] z-[100] animate-in fade-in zoom-in duration-200"
+                >
+                  <div className="px-4 py-3 text-[9px] font-black text-kindred-lime uppercase tracking-[0.2em] border-b border-kindred-text/10 mb-2">
+                    Navigation
+                  </div>
+                  <DropdownMenu.Item asChild>
+                    <Link
+                      href="/community"
+                      className="flex items-center gap-3 px-4 py-4 text-[11px] font-black uppercase text-kindred-text dark:text-white/80 hover:bg-kindred-lime hover:text-kindred-dark rounded-2xl outline-none transition-colors"
+                    >
+                      Community 🌐
+                    </Link>
+                  </DropdownMenu.Item>
+                  <DropdownMenu.Item asChild>
+                    <Link
+                      href="/notice-board"
+                      className="flex items-center gap-3 px-4 py-4 text-[11px] font-black uppercase text-kindred-text dark:text-white/80 hover:bg-kindred-lime hover:text-kindred-dark rounded-2xl outline-none transition-colors"
+                    >
+                      Notice Board 📜
+                    </Link>
+                  </DropdownMenu.Item>
+                  <DropdownMenu.Item asChild>
+                    <Link
+                      href="/favour-map"
+                      className="flex items-center gap-3 px-4 py-4 text-[11px] font-black uppercase text-kindred-text dark:text-white/80 hover:bg-kindred-lime hover:text-kindred-dark rounded-2xl outline-none transition-colors"
+                    >
+                      Favour Map 🗺️
+                    </Link>
+                  </DropdownMenu.Item>
+
+                  <div className="h-[1px] bg-kindred-text/10 my-2" />
+
+                  <DropdownMenu.Item asChild>
+                    <Link
+                      href="/inbox"
+                      className="flex items-center justify-between px-4 py-4 text-[11px] font-black uppercase text-kindred-text dark:text-white/80 hover:bg-kindred-lime hover:text-kindred-dark rounded-2xl outline-none transition-colors"
+                    >
+                      <span>Inbox 📬</span>
+                      <span
+                        className={
+                          inboxCount > 0
+                            ? "text-kindred-lime font-black"
+                            : "opacity-50"
+                        }
+                      >
+                        {inboxCount}
+                      </span>
+                    </Link>
+                  </DropdownMenu.Item>
+                  <DropdownMenu.Item asChild>
+                    <Link
+                      href="/outbox"
+                      className="flex items-center justify-between px-4 py-4 text-[11px] font-black uppercase text-kindred-text dark:text-white/80 hover:bg-kindred-lime hover:text-kindred-dark rounded-2xl outline-none transition-colors"
+                    >
+                      <span>Outbox 📤</span>
+                      <span className="opacity-50">{outboxCount}</span>
+                    </Link>
+                  </DropdownMenu.Item>
+                  <DropdownMenu.Item asChild>
+                    <Link
+                      href="/"
+                      className="flex items-center gap-3 px-4 py-4 text-[11px] font-black uppercase text-kindred-text dark:text-white/80 hover:bg-kindred-lime hover:text-kindred-dark rounded-2xl outline-none transition-colors"
+                    >
+                      Profile 👤
+                    </Link>
+                  </DropdownMenu.Item>
+                  <DropdownMenu.Item asChild>
+                    <Link
+                      href="/about-us"
+                      className="flex items-center gap-3 px-4 py-4 text-[11px] font-black uppercase text-kindred-text dark:text-white/80 hover:bg-kindred-lime hover:text-kindred-dark rounded-2xl outline-none transition-colors"
+                    >
+                      About 💚
+                    </Link>
+                  </DropdownMenu.Item>
+                </DropdownMenu.Content>
+              </DropdownMenu.Portal>
+            </DropdownMenu.Root>
+          </div>
+        </div>
+      </header>
+    </div>
   );
 }
