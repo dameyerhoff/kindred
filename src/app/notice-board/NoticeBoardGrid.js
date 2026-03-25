@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { claimFavour } from "../actions";
+import ReportButton from "@/components/ReportButton";
 
 export default function NoticeBoardGrid({ openMissions = [], userId }) {
   const [searchTerm, setSearchTerm] = useState("");
@@ -32,9 +33,17 @@ export default function NoticeBoardGrid({ openMissions = [], userId }) {
           className="p-6 rounded-[2rem] border-2 border-kindred-lime shadow-kindred transition-all duration-300 group flex flex-col h-full overflow-hidden relative hover:brightness-110"
         >
           <div className="flex justify-between items-start mb-6">
-            <span className="bg-kindred-lime/10 border border-kindred-lime/30 text-kindred-lime text-[9px] font-black px-3 py-1 rounded-full uppercase tracking-widest">
-              {mission.category || "General Favour"}
-            </span>
+            <div className="flex items-center gap-2">
+              <span className="bg-kindred-lime/10 border border-kindred-lime/30 text-kindred-lime text-[9px] font-black px-3 py-1 rounded-full uppercase tracking-widest">
+                {mission.category || "General Favour"}
+              </span>
+              {userId && userId !== mission.sender_id && (
+                <ReportButton
+                  reportUserId={mission.sender_id}
+                  evidence={`Notice Board Mission: ${mission.favour_text}`}
+                />
+              )}
+            </div>
             <span
               suppressHydrationWarning
               className="text-[9px] font-black text-kindred-text/30 uppercase tracking-tighter"

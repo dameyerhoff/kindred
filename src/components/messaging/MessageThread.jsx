@@ -1,5 +1,6 @@
 import * as Accordion from "@radix-ui/react-accordion";
 import ReplyForm from "./ReplyForm";
+import ReportButton from "../ReportButton";
 
 export default function MessageThread({ message, type }) {
   const isGiving = type === "outbox";
@@ -27,12 +28,19 @@ export default function MessageThread({ message, type }) {
               {isGiving ? "📤 " : "📩 "} {message.subject || "Kindred Message"}
             </span>
           </div>
-          <div className="text-[10px] font-black text-white/30 bg-white/5 border border-white/10 px-2 py-1 rounded-md uppercase">
-            {new Date(message.created_at).toLocaleDateString()}
+          <div className="flex items-center gap-3">
+            <div className="text-[10px] font-black text-white/30 bg-white/5 border border-white/10 px-2 py-1 rounded-md uppercase">
+              {new Date(message.created_at).toLocaleDateString()}
+            </div>
+            <div onClick={(e) => e.stopPropagation()}>
+              <ReportButton
+                reportUserId={message.sender_id}
+                evidence={message.content}
+              />
+            </div>
           </div>
         </Accordion.Trigger>
       </Accordion.Header>
-
       <Accordion.Content className="px-6 pb-6 overflow-hidden data-[state=open]:animate-slide-down">
         <div
           className={`bg-black/40 p-5 rounded-2xl border text-sm text-white/80 leading-relaxed mb-6 ${isGiving ? "border-kindred-lime/10" : "border-kindred-blue-glow/10"}`}

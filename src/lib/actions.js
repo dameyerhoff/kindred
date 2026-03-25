@@ -65,6 +65,8 @@ export async function deleteContestAction(contestId) {
   revalidatePath("/(admin)/admin");
 }
 
+const BANNED_WORDS = ["badword1", "badword2", "inapropriate-term"];
+
 export async function sendMessageAction(receiverId, content, subject = null) {
   const { userId: senderId } = await auth();
 
@@ -74,6 +76,14 @@ export async function sendMessageAction(receiverId, content, subject = null) {
 
   if (!content || content.trim() === "") {
     throw new Error("Message content cannot be empty");
+  }
+
+  const hasProfanity = BANNED_WORDS.some((word) =>
+    content.toLowerCase().includes(word.toLowerCase()),
+  );
+
+  if (hasProfanity) {
+    throw new Error("Unfavourable language detected. Please stay kindred");
   }
 
   const { data, error } = await supabase
@@ -109,4 +119,33 @@ export async function getInboxAction() {
 
   if (error) throw new Error(error.message);
   return data;
+}
+
+export async function reportUserAction(formData) {
+  const { userId: reporterId } = await auth();
+  if (!reporterId) throw new Error("You must be logged in to report a user.");
+
+  const reportedUserId = formData.get("reportedUserId");
+  const reason = formData.get("reason");
+  const evidence = formData.get("evidence");
+
+  if (!reason || reason.trim() === "") {
+    throw new Error("Please provide a reason for the report.");
+  }
+
+  const { error } = await supabase.from("reports").insert([
+    {
+      reporter_id: reporterId,
+      reported_user_id: reportedUserId,
+      reason: reason,
+      evidence: evidence,
+      status: "pending",
+    },
+  ]);
+  if (error) {
+    throw new Error(error.message);
+  }
+  revalidatePath("/(admin)/admin");
+
+  return { success: true };
 }

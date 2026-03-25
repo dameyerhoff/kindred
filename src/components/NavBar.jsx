@@ -10,7 +10,6 @@ export default function Navbar({ inboxCount = 0, outboxCount = 0, userId }) {
   const [mounted, setMounted] = useState(false);
   const [isDark, setIsDark] = useState(true);
 
-<<<<<<< HEAD
   const navLinks = [
     { href: "/favour-map", label: "Favour Map 🗺️" },
     { href: "/community", label: "Community Grid 🌐" },
@@ -18,7 +17,6 @@ export default function Navbar({ inboxCount = 0, outboxCount = 0, userId }) {
     { href: "/diary", label: "My Diary 🗓️" },
     { href: "/about-us", label: "About Us 💚" },
   ];
-=======
   useEffect(() => {
     setMounted(true);
 
@@ -45,7 +43,6 @@ export default function Navbar({ inboxCount = 0, outboxCount = 0, userId }) {
       setIsDark(true);
     }
   };
->>>>>>> faef57d7adfc20b3712e5badd1f7ff42cba3993e
 
   const linkStyles =
     "px-3 py-2 rounded-full text-[9px] font-black uppercase tracking-widest transition-all items-center gap-1.5 flex whitespace-nowrap flex-nowrap shrink-0";
