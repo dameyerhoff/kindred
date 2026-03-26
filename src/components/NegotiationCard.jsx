@@ -2,14 +2,13 @@
 
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import { finalizeMission, updateMissionTerms } from "../app/actions";
+import { finalizeMission, updateMissionTerms } from "@/app/actions";
 
 export default function NegotiationCard({ activeMission }) {
   const searchParams = useSearchParams();
   const isEdit = searchParams.get("mode") === "edit";
 
-  // Using the server actions directly in the form action or a handler
-  async function handleSubmit(formData) {
+  async function handleAction(formData) {
     if (isEdit) {
       await updateMissionTerms(formData);
     } else {
@@ -34,7 +33,7 @@ export default function NegotiationCard({ activeMission }) {
         &ldquo;{activeMission.favour_text}&rdquo;
       </p>
 
-      <form action={handleSubmit} className="space-y-4">
+      <form action={handleAction} className="space-y-4">
         <input type="hidden" name="favourId" value={activeMission.id} />
 
         <div className="grid grid-cols-2 gap-4">
