@@ -4,15 +4,42 @@ import { createClient } from "@supabase/supabase-js";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
-// Internal helper for Supabase
 function getSupabase() {
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
   return createClient(supabaseUrl, supabaseKey);
 }
 
+// --- NEW ACTION ADDED HERE ---
+export async function completeFavour(formData) {
+  const { userId } = await auth();
+  if (!userId) throw new Error("Unauthorized");
+  const supabase = getSupabase();
+  const favourId = formData.get("favourId");
+  const receiverId = formData.get("receiverId");
+
+  // 1. Update the favour status to completed
+  const { error: favourError } = await supabase
+    .from("favours")
+    .update({ status: "completed" })
+    .eq("id", favourId);
+
+  if (favourError) throw favourError;
+
+  // 2. Award a Halo to the person who helped (the receiver)
+  if (receiverId) {
+    await awardHalo(receiverId);
+  }
+
+  revalidatePath("/");
+  revalidatePath("/inbox");
+  revalidatePath("/outbox");
+
+  return { success: true };
+}
+// --- END OF NEW ACTION ---
+
 export async function saveProfile(formData) {
-  const { auth } = await import("@clerk/nextjs/server");
   const { userId } = await auth();
   if (!userId) throw new Error("Unauthorized");
   const supabase = getSupabase();
@@ -82,7 +109,6 @@ export async function startNegotiation(formData) {
 }
 
 export async function releaseFavour(formData) {
-  const { auth } = await import("@clerk/nextjs/server");
   const { userId } = await auth();
   if (!userId) throw new Error("Unauthorized");
   const supabase = getSupabase();
@@ -99,7 +125,6 @@ export async function releaseFavour(formData) {
 }
 
 export async function finalizeMission(formData) {
-  const { auth } = await import("@clerk/nextjs/server");
   const { userId } = await auth();
   if (!userId) throw new Error("Unauthorized");
   const supabase = getSupabase();
@@ -125,7 +150,6 @@ export async function finalizeMission(formData) {
 }
 
 export async function updateMissionTerms(formData) {
-  const { auth } = await import("@clerk/nextjs/server");
   const { userId } = await auth();
   if (!userId) throw new Error("Unauthorized");
   const supabase = getSupabase();
@@ -151,7 +175,6 @@ export async function updateMissionTerms(formData) {
 }
 
 export async function signOffMission(formData) {
-  const { auth } = await import("@clerk/nextjs/server");
   const { userId } = await auth();
   if (!userId) throw new Error("Unauthorized");
   const supabase = getSupabase();
@@ -216,7 +239,6 @@ export async function awardHalo(targetUserId) {
 }
 
 export async function sendFavourRequest(formData) {
-  const { auth } = await import("@clerk/nextjs/server");
   const { userId } = await auth();
   if (!userId) throw new Error("Unauthorized");
   const supabase = getSupabase();
@@ -282,7 +304,6 @@ export async function declineFavour(formData) {
 }
 
 export async function deleteFavour(formData) {
-  const { auth } = await import("@clerk/nextjs/server");
   const { userId } = await auth();
   if (!userId) throw new Error("Unauthorized");
   const supabase = getSupabase();
@@ -305,20 +326,4 @@ export async function deleteFavour(formData) {
   revalidatePath("/inbox");
   revalidatePath("/outbox");
   revalidatePath("/");
-}
-
-export async function completeFavour(formData) {
-  const { auth } = await import("@clerk/nextjs/server");
-  const { userId } = await auth();
-  if (!userId) throw new Error("Unauthorized");
-  const supabase = getSupabase();
-  const favourId = formData.get("favourId");
-
-  const { error } = await supabase
-    .from("favours")
-    .update({ status: "active", receiver_id: userId })
-    .eq("id", favourId);
-
-  if (error) throw error;
-  revalidatePath("/inbox");
 }

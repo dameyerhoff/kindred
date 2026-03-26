@@ -12,13 +12,16 @@ export default function Navbar({ inboxCount = 0, outboxCount = 0, userId }) {
 
   useEffect(() => {
     setMounted(true);
-    const savedTheme = localStorage.getItem("theme");
-    if (savedTheme === "light") {
+
+    // Sync logic: If localStorage is empty or set to dark, we are in dark mode
+    const theme = localStorage.getItem("theme");
+    if (theme === "light") {
       setIsDark(false);
       document.documentElement.classList.remove("dark");
     } else {
       setIsDark(true);
       document.documentElement.classList.add("dark");
+      localStorage.setItem("theme", "dark");
     }
   }, []);
 
@@ -33,6 +36,7 @@ export default function Navbar({ inboxCount = 0, outboxCount = 0, userId }) {
       setIsDark(true);
     }
   };
+
 
   const linkStyles =
     "px-3 py-2 rounded-full text-[9px] font-black uppercase tracking-widest transition-all items-center gap-1.5 flex whitespace-nowrap flex-nowrap shrink-0";
@@ -66,10 +70,10 @@ export default function Navbar({ inboxCount = 0, outboxCount = 0, userId }) {
           <button
             onClick={toggleTheme}
             type="button"
-            className="p-2 rounded-xl bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 hover:border-kindred-lime transition-all text-lg cursor-pointer min-w-[40px] min-h-[40px] flex items-center justify-center"
+            className="p-2 rounded-xl bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 hover:border-kindred-lime transition-all text-lg cursor-pointer min-w-[40px] min-h-[40px]"
             title="Toggle Theme"
           >
-            {mounted ? (isDark ? "☀️" : "🌙") : "🌙"}
+            {mounted ? (isDark ? "☀️" : "🌙") : null}
           </button>
 
           <Link
@@ -138,11 +142,7 @@ export default function Navbar({ inboxCount = 0, outboxCount = 0, userId }) {
               </Link>
 
               <div className="scale-110 lg:scale-125 ml-1 md:ml-2">
-                {mounted ? (
-                  <UserButton afterSignOutUrl="/" />
-                ) : (
-                  <div className="w-8 h-8 rounded-full bg-black/10 dark:bg-white/10 animate-pulse" />
-                )}
+                <UserButton afterSignOutUrl="/" />
               </div>
             </div>
           )}
@@ -188,9 +188,7 @@ export default function Navbar({ inboxCount = 0, outboxCount = 0, userId }) {
                       Favour Map 🗺️
                     </Link>
                   </DropdownMenu.Item>
-
                   <div className="h-[1px] bg-kindred-text/10 my-2" />
-
                   <DropdownMenu.Item asChild>
                     <Link
                       href="/inbox"
