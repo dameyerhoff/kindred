@@ -4,6 +4,7 @@ import {
   startNegotiation,
   getMySentRequests,
   deleteFavour,
+  completeFavour, // Added this import
 } from "../actions";
 import Link from "next/link";
 import { auth } from "@clerk/nextjs/server";
@@ -12,6 +13,7 @@ import NavBar from "@/components/NavBar";
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
+// This page shows you a list of people who have asked you for a favour
 export default async function InboxPage() {
   const { userId } = await auth();
   const myRequests = (await getMyRequests()) || [];
@@ -19,6 +21,7 @@ export default async function InboxPage() {
 
   return (
     <main className="min-h-screen bg-kindred-bg p-4 md:p-8 text-kindred-text relative overflow-hidden isolate transition-colors duration-300">
+      {/* This adds the pretty green light in the background */}
       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[1000px] h-[400px] bg-kindred-lime/10 blur-[120px] pointer-events-none -z-10"></div>
 
       <NavBar
@@ -28,6 +31,7 @@ export default async function InboxPage() {
       />
 
       <div className="max-w-4xl mx-auto relative z-10">
+        {/* This button takes you back to your main profile page */}
         <Link
           href="/"
           className="inline-block text-[10px] font-black uppercase tracking-[0.3em] text-kindred-lime hover:opacity-70 transition-all mb-12 border border-kindred-lime/20 px-4 py-2 rounded-full hover:bg-kindred-lime/10"
@@ -47,9 +51,13 @@ export default async function InboxPage() {
               return (
                 <div
                   key={req.id}
-                  className={`backdrop-blur-xl p-6 rounded-[2rem] border flex flex-col md:flex-row justify-between items-start md:items-center shadow-2xl group transition-all gap-6 ${isCompleted ? "bg-kindred-lime/10 border-kindred-lime/40" : "bg-black/5 dark:bg-white/5 border-black/10 dark:border-white/10"}`}
+                  className={`backdrop-blur-xl p-6 rounded-[2rem] border flex flex-col md:flex-row justify-between items-start md:items-center shadow-2xl group transition-all gap-6 ${
+                    isCompleted
+                      ? "bg-kindred-lime/10 border-kindred-lime/40"
+                      : "bg-black/5 dark:bg-white/5 border-black/10 dark:border-white/10"
+                  }`}
                 >
-                  <div>
+                  <div className="flex-1">
                     <p className="text-xl font-bold italic group-hover:text-kindred-lime transition-colors">
                       &ldquo;{req.favour_text}&rdquo;
                     </p>
@@ -62,7 +70,8 @@ export default async function InboxPage() {
                     </p>
                   </div>
 
-                  <div className="flex gap-3 w-full md:w-auto">
+                  <div className="flex flex-wrap gap-3 w-full md:w-auto">
+                    {/* DELETE FORM - Only active if completed */}
                     <form action={deleteFavour} className="flex-1 md:flex-none">
                       <input type="hidden" name="favourId" value={req.id} />
                       <button
@@ -74,45 +83,31 @@ export default async function InboxPage() {
                             : "bg-white/5 text-white/10 border border-white/5 cursor-not-allowed grayscale"
                         }`}
                       >
-                        Delete Record 🗑️
+                        Delete 🗑️
                       </button>
                     </form>
 
-                    {!isCompleted && (
-                      <>
-                        <form
-                          action={releaseFavour}
-                          className="flex-1 md:flex-none"
-                        >
-                          <input type="hidden" name="favourId" value={req.id} />
-                          <button
-                            type="submit"
-                            className="w-full text-kindred-text/40 hover:text-kindred-text px-4 py-3 rounded-xl font-black text-[10px] uppercase border border-black/5 dark:border-white/5 transition-all"
-                          >
-                            {req.status === "active" ? "Release" : "Decline"}
-                          </button>
-                        </form>
-
-                        <form
-                          action={startNegotiation}
-                          className="flex-1 md:flex-none"
-                        >
-                          <input type="hidden" name="favourId" value={req.id} />
-                          <button
-                            type="submit"
-                            className="w-full bg-kindred-lime text-kindred-dark px-6 py-3 rounded-xl font-black text-xs hover:brightness-110 transition-all shadow-md uppercase shadow-kindred/20"
-                          >
-                            {isAgreed ? "Re-negotiate 🔄" : "Discuss Terms 🤝"}
-                          </button>
-                        </form>
-                      </>
-                    )}
+                    <form action={completeFavour}>
+                      <input type="hidden" name="favourId" value={req.id} />
+                      <input
+                        type="hidden"
+                        name="receiverId"
+                        value={req.receiver_id}
+                      />
+                      <button
+                        type="submit"
+                        className="bg-kindred-text dark:bg-white text-kindred-bg dark:text-kindred-dark px-6 py-3 rounded-xl font-black text-xs hover:bg-kindred-lime hover:text-kindred-dark transition-all shadow-2xl uppercase hover:shadow-kindred"
+                      >
+                        Help & Earn 😇
+                      </button>
+                    </form>
                   </div>
                 </div>
               );
             })}
           </div>
         ) : (
+          /* If nobody has sent you a request, show this empty box instead */
           <div className="bg-black/5 dark:bg-white/5 border border-dashed border-black/10 dark:border-white/10 rounded-[2rem] p-20 text-center">
             <p className="text-kindred-text/20 text-xl font-black uppercase tracking-[0.4em]">
               Inbox Clear • Spirit Strong

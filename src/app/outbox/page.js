@@ -11,6 +11,7 @@ import NavBar from "@/components/NavBar";
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
+// This builds the main page for the Outbox
 export default async function OutboxPage() {
   const { userId } = await auth();
   const myRequests = userId ? (await getMyRequests()) || [] : [];
@@ -18,6 +19,7 @@ export default async function OutboxPage() {
 
   return (
     <main className="min-h-screen bg-kindred-bg p-4 md:p-8 text-kindred-text relative overflow-hidden isolate transition-colors duration-300">
+      {/* This adds a soft blue light in the background to match the sent theme */}
       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[1000px] h-[400px] bg-kindred-blue-glow/10 blur-[120px] pointer-events-none -z-10"></div>
 
       <NavBar
@@ -47,9 +49,13 @@ export default async function OutboxPage() {
               return (
                 <div
                   key={req.id}
-                  className={`backdrop-blur-xl p-6 rounded-[2rem] border flex justify-between items-center shadow-2xl group transition-all ${isCompleted ? "bg-kindred-blue-glow/10 border-kindred-blue-glow/40" : "bg-black/5 dark:bg-white/5 border-black/10 dark:border-kindred-blue-glow/10"}`}
+                  className={`backdrop-blur-xl p-6 rounded-[2rem] border flex flex-col md:flex-row justify-between items-start md:items-center shadow-2xl group transition-all gap-6 ${
+                    isCompleted
+                      ? "bg-kindred-blue-glow/10 border-kindred-blue-glow/40"
+                      : "bg-black/5 dark:bg-white/5 border-black/10 dark:border-kindred-blue-glow/10"
+                  }`}
                 >
-                  <div>
+                  <div className="flex-1">
                     <p className="text-xl font-bold italic text-kindred-text/80 group-hover:text-kindred-blue-glow transition-colors">
                       &ldquo;{req.favour_text}&rdquo;
                     </p>
@@ -62,14 +68,14 @@ export default async function OutboxPage() {
                     </p>
                   </div>
 
-                  <div className="flex gap-4 items-center">
-                    {/* ALWAYS SHOW DELETE - DISABLED UNLESS COMPLETED */}
-                    <form action={deleteFavour}>
+                  <div className="flex flex-wrap gap-4 items-center w-full md:w-auto">
+                    {/* DELETE HISTORY FORM */}
+                    <form action={deleteFavour} className="flex-1 md:flex-none">
                       <input type="hidden" name="favourId" value={req.id} />
                       <button
                         type="submit"
                         disabled={!isCompleted}
-                        className={`px-6 py-3 rounded-xl text-[10px] font-black uppercase transition-all shadow-lg ${
+                        className={`w-full px-6 py-3 rounded-xl text-[10px] font-black uppercase transition-all shadow-lg ${
                           isCompleted
                             ? "bg-red-500/20 text-red-500 border border-red-500/40 hover:bg-red-500 hover:text-white cursor-pointer"
                             : "bg-white/5 text-white/10 border border-white/5 cursor-not-allowed grayscale"
@@ -80,11 +86,14 @@ export default async function OutboxPage() {
                     </form>
 
                     {!isCompleted && (
-                      <form action={startNegotiation}>
+                      <form
+                        action={startNegotiation}
+                        className="flex-1 md:flex-none"
+                      >
                         <input type="hidden" name="favourId" value={req.id} />
                         <button
                           type="submit"
-                          className="bg-kindred-blue-glow/10 px-6 py-3 rounded-xl border border-kindred-blue-glow/20 text-[10px] font-black text-kindred-blue-glow uppercase tracking-widest hover:bg-kindred-blue-glow/20 transition-all"
+                          className="w-full bg-kindred-blue-glow/10 px-6 py-3 rounded-xl border border-kindred-blue-glow/20 text-[10px] font-black text-kindred-blue-glow uppercase tracking-widest hover:bg-kindred-blue-glow/20 transition-all"
                         >
                           {isAgreed
                             ? "Re-negotiate 🔄"
@@ -100,6 +109,7 @@ export default async function OutboxPage() {
             })}
           </div>
         ) : (
+          /* If you haven't sent any requests, show this empty box instead */
           <div className="bg-black/5 dark:bg-white/5 border border-dashed border-black/10 dark:border-white/10 rounded-[2rem] p-20 text-center">
             <p className="text-kindred-text/20 text-xl font-black uppercase tracking-[0.4em]">
               Outbox Empty
