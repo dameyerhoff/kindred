@@ -20,7 +20,9 @@ export default function CommunityGridPage() {
 
   useEffect(() => {
     async function loadData() {
+      // These are server actions being called from the client
       const allProfiles = (await getProfiles()) || [];
+
       // Filter out current user from the grid
       setCommunityProfiles(allProfiles.filter((p) => p.clerk_id !== userId));
 
