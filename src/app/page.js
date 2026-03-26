@@ -95,6 +95,7 @@ export default async function Home({ searchParams }) {
               <div className="absolute -inset-1 bg-gradient-to-r from-kindred-lime via-emerald-400 to-kindred-blue-glow rounded-[2.5rem] blur-xl opacity-20 group-hover:opacity-50 transition duration-1000"></div>
               <div className="relative bg-black/5 dark:bg-white/5 backdrop-blur-3xl border border-black/10 dark:border-white/10 p-8 rounded-[2.5rem] flex flex-col md:flex-row gap-8 items-center">
                 <div className="relative">
+                  {/* SAFE CHARAT CHECK: Added fallback and optional chaining */}
                   <div className="w-24 h-24 rounded-full border-4 border-kindred-lime flex items-center justify-center bg-kindred-bg text-4xl font-black text-kindred-text shadow-kindred">
                     {myProfile?.full_name?.charAt(0) || "?"}
                   </div>
