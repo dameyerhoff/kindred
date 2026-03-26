@@ -5,7 +5,7 @@ import {
   deleteFavour,
 } from "../actions";
 import Link from "next/link";
-import { auth } from "@clerk/nextjs/server";
+import { useAuth } from "@clerk/nextjs";
 import NavBar from "@/components/NavBar";
 
 export const dynamic = "force-dynamic";
