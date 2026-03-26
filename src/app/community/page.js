@@ -1,11 +1,13 @@
+"use client";
+
+import { useState, useEffect } from "react";
 import {
   getProfiles,
   sendFavourRequest,
   getMyRequests,
   getMySentRequests,
 } from "../actions";
-import { UserButton } from "@clerk/nextjs";
-import { auth } from "@clerk/nextjs/server";
+import { useAuth } from "@clerk/nextjs";
 import Link from "next/link";
 import CommunityGrid from "./CommunityGrid";
 import NavBar from "@/components/NavBar";
@@ -28,8 +30,8 @@ export default async function CommunityGridPage() {
 
       <NavBar
         userId={userId}
-        inboxCount={myRequests.length}
-        outboxCount={mySentRequests.length}
+        inboxCount={counts.inbox}
+        outboxCount={counts.outbox}
       />
 
       <section className="max-w-6xl mx-auto relative z-10">
@@ -73,6 +75,7 @@ export default async function CommunityGridPage() {
           communityProfiles={communityProfiles}
           userId={userId}
           sendFavourRequest={sendFavourRequest}
+          searchTerm={searchTerm}
         />
       </section>
     </main>

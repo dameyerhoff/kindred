@@ -1,15 +1,19 @@
-import { getProfiles, getMyRequests, getMySentRequests } from "./actions";
-import { UserButton, SignInButton, SignUpButton } from "@clerk/nextjs";
+import {
+  getProfiles,
+  getMyRequests,
+  getMySentRequests,
+  signOffMission,
+} from "./actions";
 import { auth } from "@clerk/nextjs/server";
 import Link from "next/link";
-// Diagnostic tracer intact
 import { createClient } from "@supabase/supabase-js";
 import NavBar from "@/components/NavBar";
+import { headers } from "next/headers";
+import NegotiationCard from "@/components/NegotiationCard";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
-// This part helps decide what name and picture to show based on how many points someone has
 const getSaintlyRank = (halos = 0) => {
   if (halos >= 50) return { title: "Kindred Legend", icon: "👑" };
   if (halos >= 25) return { title: "Arch-Guardian", icon: "🕊️" };
@@ -18,32 +22,45 @@ const getSaintlyRank = (halos = 0) => {
   return { title: "Level 1 Saint", icon: "🌱" };
 };
 
-// This is the main front page where you see your profile and stats
-export default async function Home() {
-  // Check who is logged in right now
-  const { userId } = await auth();
+async function getMissionData(missionId) {
+  if (!missionId) return null;
+  const supabase = createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
+  );
+  const { data } = await supabase
+    .from("favours")
+    .select("*, profiles:sender_id(full_name)")
+    .eq("id", missionId)
+    .single();
+  return data;
+}
 
-  // Connect to the database to check the connection
+export default async function Home({ searchParams }) {
+  await headers();
+  const { userId } = await auth();
+  const params = await searchParams;
+  const missionId = params.missionId;
+
   const tempClient = createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
   );
 
-  // Get all the info about profiles and help requests from the database
   const profiles = (await getProfiles()) || [];
   const myRequests = (await getMyRequests()) || [];
   const mySentRequests = (await getMySentRequests()) || [];
+  const activeMission = await getMissionData(missionId);
 
-  // Get a list of the last 5 good deeds finished
   const { data: myDeeds } = await tempClient
     .from("favours")
-    .select("*")
-    .eq("receiver_id", userId)
-    .eq("status", "completed")
-    .order("id", { ascending: false })
-    .limit(5);
+    .select(
+      "*, sender:sender_id(full_name), receiver:receiver_id(full_name), scheduled_date, scheduled_time, exchange_details, sender_signed_off, receiver_signed_off",
+    )
+    .or(`sender_id.eq.${userId},receiver_id.eq.${userId}`)
+    .in("status", ["active", "completed"])
+    .order("created_at", { ascending: false });
 
-  // Find the specific profile for this user in the list
   const myProfile = profiles.find((p) => p.clerk_id === userId);
 
   return (
@@ -58,9 +75,10 @@ export default async function Home() {
         outboxCount={mySentRequests.length}
       />
 
-      {/* This section holds the main content where profile details are displayed */}
-      <section className="max-w-6xl mx-auto space-y-12 relative z-10">
-        {myProfile ? (
+      <section className="max-w-6xl mx-auto space-y-12 relative z-10 pt-10">
+        {activeMission && <NegotiationCard activeMission={activeMission} />}
+
+        {myProfile && !activeMission ? (
           <div className="space-y-6">
             <div className="relative group">
               <div className="absolute -inset-1 bg-gradient-to-r from-kindred-lime via-emerald-400 to-kindred-blue-glow rounded-[2.5rem] blur-xl opacity-20 group-hover:opacity-50 transition duration-1000"></div>
@@ -166,7 +184,7 @@ export default async function Home() {
             {myDeeds && myDeeds.length > 0 && (
               <div className="bg-black/5 dark:bg-white/5 rounded-[2rem] p-6 border border-black/5 dark:border-white/5 backdrop-blur-sm">
                 <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-kindred-lime/50 mb-4">
-                  Recent Kindred Deeds
+                  Kindred Mission Log
                 </h3>
                 <div className="space-y-3">
                   {myDeeds.map((deed) => (

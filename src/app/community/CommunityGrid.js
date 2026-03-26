@@ -1,7 +1,7 @@
 "use client";
 
-import { useState } from "react";
 import { SignInButton } from "@clerk/nextjs";
+import Link from "next/link";
 
 const getSaintlyRank = (halos = 0) => {
   if (halos >= 50) return { title: "Kindred Legend", icon: "👑" };
@@ -15,6 +15,7 @@ export default function CommunityGrid({
   communityProfiles = [],
   userId,
   sendFavourRequest,
+  searchTerm = "",
 }) {
   const [searchTerm, setSearchTerm] = useState("");
 
@@ -55,6 +56,12 @@ export default function CommunityGrid({
                   {profile.city} • {getSaintlyRank(profile.halos).title}
                 </p>
               </div>
+              <Link
+                href={`/profile/${profile.clerk_id}`}
+                className="text-[8px] font-black uppercase tracking-tighter bg-kindred-lime text-kindred-dark px-2 py-1 rounded-lg hover:scale-105 transition-transform shadow-sm"
+              >
+                View Profile 👤
+              </Link>
             </div>
             <div className="flex items-center bg-kindred-text/5 px-3 py-1.5 rounded-full border border-kindred-text/10 self-start">
               <span className="text-sm">😇</span>

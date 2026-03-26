@@ -1,4 +1,9 @@
-import { getMyRequests, getMySentRequests } from "../actions";
+import {
+  getMyRequests,
+  getMySentRequests,
+  startNegotiation,
+  deleteFavour,
+} from "../actions";
 import Link from "next/link";
 import { auth } from "@clerk/nextjs/server";
 import NavBar from "@/components/NavBar";
@@ -9,7 +14,6 @@ export const revalidate = 0;
 // This builds the main page for the Outbox
 export default async function OutboxPage() {
   const { userId } = await auth();
-  // Go to the database and find all the requests I have sent out
   const myRequests = userId ? (await getMyRequests()) || [] : [];
   const mySentRequests = (await getMySentRequests()) || [];
 
@@ -25,7 +29,6 @@ export default async function OutboxPage() {
       />
 
       <div className="max-w-4xl mx-auto relative z-10">
-        {/* This button takes you back to your main profile page */}
         <Link
           href="/"
           className="inline-block text-[10px] font-black uppercase tracking-[0.3em] text-kindred-blue-glow hover:opacity-70 transition-all mb-12 border border-kindred-blue-glow/20 px-4 py-2 rounded-full hover:bg-kindred-blue-glow/10"
@@ -37,7 +40,6 @@ export default async function OutboxPage() {
           Sent Requests 📤
         </h1>
 
-        {/* If there are requests you sent, show them in a list */}
         {mySentRequests.length > 0 ? (
           <div className="grid gap-4">
             {mySentRequests.map((req) => (
@@ -60,8 +62,8 @@ export default async function OutboxPage() {
                     Pending
                   </span>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         ) : (
           /* If you haven't sent any requests, show this empty box instead */

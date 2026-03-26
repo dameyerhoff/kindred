@@ -1,8 +1,9 @@
 import {
   getMyRequests,
-  completeFavour,
-  declineFavour,
+  releaseFavour,
+  startNegotiation,
   getMySentRequests,
+  deleteFavour,
 } from "../actions";
 import Link from "next/link";
 import { auth } from "@clerk/nextjs/server";
@@ -14,7 +15,6 @@ export const revalidate = 0;
 // This page shows you a list of people who have asked you for a favour
 export default async function InboxPage() {
   const { userId } = await auth();
-  // Go to the database and find all the requests sent to me
   const myRequests = (await getMyRequests()) || [];
   const mySentRequests = userId ? (await getMySentRequests()) || [] : [];
 
@@ -41,7 +41,6 @@ export default async function InboxPage() {
           Kindred Inbox 📬
         </h1>
 
-        {/* If there are requests, show them in a list */}
         {myRequests.length > 0 ? (
           <div className="grid gap-4">
             {myRequests.map((req) => (
@@ -86,8 +85,8 @@ export default async function InboxPage() {
                     </button>
                   </form>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         ) : (
           /* If nobody has sent you a request, show this empty box instead */

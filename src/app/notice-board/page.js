@@ -1,3 +1,6 @@
+"use client";
+
+import { useEffect, useState } from "react";
 import {
   getPublicNoticeBoard,
   getMyRequests,
@@ -8,8 +11,11 @@ import Link from "next/link";
 import NoticeBoardGrid from "./NoticeBoardGrid";
 import NavBar from "@/components/NavBar";
 
-export const dynamic = "force-dynamic";
-export const revalidate = 0;
+export default function NoticeBoard() {
+  const { userId } = useAuth(); // Client-side hook for auth
+  const [openMissions, setOpenMissions] = useState([]);
+  const [counts, setCounts] = useState({ inbox: 0, outbox: 0 });
+  const [searchTerm, setSearchTerm] = useState("");
 
 export default async function NoticeBoard() {
   const { userId } = await auth();
@@ -24,8 +30,8 @@ export default async function NoticeBoard() {
 
       <NavBar
         userId={userId}
-        inboxCount={myRequests.length}
-        outboxCount={mySentRequests.length}
+        inboxCount={counts.inbox}
+        outboxCount={counts.outbox}
       />
 
       <section className="max-w-6xl mx-auto relative z-10">
@@ -65,7 +71,11 @@ export default async function NoticeBoard() {
           </div>
         </header>
 
-        <NoticeBoardGrid openMissions={openMissions} userId={userId} />
+        <NoticeBoardGrid
+          openMissions={openMissions}
+          userId={userId}
+          searchTerm={searchTerm}
+        />
       </section>
     </main>
   );
