@@ -12,7 +12,7 @@ import NoticeBoardGrid from "./NoticeBoardGrid";
 import NavBar from "@/components/NavBar";
 
 export default function NoticeBoard() {
-  const { userId } = useAuth(); // Client-side hook for auth
+  const { userId, isLoaded } = useAuth(); // Added isLoaded for better sync
   const [openMissions, setOpenMissions] = useState([]);
   const [counts, setCounts] = useState({ inbox: 0, outbox: 0 });
   const [searchTerm, setSearchTerm] = useState("");
@@ -31,8 +31,10 @@ export default function NoticeBoard() {
         });
       }
     }
-    loadData();
-  }, [userId]);
+    if (isLoaded) {
+      loadData();
+    }
+  }, [userId, isLoaded]);
 
   return (
     <main className="min-h-screen bg-kindred-bg p-4 md:p-8 text-kindred-text relative overflow-hidden isolate transition-colors duration-300">

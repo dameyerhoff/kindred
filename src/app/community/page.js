@@ -13,17 +13,14 @@ import CommunityGrid from "./CommunityGrid";
 import NavBar from "@/components/NavBar";
 
 export default function CommunityGridPage() {
-  const { userId } = useAuth(); // Client-side hook for auth
+  const { userId, isLoaded } = useAuth();
   const [communityProfiles, setCommunityProfiles] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [counts, setCounts] = useState({ inbox: 0, outbox: 0 });
 
   useEffect(() => {
     async function loadData() {
-      // These are server actions being called from the client
       const allProfiles = (await getProfiles()) || [];
-
-      // Filter out current user from the grid
       setCommunityProfiles(allProfiles.filter((p) => p.clerk_id !== userId));
 
       if (userId) {
@@ -35,8 +32,10 @@ export default function CommunityGridPage() {
         });
       }
     }
-    loadData();
-  }, [userId]);
+    if (isLoaded) {
+      loadData();
+    }
+  }, [userId, isLoaded]);
 
   return (
     <main className="min-h-screen bg-kindred-bg p-4 md:p-8 text-kindred-text relative overflow-hidden isolate transition-colors duration-300">
@@ -54,7 +53,7 @@ export default function CommunityGridPage() {
             href="/"
             className="text-kindred-lime text-xs font-black uppercase tracking-[0.3em] hover:opacity-70 transition-all flex items-center gap-2 mb-8"
           >
-            ← Back to your Profile
+            &larr; Back to your Profile
           </Link>
 
           <div className="flex flex-col md:flex-row md:items-center gap-6 md:gap-10">

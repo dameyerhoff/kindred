@@ -52,14 +52,24 @@ export default async function Home({ searchParams }) {
   const mySentRequests = (await getMySentRequests()) || [];
   const activeMission = await getMissionData(missionId);
 
-  const { data: myDeeds } = await supabase
+  // FIXED: Simplified query to avoid the "Relationship Ambiguity" error
+  const { data: rawDeeds } = await supabase
     .from("favours")
-    .select(
-      "*, sender:sender_id(full_name), receiver:receiver_id(full_name), scheduled_date, scheduled_time, exchange_details, sender_signed_off, receiver_signed_off",
-    )
+    .select("*")
     .or(`sender_id.eq.${userId},receiver_id.eq.${userId}`)
     .in("status", ["active", "completed"])
     .order("created_at", { ascending: false });
+
+  // Manually join the names using the profiles we already fetched above
+  const myDeeds = (rawDeeds || []).map((deed) => {
+    const senderProf = profiles.find((p) => p.clerk_id === deed.sender_id);
+    const receiverProf = profiles.find((p) => p.clerk_id === deed.receiver_id);
+    return {
+      ...deed,
+      sender: senderProf ? { full_name: senderProf.full_name } : null,
+      receiver: receiverProf ? { full_name: receiverProf.full_name } : null,
+    };
+  });
 
   const myProfile = profiles.find((p) => p.clerk_id === userId);
 
@@ -81,7 +91,7 @@ export default async function Home({ searchParams }) {
               <div className="relative bg-black/5 dark:bg-white/5 backdrop-blur-3xl border border-black/10 dark:border-white/10 p-8 rounded-[2.5rem] flex flex-col md:flex-row gap-8 items-center">
                 <div className="relative">
                   <div className="w-24 h-24 rounded-full border-4 border-kindred-lime flex items-center justify-center bg-kindred-bg text-4xl font-black text-kindred-text shadow-kindred">
-                    {myProfile.full_name.charAt(0)}
+                    {myProfile.full_name?.charAt(0) || "K"}
                   </div>
                   <div className="absolute -top-2 -right-2 bg-kindred-lime text-kindred-dark text-[11px] font-black px-3 py-1 rounded-full animate-bounce shadow-xl uppercase border-2 border-white dark:border-kindred-dark">
                     {getSaintlyRank(myProfile.halos).icon} Rank

@@ -8,13 +8,10 @@ import { usePathname } from "next/navigation";
 export default function Navbar({ inboxCount = 0, outboxCount = 0, userId }) {
   const pathname = usePathname();
   const [mounted, setMounted] = useState(false);
-
-  // Start with true to align with our dark-first strategy
   const [isDark, setIsDark] = useState(true);
 
   useEffect(() => {
     setMounted(true);
-    // Sync logic: If localStorage is 'light', set to false, otherwise stay dark
     const savedTheme = localStorage.getItem("theme");
     if (savedTheme === "light") {
       setIsDark(false);
@@ -50,7 +47,6 @@ export default function Navbar({ inboxCount = 0, outboxCount = 0, userId }) {
 
   return (
     <div className="max-w-7xl mx-auto px-4">
-      {/* Logo Container */}
       <div className="flex justify-start mb-4">
         <Link href="/">
           <img
@@ -66,7 +62,6 @@ export default function Navbar({ inboxCount = 0, outboxCount = 0, userId }) {
       </div>
 
       <header className="flex flex-row justify-between items-center mb-16 relative z-50 border-2 border-black/10 dark:border-kindred-lime bg-black/[0.02] dark:bg-kindred-dark/40 backdrop-blur-md py-3 px-4 md:px-6 rounded-[2rem] flex-nowrap shadow-xl transition-all duration-300">
-        {/* AREA 1: THEME TOGGLE (Left) */}
         <div className="flex items-center gap-2">
           <button
             onClick={toggleTheme}
@@ -87,7 +82,6 @@ export default function Navbar({ inboxCount = 0, outboxCount = 0, userId }) {
 
         <Divider />
 
-        {/* AREA 2: CORE NAV (Middle - Desktop Only) */}
         <nav className="hidden md:flex flex-row items-center gap-3 flex-nowrap px-4">
           <Link
             href="/favour-map"
@@ -111,11 +105,9 @@ export default function Navbar({ inboxCount = 0, outboxCount = 0, userId }) {
 
         <Divider />
 
-        {/* AREA 3: USER (Right) */}
         <div className="flex flex-row items-center gap-2 flex-nowrap">
           {userId && (
             <div className="flex flex-row gap-2 flex-nowrap items-center">
-              {/* Inbox/Outbox - Hidden on Mobile */}
               <div className="hidden md:flex flex-row gap-2 items-center">
                 <Link
                   href="/inbox"
@@ -146,7 +138,6 @@ export default function Navbar({ inboxCount = 0, outboxCount = 0, userId }) {
               </Link>
 
               <div className="scale-110 lg:scale-125 ml-1 md:ml-2">
-                {/* HYDRATION FIX: Only render UserButton on the client side */}
                 {mounted ? (
                   <UserButton afterSignOutUrl="/" />
                 ) : (
@@ -156,7 +147,6 @@ export default function Navbar({ inboxCount = 0, outboxCount = 0, userId }) {
             </div>
           )}
 
-          {/* Mobile Menu (Hamburger) */}
           <div className="md:hidden">
             <DropdownMenu.Root>
               <DropdownMenu.Trigger asChild>
