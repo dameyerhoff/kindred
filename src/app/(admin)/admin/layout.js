@@ -1,12 +1,12 @@
-import { auth } from "@clerk/nextjs/server";
+import { getUserId } from "@/lib/clerk-server"; // FIXED: Safe helper
 import { redirect } from "next/navigation";
 import { supabase } from "@/lib/db";
 import AdminSidebar from "@/components/admin/AdminSidebar";
 
 // This part builds the special layout for the admin pages
 export default async function AdminLayout({ children }) {
-  // Check who is logged in right now
-  const { userId } = await auth();
+  // FIXED: Using safe helper to check who is logged in
+  const userId = await getUserId();
 
   // If nobody is logged in, send them back to the sign in page
   if (!userId) redirect("/sign-in");
