@@ -1,7 +1,6 @@
 "use server";
 
 import { createClient } from "@supabase/supabase-js";
-import { auth } from "@clerk/nextjs/server";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
@@ -86,6 +85,7 @@ export async function getPublicNoticeBoard() {
 }
 
 export async function claimFavour(formData) {
+  const { auth } = await import("@clerk/nextjs/server");
   const { userId } = await auth();
   if (!userId) throw new Error("Unauthorized");
   const supabase = getSupabase();
@@ -264,6 +264,7 @@ export async function sendFavourRequest(formData) {
 }
 
 export async function getMyRequests() {
+  const { auth } = await import("@clerk/nextjs/server");
   const { userId } = await auth();
   if (!userId) return [];
   const supabase = getSupabase();
@@ -277,6 +278,7 @@ export async function getMyRequests() {
 }
 
 export async function getMySentRequests() {
+  const { auth } = await import("@clerk/nextjs/server");
   const { userId } = await auth();
   if (!userId) return [];
   const supabase = getSupabase();
