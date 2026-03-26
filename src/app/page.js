@@ -3,6 +3,8 @@ import {
   getMyRequests,
   getMySentRequests,
   signOffMission,
+  finalizeMission,
+  updateMissionTerms,
 } from "./actions";
 import Link from "next/link";
 import { createClient } from "@supabase/supabase-js";
@@ -79,7 +81,14 @@ export default async function Home({ searchParams }) {
       />
 
       <section className="max-w-6xl mx-auto space-y-12 relative z-10 pt-10">
-        {activeMission && <NegotiationCard activeMission={activeMission} />}
+        {/* FIXED: Passing actions as props to avoid illegal client-side imports */}
+        {activeMission && (
+          <NegotiationCard
+            activeMission={activeMission}
+            finalizeAction={finalizeMission}
+            updateAction={updateMissionTerms}
+          />
+        )}
 
         {myProfile && !activeMission ? (
           <div className="space-y-6">

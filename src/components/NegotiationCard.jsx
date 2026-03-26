@@ -2,17 +2,23 @@
 
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import { finalizeMission, updateMissionTerms } from "../app/actions";
 
-export default function NegotiationCard({ activeMission }) {
+// REMOVED: import { finalizeMission, updateMissionTerms } from "../app/actions";
+
+export default function NegotiationCard({
+  activeMission,
+  finalizeAction,
+  updateAction,
+}) {
   const searchParams = useSearchParams();
   const isEdit = searchParams.get("mode") === "edit";
 
   async function handleSubmit(formData) {
+    // We use the actions passed down from the Server Page
     if (isEdit) {
-      await updateMissionTerms(formData);
+      await updateAction(formData);
     } else {
-      await finalizeMission(formData);
+      await finalizeAction(formData);
     }
   }
 
