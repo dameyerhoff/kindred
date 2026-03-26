@@ -22,26 +22,31 @@ export default function RootLayout({ children }) {
   return (
     <ClerkProvider>
       <html lang="en" suppressHydrationWarning>
-        <head />
+        <head>
+          <script
+            dangerouslySetInnerHTML={{
+              __html: `
+                (function() {
+                  try {
+                    // If no theme is set at all, default to dark and save it
+                    if (!localStorage.theme) {
+                      localStorage.theme = 'dark';
+                    }
+
+                    if (localStorage.theme === 'dark') {
+                      document.documentElement.classList.add('dark');
+                    } else {
+                      document.documentElement.classList.remove('dark');
+                    }
+                  } catch (_) {}
+                })()
+              `,
+            }}
+          />
+        </head>
         <body
           className={`${geistSans.variable} ${geistMono.variable} antialiased transition-colors duration-300`}
         >
-          <Script id="theme-logic" strategy="beforeInteractive">
-            {`
-              (function() {
-                try {
-                  if (!localStorage.theme) {
-                    localStorage.theme = 'dark';
-                  }
-                  if (localStorage.theme === 'dark') {
-                    document.documentElement.classList.add('dark');
-                  } else {
-                    document.documentElement.classList.remove('dark');
-                  }
-                } catch (_) {}
-              })()
-            `}
-          </Script>
           {children}
         </body>
       </html>
