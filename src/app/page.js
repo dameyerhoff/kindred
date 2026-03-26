@@ -94,30 +94,32 @@ export default async function Home({ searchParams }) {
               <div className="absolute -inset-1 bg-gradient-to-r from-kindred-lime via-emerald-400 to-kindred-blue-glow rounded-[2.5rem] blur-xl opacity-20 group-hover:opacity-50 transition duration-1000"></div>
               <div className="relative bg-black/5 dark:bg-white/5 backdrop-blur-3xl border border-black/10 dark:border-white/10 p-8 rounded-[2.5rem] flex flex-col md:flex-row gap-8 items-center">
                 <div className="relative">
+                  {/* SAFE CHARAT CHECK: Added fallback and optional chaining */}
                   <div className="w-24 h-24 rounded-full border-4 border-kindred-lime flex items-center justify-center bg-kindred-bg text-4xl font-black text-kindred-text shadow-kindred">
-                    {myProfile.full_name.charAt(0)}
+                    {myProfile?.full_name?.charAt(0) || "?"}
                   </div>
                   <div className="absolute -top-2 -right-2 bg-kindred-lime text-kindred-dark text-[11px] font-black px-3 py-1 rounded-full animate-bounce shadow-xl uppercase border-2 border-white dark:border-kindred-dark">
-                    {getSaintlyRank(myProfile.halos).icon} Rank
+                    {getSaintlyRank(myProfile?.halos || 0).icon} Rank
                   </div>
                 </div>
 
                 <div className="flex-1 text-center md:text-left">
                   <h2 className="text-4xl font-black text-kindred-text tracking-tighter mb-1">
-                    {myProfile.full_name}
+                    {myProfile?.full_name || "Kindred Guardian"}
                   </h2>
                   <div className="flex flex-wrap items-center justify-center md:justify-start gap-2 mb-4">
                     <p className="text-kindred-lime/80 text-sm font-bold uppercase tracking-widest">
-                      {myProfile.city} • {getSaintlyRank(myProfile.halos).title}
+                      {myProfile?.city || "Unknown Zone"} •{" "}
+                      {getSaintlyRank(myProfile?.halos || 0).title}
                     </p>
-                    {myProfile.postcode && (
+                    {myProfile?.postcode && (
                       <span className="bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 text-[9px] text-kindred-text/40 px-2 py-0.5 rounded-md font-black uppercase tracking-tighter">
                         {myProfile.postcode.split(" ")[0]}
                       </span>
                     )}
                   </div>
 
-                  {myProfile.tags && myProfile.tags.length > 0 && (
+                  {myProfile?.tags && myProfile.tags.length > 0 && (
                     <div className="flex flex-wrap justify-center md:justify-start gap-2 mb-6">
                       {myProfile.tags.map((tag, idx) => (
                         <span
@@ -134,7 +136,7 @@ export default async function Home({ searchParams }) {
                     <div className="bg-black/5 dark:bg-white/10 border border-black/10 dark:border-white/20 px-4 py-2 rounded-full flex items-center gap-2 backdrop-blur-md">
                       <span className="text-lg">😇</span>
                       <span className="text-xs font-black text-kindred-text uppercase tracking-widest">
-                        {myProfile.halos || 0} HALOS
+                        {myProfile?.halos || 0} HALOS
                       </span>
                     </div>
 
