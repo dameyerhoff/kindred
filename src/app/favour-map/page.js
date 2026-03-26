@@ -3,7 +3,7 @@ import {
   getMyRequests,
   getMySentRequests,
 } from "../actions";
-import { auth } from "@clerk/nextjs/server";
+import { getUserId } from "@/lib/clerk-server"; // FIXED: Safe helper
 import Link from "next/link";
 import FavourMapClient from "./FavourMapClient";
 import NavBar from "@/components/NavBar";
@@ -11,7 +11,7 @@ import NavBar from "@/components/NavBar";
 export const dynamic = "force-dynamic";
 
 export default async function FavourMapPage() {
-  const { userId } = await auth();
+  const userId = await getUserId(); // FIXED: Using helper
   const openMissions = await getPublicNoticeBoard();
   const myRequests = userId ? (await getMyRequests()) || [] : [];
   const mySentRequests = userId ? (await getMySentRequests()) || [] : [];
@@ -32,7 +32,7 @@ export default async function FavourMapPage() {
             href="/"
             className="text-kindred-lime text-xs font-black uppercase tracking-[0.3em] hover:opacity-70 transition-all flex items-center gap-2 mb-8"
           >
-            ← Back to your Profile
+            &larr; Back to your Profile
           </Link>
           <h1 className="text-5xl font-black tracking-tighter mb-2 text-kindred-text">
             Favour Map

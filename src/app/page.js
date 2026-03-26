@@ -4,7 +4,7 @@ import {
   getMySentRequests,
   signOffMission,
 } from "./actions";
-import { auth } from "@clerk/nextjs/server";
+import { getUserId } from "@/lib/clerk-server"; // FIXED: Safe helper
 import Link from "next/link";
 import { createClient } from "@supabase/supabase-js";
 import NavBar from "@/components/NavBar";
@@ -38,7 +38,7 @@ async function getMissionData(missionId) {
 
 export default async function Home({ searchParams }) {
   await headers();
-  const { userId } = await auth();
+  const userId = await getUserId(); // FIXED: Using helper
   const params = await searchParams;
   const missionId = params.missionId;
 
@@ -52,7 +52,7 @@ export default async function Home({ searchParams }) {
   const mySentRequests = (await getMySentRequests()) || [];
   const activeMission = await getMissionData(missionId);
 
-  // FIXED: Simplified query to avoid the "Relationship Ambiguity" error
+  // Simplified query to avoid the "Relationship Ambiguity" error
   const { data: rawDeeds } = await supabase
     .from("favours")
     .select("*")

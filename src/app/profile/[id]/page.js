@@ -1,5 +1,5 @@
 import { getProfiles } from "../../actions";
-import { auth } from "@clerk/nextjs/server";
+import { getUserId } from "@/lib/clerk-server"; // FIXED: Safe helper
 import Link from "next/link";
 import { createClient } from "@supabase/supabase-js";
 import NavBar from "@/components/NavBar";
@@ -17,7 +17,7 @@ const getSaintlyRank = (halos = 0) => {
 
 export default async function PublicProfilePage({ params }) {
   const { id } = await params;
-  const { userId: myId } = await auth();
+  const myId = await getUserId(); // FIXED: Using helper
 
   const tempClient = createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL,
@@ -64,7 +64,7 @@ export default async function PublicProfilePage({ params }) {
           href="/community"
           className="text-[10px] font-black text-kindred-lime uppercase tracking-[0.3em] hover:opacity-70"
         >
-          ← Back to Community
+          &larr; Back to Community
         </Link>
 
         {/* Profile Hero Card */}
@@ -155,7 +155,7 @@ export default async function PublicProfilePage({ params }) {
                           href={`/profile/${partnerId}`}
                           className="text-[9px] text-kindred-lime/60 font-black uppercase tracking-widest hover:text-kindred-lime transition-colors"
                         >
-                          Partner: {partnerName} →
+                          Partner: {partnerName} &rarr;
                         </Link>
                       </div>
                     </div>

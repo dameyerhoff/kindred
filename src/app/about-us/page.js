@@ -1,11 +1,11 @@
 import AboutUsAnimation from "@/components/AboutUsAnimation";
 import { getMyRequests, getMySentRequests } from "../actions";
-import { auth } from "@clerk/nextjs/server";
+import { getUserId } from "@/lib/clerk-server"; // FIXED: Safe helper
 import NavBar from "@/components/NavBar";
 import Link from "next/link";
 
 export default async function AboutUsPage() {
-  const { userId } = await auth();
+  const userId = await getUserId(); // FIXED: Using helper
   const myRequests = userId ? (await getMyRequests()) || [] : [];
   const mySentRequests = userId ? (await getMySentRequests()) || [] : [];
 
@@ -24,7 +24,7 @@ export default async function AboutUsPage() {
           href="/"
           className="text-kindred-lime text-xs font-black uppercase tracking-[0.3em] hover:opacity-70 transition-all flex items-center gap-2 mb-2"
         >
-          ← Back to your Profile
+          &larr; Back to your Profile
         </Link>
 
         {/* Animation container sits higher now */}
