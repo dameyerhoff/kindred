@@ -1,3 +1,6 @@
+"use client";
+
+import { useEffect, useState } from "react";
 import {
   getMyRequests,
   releaseFavour,
@@ -7,7 +10,7 @@ import {
   completeFavour, // Added this import
 } from "../actions";
 import Link from "next/link";
-import { auth } from "@clerk/nextjs/server";
+import { useAuth } from "@clerk/nextjs";
 import NavBar from "@/components/NavBar";
 
 export const dynamic = "force-dynamic";
@@ -36,7 +39,7 @@ export default async function InboxPage() {
           href="/"
           className="inline-block text-[10px] font-black uppercase tracking-[0.3em] text-kindred-lime hover:opacity-70 transition-all mb-12 border border-kindred-lime/20 px-4 py-2 rounded-full hover:bg-kindred-lime/10"
         >
-          ← Back to Dashboard
+          &larr; Back to Dashboard
         </Link>
         <h1 className="text-5xl font-black tracking-tighter mb-12 text-kindred-text">
           Kindred Inbox 📬

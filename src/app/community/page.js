@@ -40,7 +40,7 @@ export default async function CommunityGridPage() {
             href="/"
             className="text-kindred-lime text-xs font-black uppercase tracking-[0.3em] hover:opacity-70 transition-all flex items-center gap-2 mb-8"
           >
-            ← Back to your Profile
+            &larr; Back to your Profile
           </Link>
 
           <div className="flex flex-col md:flex-row md:items-center gap-6 md:gap-10">
