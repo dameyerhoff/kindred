@@ -29,7 +29,6 @@ async function getMissionData(missionId) {
     process.env.NEXT_PUBLIC_SUPABASE_URL,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
   );
-  // Restored the proper join for the active negotiation view
   const { data } = await supabase
     .from("favours")
     .select("*, profiles:sender_id(full_name)")
@@ -57,15 +56,15 @@ export default async function Home({ searchParams }) {
   const mySentRequests = userId ? (await getMySentRequests()) || [] : [];
   const activeMission = await getMissionData(missionId);
 
-  // RESTORED: Full relational select so names and details are available
+  // FIXED: Using a 'clean' select that won't fail if a profile is missing
   const { data: myDeeds } = userId
     ? await tempClient
         .from("favours")
         .select(
           `
           *,
-          sender:sender_id(full_name, city),
-          receiver:receiver_id(full_name, city)
+          sender:profiles!sender_id(full_name),
+          receiver:profiles!receiver_id(full_name)
         `,
         )
         .or(`sender_id.eq.${userId},receiver_id.eq.${userId}`)
@@ -117,25 +116,7 @@ export default async function Home({ searchParams }) {
                       {myProfile?.city || "Unknown Zone"} •{" "}
                       {getSaintlyRank(myProfile?.halos || 0).title}
                     </p>
-                    {myProfile?.postcode && (
-                      <span className="bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 text-[9px] text-kindred-text/40 px-2 py-0.5 rounded-md font-black uppercase tracking-tighter">
-                        {myProfile.postcode.split(" ")[0]}
-                      </span>
-                    )}
                   </div>
-
-                  {myProfile?.tags && myProfile.tags.length > 0 && (
-                    <div className="flex flex-wrap justify-center md:justify-start gap-2 mb-6">
-                      {myProfile.tags.map((tag, idx) => (
-                        <span
-                          key={`hero-tag-${idx}`}
-                          className="bg-kindred-lime/10 border border-kindred-lime/30 text-kindred-lime text-[9px] font-black px-3 py-1 rounded-full uppercase tracking-tighter"
-                        >
-                          {tag.label}
-                        </span>
-                      ))}
-                    </div>
-                  )}
 
                   <div className="flex flex-wrap justify-center md:justify-start gap-4 items-center">
                     <div className="bg-black/5 dark:bg-white/10 border border-black/10 dark:border-white/20 px-4 py-2 rounded-full flex items-center gap-2 backdrop-blur-md">
@@ -153,12 +134,11 @@ export default async function Home({ searchParams }) {
                     </Link>
 
                     <div className="flex gap-2">
-                      {/* FIXED: Inbox Button Color & Readability */}
                       <Link
                         href="/inbox"
                         className="flex items-center gap-2 bg-kindred-lime/20 border border-kindred-lime/40 px-3 py-2 rounded-xl hover:bg-kindred-lime/40 transition-all group relative"
                       >
-                        <span className="text-base">📬</span>
+                        <span className="text-base text-kindred-lime">📬</span>
                         <span className="text-sm font-black text-kindred-lime">
                           {myRequests.length}
                         </span>
@@ -168,7 +148,9 @@ export default async function Home({ searchParams }) {
                         href="/outbox"
                         className="flex items-center gap-2 bg-kindred-blue-glow/20 border border-kindred-blue-glow/30 px-3 py-2 rounded-xl hover:bg-kindred-blue-glow/40 transition-all group relative"
                       >
-                        <span className="text-base">📤</span>
+                        <span className="text-base text-kindred-blue-glow">
+                          📤
+                        </span>
                         <span className="text-sm font-black text-kindred-blue-glow">
                           {mySentRequests.length}
                         </span>
@@ -202,14 +184,13 @@ export default async function Home({ searchParams }) {
                           </div>
                           <p className="text-[10px] text-kindred-text/40 uppercase tracking-widest font-black pl-5">
                             Partner:{" "}
-                            {deed.sender?.full_name === myProfile.full_name
-                              ? deed.receiver?.full_name
+                            {deed.sender_id === userId
+                              ? deed.receiver?.full_name || "Kindred Soul"
                               : deed.sender?.full_name || "Kindred Soul"}
                           </p>
                         </div>
 
                         <div className="flex flex-wrap items-center gap-2">
-                          {/* DYNAMIC ACTION BUTTONS */}
                           {deed.status === "pending" ||
                           deed.status === "negotiating" ? (
                             <>
