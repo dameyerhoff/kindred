@@ -110,32 +110,59 @@ export default async function Home({ searchParams }) {
                   <div className="w-24 h-24 rounded-full border-4 border-kindred-lime flex items-center justify-center bg-kindred-bg text-4xl font-black text-kindred-text shadow-kindred">
                     {myProfile?.full_name?.charAt(0) || "?"}
                   </div>
+                  {/* RESTORED: Saintly Rank Badge */}
+                  <div className="absolute -top-2 -right-2 bg-kindred-lime text-kindred-dark text-[11px] font-black px-3 py-1 rounded-full animate-bounce shadow-xl uppercase border-2 border-white dark:border-kindred-dark">
+                    {getSaintlyRank(myProfile?.halos || 0).icon} Rank
+                  </div>
                 </div>
 
                 <div className="flex-1 text-center md:text-left">
                   <h2 className="text-4xl font-black text-kindred-text tracking-tighter mb-1">
                     {myProfile?.full_name || "Kindred Guardian"}
                   </h2>
-                  <div className="flex flex-wrap items-center justify-center md:justify-start gap-4 mt-6">
-                    {/* FIXED: Explicit text colors for Inbox/Outbox buttons */}
-                    <Link
-                      href="/inbox"
-                      className="flex items-center gap-2 bg-kindred-lime/10 border border-kindred-lime/30 px-4 py-2 rounded-xl hover:bg-kindred-lime/20 transition-all !text-kindred-lime"
-                    >
-                      <span className="text-xl">📬</span>
-                      <span className="text-sm font-black uppercase tracking-widest">
-                        Inbox ({myRequests.length})
+                  <div className="flex flex-wrap items-center justify-center md:justify-start gap-2 mb-4">
+                    <p className="text-kindred-lime/80 text-sm font-bold uppercase tracking-widest">
+                      {myProfile?.city || "Unknown Zone"} •{" "}
+                      {getSaintlyRank(myProfile?.halos || 0).title}
+                    </p>
+                  </div>
+
+                  <div className="flex flex-wrap justify-center md:justify-start gap-4 items-center mt-6">
+                    <div className="bg-black/5 dark:bg-white/10 border border-black/10 dark:border-white/20 px-4 py-2 rounded-full flex items-center gap-2 backdrop-blur-md">
+                      <span className="text-lg">😇</span>
+                      <span className="text-xs font-black text-kindred-text uppercase tracking-widest">
+                        {myProfile?.halos || 0} HALOS
                       </span>
-                    </Link>
+                    </div>
+
+                    {/* RESTORED: Manage Profile Link */}
                     <Link
-                      href="/outbox"
-                      className="flex items-center gap-2 bg-kindred-blue-glow/10 border border-kindred-blue-glow/30 px-4 py-2 rounded-xl hover:bg-kindred-blue-glow/20 transition-all !text-kindred-blue-glow"
+                      href="/setup"
+                      className="bg-black/5 dark:bg-white/5 hover:bg-black/10 dark:hover:bg-white/10 text-kindred-text px-5 py-2 rounded-full text-xs font-black transition border border-black/10 dark:border-white/20 uppercase tracking-widest"
                     >
-                      <span className="text-xl">📤</span>
-                      <span className="text-sm font-black uppercase tracking-widest">
-                        Outbox ({mySentRequests.length})
-                      </span>
+                      Manage Profile
                     </Link>
+
+                    <div className="flex gap-2">
+                      <Link
+                        href="/inbox"
+                        className="flex items-center gap-2 bg-kindred-lime/20 border border-kindred-lime/30 px-4 py-2 rounded-xl hover:bg-kindred-lime/50 transition-all !text-kindred-lime"
+                      >
+                        <span className="text-xl">📬</span>
+                        <span className="text-sm font-black uppercase tracking-widest">
+                          Inbox ({myRequests.length})
+                        </span>
+                      </Link>
+                      <Link
+                        href="/outbox"
+                        className="flex items-center gap-2 bg-kindred-blue-glow/10 border border-kindred-blue-glow/30 px-4 py-2 rounded-xl hover:bg-kindred-blue-glow/20 transition-all !text-kindred-blue-glow"
+                      >
+                        <span className="text-xl">📤</span>
+                        <span className="text-sm font-black uppercase tracking-widest">
+                          Outbox ({mySentRequests.length})
+                        </span>
+                      </Link>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -181,7 +208,6 @@ export default async function Home({ searchParams }) {
                                   ? "Discuss Terms 💬"
                                   : "Renegotiate 🤝"}
                               </Link>
-                              {/* FIXED: Release button is now universal and Delete is removed */}
                               <button className="text-[10px] bg-red-500/10 text-red-400 border border-red-500/20 px-4 py-2 rounded-lg font-black uppercase tracking-tighter hover:bg-red-500/30 transition-all">
                                 Release 🚩
                               </button>
