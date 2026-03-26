@@ -4,42 +4,22 @@ import {
   startNegotiation,
   deleteFavour,
 } from "../actions";
+import { auth } from "@clerk/nextjs/server";
 import Link from "next/link";
-import { useAuth } from "@clerk/nextjs";
 import NavBar from "@/components/NavBar";
 
-export default function OutboxPage() {
-  const { userId, isLoaded } = useAuth();
-  const [myRequests, setMyRequests] = useState([]);
-  const [mySentRequests, setMySentRequests] = useState([]);
-  const [loading, setLoading] = useState(true);
+export const dynamic = "force-dynamic";
 
-  useEffect(() => {
-    async function loadData() {
-      if (userId) {
-        // FIXED: Dynamically import to keep client and server separate during build
-        const { getMyRequests, getMySentRequests } = await import("../actions");
-        const reqs = await getMyRequests();
-        const sent = await getMySentRequests();
-        setMyRequests(reqs || []);
-        setMySentRequests(sent || []);
-      }
-      setLoading(false);
-    }
-    if (isLoaded) {
-      loadData();
-    }
-  }, [userId, isLoaded]);
-
-// This builds the main page for the Outbox
 export default async function OutboxPage() {
   const { userId } = await auth();
+
+  // Fetching data directly on the server for speed and reliability
   const myRequests = userId ? (await getMyRequests()) || [] : [];
-  const mySentRequests = (await getMySentRequests()) || [];
+  const mySentRequests = userId ? (await getMySentRequests()) || [] : [];
 
   return (
     <main className="min-h-screen bg-kindred-bg p-4 md:p-8 text-kindred-text relative overflow-hidden isolate transition-colors duration-300">
-      {/* This adds a soft blue light in the background to match the sent theme */}
+      {/* Soft blue light background for the sent theme */}
       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[1000px] h-[400px] bg-kindred-blue-glow/10 blur-[120px] pointer-events-none -z-10"></div>
 
       <NavBar
@@ -48,7 +28,7 @@ export default async function OutboxPage() {
         outboxCount={mySentRequests.length}
       />
 
-      <div className="max-w-4xl mx-auto relative z-10">
+      <div className="max-w-4xl mx-auto relative z-10 pt-10">
         <Link
           href="/"
           className="inline-block text-[10px] font-black uppercase tracking-[0.3em] text-kindred-blue-glow hover:opacity-70 transition-all mb-12 border border-kindred-blue-glow/20 px-4 py-2 rounded-full hover:bg-kindred-blue-glow/10"
@@ -129,7 +109,6 @@ export default async function OutboxPage() {
             })}
           </div>
         ) : (
-          /* If you haven't sent any requests, show this empty box instead */
           <div className="bg-black/5 dark:bg-white/5 border border-dashed border-black/10 dark:border-white/10 rounded-[2rem] p-20 text-center">
             <p className="text-kindred-text/20 text-xl font-black uppercase tracking-[0.4em]">
               Outbox Empty
