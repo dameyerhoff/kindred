@@ -24,7 +24,7 @@ export default async function AboutUsPage() {
           href="/"
           className="text-kindred-lime text-xs font-black uppercase tracking-[0.3em] hover:opacity-70 transition-all flex items-center gap-2 mb-2"
         >
-          &larr; Back to your Profile
+          ← Back to your Profile
         </Link>
 
         {/* Animation container sits higher now */}

@@ -131,6 +131,7 @@ export default function SetupPage() {
           &larr; Back to Dashboard
         </Link>
 
+        {/* This is the main box for the profile form */}
         <div className="bg-black/5 dark:bg-white/5 backdrop-blur-3xl border border-black/10 dark:border-white/10 p-8 md:p-12 rounded-[3rem] shadow-2xl">
           <h2 className="text-4xl font-black mb-2 tracking-tighter uppercase">
             {myProfile ? "Manage Profile" : "Create Profile"}

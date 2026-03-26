@@ -4,7 +4,7 @@ import {
   getMySentRequests,
   signOffMission,
 } from "./actions";
-import { getUserId } from "@/lib/clerk-server"; // FIXED: Safe helper
+import { auth } from "@clerk/nextjs/server";
 import Link from "next/link";
 import { createClient } from "@supabase/supabase-js";
 import NavBar from "@/components/NavBar";
@@ -38,11 +38,11 @@ async function getMissionData(missionId) {
 
 export default async function Home({ searchParams }) {
   await headers();
-  const userId = await getUserId(); // FIXED: Using helper
+  const { userId } = await auth();
   const params = await searchParams;
   const missionId = params.missionId;
 
-  const supabase = createClient(
+  const tempClient = createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
   );
@@ -52,29 +52,23 @@ export default async function Home({ searchParams }) {
   const mySentRequests = (await getMySentRequests()) || [];
   const activeMission = await getMissionData(missionId);
 
-  // Simplified query to avoid the "Relationship Ambiguity" error
-  const { data: rawDeeds } = await supabase
+  const { data: myDeeds } = await tempClient
     .from("favours")
-    .select("*")
+    .select(
+      "*, sender:sender_id(full_name), receiver:receiver_id(full_name), scheduled_date, scheduled_time, exchange_details, sender_signed_off, receiver_signed_off",
+    )
     .or(`sender_id.eq.${userId},receiver_id.eq.${userId}`)
     .in("status", ["active", "completed"])
     .order("created_at", { ascending: false });
-
-  // Manually join the names using the profiles we already fetched above
-  const myDeeds = (rawDeeds || []).map((deed) => {
-    const senderProf = profiles.find((p) => p.clerk_id === deed.sender_id);
-    const receiverProf = profiles.find((p) => p.clerk_id === deed.receiver_id);
-    return {
-      ...deed,
-      sender: senderProf ? { full_name: senderProf.full_name } : null,
-      receiver: receiverProf ? { full_name: receiverProf.full_name } : null,
-    };
-  });
 
   const myProfile = profiles.find((p) => p.clerk_id === userId);
 
   return (
     <main className="min-h-screen bg-kindred-bg p-4 md:p-8 text-kindred-text relative overflow-hidden isolate transition-colors duration-300">
+      {/* This adds a pretty green glow at the top of the screen */}
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[1000px] h-[400px] bg-kindred-lime/10 blur-[120px] pointer-events-none -z-10"></div>
+
+      {/* This is the top bar with the logo and the navigation buttons */}
       <NavBar
         userId={userId}
         inboxCount={myRequests.length}
@@ -90,137 +84,130 @@ export default async function Home({ searchParams }) {
               <div className="absolute -inset-1 bg-gradient-to-r from-kindred-lime via-emerald-400 to-kindred-blue-glow rounded-[2.5rem] blur-xl opacity-20 group-hover:opacity-50 transition duration-1000"></div>
               <div className="relative bg-black/5 dark:bg-white/5 backdrop-blur-3xl border border-black/10 dark:border-white/10 p-8 rounded-[2.5rem] flex flex-col md:flex-row gap-8 items-center">
                 <div className="relative">
+                  {/* Shows the first letter of the name in a circle */}
                   <div className="w-24 h-24 rounded-full border-4 border-kindred-lime flex items-center justify-center bg-kindred-bg text-4xl font-black text-kindred-text shadow-kindred">
-                    {myProfile.full_name?.charAt(0) || "K"}
+                    {myProfile.full_name.charAt(0)}
                   </div>
+                  {/* Shows the rank icon */}
                   <div className="absolute -top-2 -right-2 bg-kindred-lime text-kindred-dark text-[11px] font-black px-3 py-1 rounded-full animate-bounce shadow-xl uppercase border-2 border-white dark:border-kindred-dark">
                     {getSaintlyRank(myProfile.halos).icon} Rank
                   </div>
                 </div>
 
                 <div className="flex-1 text-center md:text-left">
-                  <h2 className="text-4xl font-black text-kindred-text tracking-tighter mb-1 uppercase">
+                  {/* Shows the full name */}
+                  <h2 className="text-4xl font-black text-kindred-text tracking-tighter mb-1">
                     {myProfile.full_name}
                   </h2>
-                  <div className="bg-black/5 dark:bg-white/10 border border-black/10 dark:border-white/20 px-4 py-2 rounded-full inline-flex items-center gap-2 backdrop-blur-md mt-4">
-                    <span className="text-lg">😇</span>
-                    <span className="text-xs font-black text-kindred-text uppercase tracking-widest">
-                      {myProfile.halos || 0} HALOS
-                    </span>
+                  <div className="flex flex-wrap items-center justify-center md:justify-start gap-2 mb-4">
+                    {/* Shows the city and rank title */}
+                    <p className="text-kindred-lime/80 text-sm font-bold uppercase tracking-widest">
+                      {myProfile.city} • {getSaintlyRank(myProfile.halos).title}
+                    </p>
+                    {myProfile.postcode && (
+                      <span className="bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 text-[9px] text-kindred-text/40 px-2 py-0.5 rounded-md font-black uppercase tracking-tighter">
+                        {myProfile.postcode.split(" ")[0]}
+                      </span>
+                    )}
+                  </div>
+
+                  {/* Shows the list of skills picked */}
+                  {myProfile.tags && myProfile.tags.length > 0 && (
+                    <div className="flex flex-wrap justify-center md:justify-start gap-2 mb-6">
+                      {myProfile.tags.map((tag, idx) => (
+                        <span
+                          key={`hero-tag-${idx}`}
+                          className="bg-kindred-lime/10 border border-kindred-lime/30 text-kindred-lime text-[9px] font-black px-3 py-1 rounded-full uppercase tracking-tighter"
+                        >
+                          {tag.label}
+                        </span>
+                      ))}
+                    </div>
+                  )}
+
+                  <div className="flex flex-wrap justify-center md:justify-start gap-4 items-center">
+                    {/* Shows how many halo points have been earned */}
+                    <div className="bg-black/5 dark:bg-white/10 border border-black/10 dark:border-white/20 px-4 py-2 rounded-full flex items-center gap-2 backdrop-blur-md">
+                      <span className="text-lg">😇</span>
+                      <span className="text-xs font-black text-kindred-text uppercase tracking-widest">
+                        {myProfile.halos || 0} HALOS
+                      </span>
+                    </div>
+
+                    <Link
+                      href="/setup"
+                      className="bg-black/5 dark:bg-white/5 hover:bg-black/10 dark:hover:bg-white/10 text-kindred-text px-5 py-2 rounded-full text-xs font-black transition border border-black/10 dark:border-white/20 uppercase tracking-widest"
+                    >
+                      Manage Profile
+                    </Link>
+
+                    {/* Shows the inbox and outbox buttons with message counts */}
+                    <div className="flex gap-2">
+                      <Link
+                        href="/inbox"
+                        className="flex items-center gap-2 bg-kindred-lime/20 border border-kindred-lime/30 px-3 py-2 rounded-xl hover:bg-kindred-lime/40 transition-all group relative"
+                      >
+                        <span className="text-base">📬</span>
+                        <span className="text-sm font-black text-kindred-lime">
+                          {myRequests.length}
+                        </span>
+                        <span
+                          className="absolute -top-8 left-1/2 -translate-x-1/2 bg-white text-kindred-dark text-[8px] px-2 py-1 rounded font-black opacity-0 group-hover:opacity-100 uppercase transition-opacity whitespace-nowrap shadow-xl"
+                          style={{ zIndex: 50 }}
+                        >
+                          Open Inbox
+                        </span>
+                      </Link>
+
+                      <Link
+                        href="/outbox"
+                        className="flex items-center gap-2 bg-kindred-blue-glow/20 border border-kindred-blue-glow/30 px-3 py-2 rounded-xl hover:bg-kindred-blue-glow/40 transition-all group relative"
+                      >
+                        <span className="text-base">📤</span>
+                        <span className="text-sm font-black text-kindred-blue-glow">
+                          {mySentRequests.length}
+                        </span>
+                        <span
+                          className="absolute -top-8 left-1/2 -translate-x-1/2 bg-white text-kindred-dark text-[8px] px-2 py-1 rounded font-black opacity-0 group-hover:opacity-100 uppercase transition-opacity whitespace-nowrap shadow-xl"
+                          style={{ zIndex: 50 }}
+                        >
+                          View Sent
+                        </span>
+                      </Link>
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
 
+            {/* Recent Deeds List */}
             {myDeeds && myDeeds.length > 0 && (
-              <div className="bg-black/5 dark:bg-white/5 rounded-[2rem] p-6 border border-black/5 backdrop-blur-sm">
+              <div className="bg-black/5 dark:bg-white/5 rounded-[2rem] p-6 border border-black/5 dark:border-white/5 backdrop-blur-sm">
                 <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-kindred-lime/50 mb-4">
                   Kindred Mission Log
                 </h3>
-                <div className="space-y-4">
-                  {myDeeds.map((deed) => {
-                    const isReceiver = deed.receiver_id === userId;
-                    const partnerName = isReceiver
-                      ? deed.sender?.full_name
-                      : deed.receiver?.full_name;
-                    const partnerId = isReceiver
-                      ? deed.sender_id
-                      : deed.receiver_id;
-                    const isCompleted = deed.status === "completed";
-
-                    const haveIVouched = isReceiver
-                      ? deed.receiver_signed_off
-                      : deed.sender_signed_off;
-
-                    return (
-                      <div
-                        key={deed.id}
-                        className={`group p-4 rounded-2xl border transition-all ${isCompleted ? "bg-kindred-lime/5 border-kindred-lime/20" : "bg-white/5 border-white/5"}`}
-                      >
-                        <div className="flex items-start gap-3">
-                          <span
-                            className={
-                              isCompleted
-                                ? "text-kindred-lime"
-                                : "text-kindred-text/20"
-                            }
-                          >
-                            {isCompleted ? "✨" : "⏳"}
-                          </span>
-                          <div className="flex-1">
-                            <p className="text-sm text-kindred-text font-bold italic mb-2">
-                              &ldquo;{deed.favour_text}&rdquo;
-                            </p>
-
-                            <div className="flex flex-wrap gap-x-4 gap-y-1 text-[10px] text-kindred-text/40 mb-3 uppercase font-black tracking-tight">
-                              <span>
-                                📅 {deed.scheduled_date || "TBD"} @{" "}
-                                {deed.scheduled_time || "TBD"}
-                              </span>
-                              <span className="text-kindred-lime/60">
-                                🔄 Exchange:{" "}
-                                {deed.exchange_details || "Unspecified"}
-                              </span>
-                            </div>
-
-                            <div className="flex items-center justify-between mt-2 border-t border-white/5 pt-3">
-                              <div className="flex gap-3 items-center">
-                                <span
-                                  className={`text-[9px] px-2 py-0.5 rounded-full uppercase font-black tracking-tighter ${isCompleted ? "bg-kindred-lime text-kindred-dark" : "bg-white/10 text-white/40"}`}
-                                >
-                                  {isCompleted
-                                    ? "Fully Signed Off ✅"
-                                    : haveIVouched
-                                      ? "Vouched For Partner 🕊️"
-                                      : isReceiver
-                                        ? "Helping 😇"
-                                        : "Requested 🤝"}
-                                </span>
-
-                                {!isCompleted && (
-                                  <Link
-                                    href={`/?missionId=${deed.id}&mode=edit`}
-                                    className="text-[9px] font-black uppercase text-kindred-blue-glow hover:text-white transition-colors"
-                                  >
-                                    Re-negotiate 🔄
-                                  </Link>
-                                )}
-
-                                {!isCompleted && !haveIVouched && (
-                                  <form action={signOffMission}>
-                                    <input
-                                      type="hidden"
-                                      name="favourId"
-                                      value={deed.id}
-                                    />
-                                    <button
-                                      type="submit"
-                                      className="text-[9px] font-black uppercase bg-kindred-lime text-kindred-dark px-3 py-1 rounded-lg hover:scale-105 transition-transform"
-                                    >
-                                      Vouch for Partner & Award Halo 😇
-                                    </button>
-                                  </form>
-                                )}
-                              </div>
-                              <Link
-                                href={`/profile/${partnerId}`}
-                                className="text-[9px] font-black uppercase text-kindred-text/30 hover:text-kindred-lime transition-colors"
-                              >
-                                Partner: {partnerName || "Kindred Soul"} →
-                              </Link>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    );
-                  })}
+                <div className="space-y-3">
+                  {myDeeds.map((deed) => (
+                    <div
+                      key={deed.id}
+                      className="flex items-center gap-3 text-sm text-kindred-text/40 border-b border-black/5 dark:border-white/5 last:border-0 last:pb-0 pb-2"
+                    >
+                      <span className="text-kindred-lime">✨</span>
+                      <span className="italic flex-1">
+                        &ldquo;{deed.favour_text}&rdquo;
+                      </span>
+                      <span className="text-[9px] bg-kindred-lime/10 text-kindred-lime px-2 py-0.5 rounded-full uppercase font-black tracking-tighter">
+                        Completed 😇
+                      </span>
+                    </div>
+                  ))}
                 </div>
               </div>
             )}
           </div>
         ) : (
-          userId &&
-          !activeMission && (
+          /* If someone is logged in but has no profile yet */
+          userId && (
             <div className="bg-black/5 dark:bg-white/5 backdrop-blur-md border border-black/10 dark:border-white/10 p-10 rounded-[2.5rem] text-center">
               <p className="text-kindred-text/60 text-lg mb-8 font-medium italic">
                 Preparing your spirit... 😇
