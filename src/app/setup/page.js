@@ -109,7 +109,6 @@ export default function SetupPage() {
     const hiddenInput = e.currentTarget.querySelector('input[name="tags"]');
     if (hiddenInput) {
       hiddenInput.value = JSON.stringify(tags);
-      console.log("🚀 DAVE DEBUG: Shipping Tags:", hiddenInput.value);
     }
   };
 
