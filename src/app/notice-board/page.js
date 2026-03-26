@@ -4,10 +4,10 @@ import {
   getMySentRequests,
 } from "../actions";
 import { auth } from "@clerk/nextjs/server";
-import { auth } from "@clerk/nextjs/server";
 import Link from "next/link";
 import NavBar from "@/components/NavBar";
-import NoticeBoardClient from "./NoticeBoardClient";
+// Updated to match your actual filename
+import NoticeBoardClient from "./NoticeBoardGrid";
 
 export const dynamic = "force-dynamic";
 
@@ -39,7 +39,7 @@ export default async function NoticeBoardPage() {
             ← Back to your Profile
           </Link>
 
-          {/* We pass the initial data to a Client component that handles the search bar */}
+          {/* This component handles the search input and the grid display */}
           <NoticeBoardClient openMissions={openMissions} userId={userId} />
         </header>
       </section>

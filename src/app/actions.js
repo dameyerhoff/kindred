@@ -11,6 +11,36 @@ function getSupabase() {
   return createClient(supabaseUrl, supabaseKey);
 }
 
+// --- NEW ACTION ADDED HERE ---
+export async function completeFavour(formData) {
+  const { userId } = await auth();
+  if (!userId) throw new Error("Unauthorized");
+
+  const supabase = getSupabase();
+  const favourId = formData.get("favourId");
+  const receiverId = formData.get("receiverId");
+
+  // 1. Update the favour status to completed
+  const { error: favourError } = await supabase
+    .from("favours")
+    .update({ status: "completed" })
+    .eq("id", favourId);
+
+  if (favourError) throw favourError;
+
+  // 2. Award a Halo to the person who helped (the receiver)
+  if (receiverId) {
+    await awardHalo(receiverId);
+  }
+
+  revalidatePath("/");
+  revalidatePath("/inbox");
+  revalidatePath("/outbox");
+
+  return { success: true };
+}
+// --- END OF NEW ACTION ---
+
 export async function saveProfile(formData) {
   const { userId } = await auth();
   if (!userId) throw new Error("Unauthorized");
