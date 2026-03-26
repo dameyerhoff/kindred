@@ -15,8 +15,9 @@ export default function CommunityGrid({
   communityProfiles = [],
   userId,
   sendFavourRequest,
-  searchTerm = "",
+  searchTerm = "", // Received as a prop from the parent
 }) {
+  // Filter logic using the prop passed down from the parent
   const filteredProfiles = communityProfiles.filter((profile) => {
     const search = searchTerm.toLowerCase();
     const inName = profile.full_name?.toLowerCase().includes(search) || false;

@@ -47,9 +47,13 @@ export default async function InboxPage() {
               return (
                 <div
                   key={req.id}
-                  className={`backdrop-blur-xl p-6 rounded-[2rem] border flex flex-col md:flex-row justify-between items-start md:items-center shadow-2xl group transition-all gap-6 ${isCompleted ? "bg-kindred-lime/10 border-kindred-lime/40" : "bg-black/5 dark:bg-white/5 border-black/10 dark:border-white/10"}`}
+                  className={`backdrop-blur-xl p-6 rounded-[2rem] border flex flex-col md:flex-row justify-between items-start md:items-center shadow-2xl group transition-all gap-6 ${
+                    isCompleted
+                      ? "bg-kindred-lime/10 border-kindred-lime/40"
+                      : "bg-black/5 dark:bg-white/5 border-black/10 dark:border-white/10"
+                  }`}
                 >
-                  <div>
+                  <div className="flex-1">
                     <p className="text-xl font-bold italic group-hover:text-kindred-lime transition-colors">
                       &ldquo;{req.favour_text}&rdquo;
                     </p>
@@ -62,8 +66,8 @@ export default async function InboxPage() {
                     </p>
                   </div>
 
-                  <div className="flex gap-3 w-full md:w-auto">
-                    {/* ALWAYS SHOW DELETE - DISABLED UNLESS COMPLETED */}
+                  <div className="flex flex-wrap gap-3 w-full md:w-auto">
+                    {/* DELETE FORM - Only active if completed */}
                     <form action={deleteFavour} className="flex-1 md:flex-none">
                       <input type="hidden" name="favourId" value={req.id} />
                       <button
@@ -75,7 +79,7 @@ export default async function InboxPage() {
                             : "bg-white/5 text-white/10 border border-white/5 cursor-not-allowed grayscale"
                         }`}
                       >
-                        Delete Record 🗑️
+                        Delete 🗑️
                       </button>
                     </form>
 
