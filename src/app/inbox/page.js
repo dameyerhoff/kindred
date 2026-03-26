@@ -1,16 +1,12 @@
-"use client";
-
-import { useEffect, useState } from "react";
 import {
   getMyRequests,
   releaseFavour,
   startNegotiation,
   getMySentRequests,
   deleteFavour,
-  completeFavour, // Added this import
+  completeFavour,
 } from "../actions";
 import Link from "next/link";
-import { useAuth } from "@clerk/nextjs";
 import NavBar from "@/components/NavBar";
 
 export const dynamic = "force-dynamic";
@@ -18,8 +14,11 @@ export const revalidate = 0;
 
 // This page shows you a list of people who have asked you for a favour
 export default async function InboxPage() {
+  // FIXED: Inline import to prevent build errors and using server-side auth
+  const { auth } = await import("@clerk/nextjs/server");
   const { userId } = await auth();
-  const myRequests = (await getMyRequests()) || [];
+
+  const myRequests = userId ? (await getMyRequests()) || [] : [];
   const mySentRequests = userId ? (await getMySentRequests()) || [] : [];
 
   return (
@@ -33,7 +32,7 @@ export default async function InboxPage() {
         outboxCount={mySentRequests.length}
       />
 
-      <div className="max-w-4xl mx-auto relative z-10">
+      <div className="max-w-4xl mx-auto relative z-10 pt-10">
         {/* This button takes you back to your main profile page */}
         <Link
           href="/"
@@ -68,7 +67,7 @@ export default async function InboxPage() {
                       {isCompleted
                         ? "Mission Completed ✨"
                         : req.status === "active"
-                          ? "Active Mission 🤝"
+                          ? "Mission Claimed 🤝"
                           : "Direct Favour Request ✨"}
                     </p>
                   </div>
@@ -90,7 +89,10 @@ export default async function InboxPage() {
                       </button>
                     </form>
 
-                    <form action={completeFavour}>
+                    <form
+                      action={completeFavour}
+                      className="flex-1 md:flex-none"
+                    >
                       <input type="hidden" name="favourId" value={req.id} />
                       <input
                         type="hidden"
@@ -99,7 +101,7 @@ export default async function InboxPage() {
                       />
                       <button
                         type="submit"
-                        className="bg-kindred-text dark:bg-white text-kindred-bg dark:text-kindred-dark px-6 py-3 rounded-xl font-black text-xs hover:bg-kindred-lime hover:text-kindred-dark transition-all shadow-2xl uppercase hover:shadow-kindred"
+                        className="w-full bg-kindred-text dark:bg-white text-kindred-bg dark:text-kindred-dark px-6 py-3 rounded-xl font-black text-xs hover:bg-kindred-lime hover:text-kindred-dark transition-all shadow-2xl uppercase hover:shadow-kindred"
                       >
                         Help & Earn 😇
                       </button>
