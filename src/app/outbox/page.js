@@ -4,13 +4,14 @@ import {
   startNegotiation,
   deleteFavour,
 } from "../actions";
-import { auth } from "@clerk/nextjs/server";
 import Link from "next/link";
 import NavBar from "@/components/NavBar";
 
 export const dynamic = "force-dynamic";
 
 export default async function OutboxPage() {
+  // FIXED: Inline import to prevent build errors
+  const { auth } = await import("@clerk/nextjs/server");
   const { userId } = await auth();
 
   // Fetching data directly on the server for speed and reliability

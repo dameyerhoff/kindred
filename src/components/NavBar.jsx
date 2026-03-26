@@ -1,9 +1,15 @@
 "use client";
+
 import { useEffect, useState } from "react";
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
 import { UserButton } from "@clerk/nextjs";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+
+// --- FIXED: Divider is now declared OUTSIDE of the render function ---
+const Divider = () => (
+  <div className="h-6 w-[1.5px] bg-black/10 dark:bg-white/10 mx-1 hidden md:block" />
+);
 
 export default function Navbar({ inboxCount = 0, outboxCount = 0, userId }) {
   const pathname = usePathname();
@@ -11,32 +17,34 @@ export default function Navbar({ inboxCount = 0, outboxCount = 0, userId }) {
   const [isDark, setIsDark] = useState(true);
 
   useEffect(() => {
-    setMounted(true);
-
-    // Sync logic: If localStorage is empty or set to dark, we are in dark mode
     const theme = localStorage.getItem("theme");
+    const root = document.documentElement;
+
     if (theme === "light") {
       setIsDark(false);
-      document.documentElement.classList.remove("dark");
+      root.classList.remove("dark");
     } else {
       setIsDark(true);
-      document.documentElement.classList.add("dark");
-      localStorage.setItem("theme", "dark");
+      root.classList.add("dark");
+      if (!theme) localStorage.setItem("theme", "dark");
     }
+
+    // We set mounted at the very end to avoid cascading renders
+    setMounted(true);
   }, []);
 
   const toggleTheme = () => {
+    const root = document.documentElement;
     if (isDark) {
-      document.documentElement.classList.remove("dark");
+      root.classList.remove("dark");
       localStorage.setItem("theme", "light");
       setIsDark(false);
     } else {
-      document.documentElement.classList.add("dark");
+      root.classList.add("dark");
       localStorage.setItem("theme", "dark");
       setIsDark(true);
     }
   };
-
 
   const linkStyles =
     "px-3 py-2 rounded-full text-[9px] font-black uppercase tracking-widest transition-all items-center gap-1.5 flex whitespace-nowrap flex-nowrap shrink-0";
@@ -44,10 +52,6 @@ export default function Navbar({ inboxCount = 0, outboxCount = 0, userId }) {
     "bg-black/5 dark:bg-white/5 hover:bg-black/10 dark:hover:bg-white/10 border border-black/10 dark:border-white/10 text-kindred-text dark:text-white/80";
   const activeStyles =
     "bg-kindred-lime text-kindred-dark border border-kindred-lime shadow-kindred";
-
-  const Divider = () => (
-    <div className="h-6 w-[1.5px] bg-black/10 dark:bg-white/10 mx-1 hidden md:block" />
-  );
 
   return (
     <div className="max-w-7xl mx-auto px-4">
@@ -73,7 +77,7 @@ export default function Navbar({ inboxCount = 0, outboxCount = 0, userId }) {
             className="p-2 rounded-xl bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 hover:border-kindred-lime transition-all text-lg cursor-pointer min-w-[40px] min-h-[40px]"
             title="Toggle Theme"
           >
-            {mounted ? (isDark ? "☀️" : "🌙") : null}
+            {mounted ? (isDark ? "☀️" : "🌙") : "..."}
           </button>
 
           <Link

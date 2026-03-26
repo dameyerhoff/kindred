@@ -1,25 +1,23 @@
-"use client";
-
-import { useEffect, useState } from "react";
 import {
   getPublicNoticeBoard,
   getMyRequests,
   getMySentRequests,
 } from "../actions";
-import { auth } from "@clerk/nextjs/server";
 import Link from "next/link";
 import NavBar from "@/components/NavBar";
-// Updated to match your actual filename
 import NoticeBoardClient from "./NoticeBoardGrid";
 
 export const dynamic = "force-dynamic";
 
 export default async function NoticeBoardPage() {
-  // 1. Fetch data on the Server
+  // FIXED: Inline import to prevent build errors
+  const { auth } = await import("@clerk/nextjs/server");
   const { userId } = await auth();
+
+  // Fetch data on the Server
   const openMissions = await getPublicNoticeBoard();
 
-  // 2. Fetch counts if user is logged in
+  // Fetch counts if user is logged in
   const myRequests = userId ? (await getMyRequests()) || [] : [];
   const mySentRequests = userId ? (await getMySentRequests()) || [] : [];
 
@@ -29,11 +27,11 @@ export default async function NoticeBoardPage() {
 
       <NavBar
         userId={userId}
-        inboxCount={counts.inbox}
-        outboxCount={counts.outbox}
+        inboxCount={myRequests.length}
+        outboxCount={mySentRequests.length}
       />
 
-      <section className="max-w-6xl mx-auto relative z-10">
+      <section className="max-w-6xl mx-auto relative z-10 pt-10">
         <header className="mb-12">
           <Link
             href="/"

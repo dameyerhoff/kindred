@@ -4,7 +4,6 @@ import {
   getMyRequests,
   getMySentRequests,
 } from "../actions";
-import { auth } from "@clerk/nextjs/server";
 import Link from "next/link";
 import CommunityGrid from "./CommunityGrid";
 import NavBar from "@/components/NavBar";
@@ -12,6 +11,8 @@ import NavBar from "@/components/NavBar";
 export const dynamic = "force-dynamic";
 
 export default async function CommunityGridPage() {
+  // FIXED: Inline import to prevent build errors
+  const { auth } = await import("@clerk/nextjs/server");
   const { userId } = await auth();
 
   // Fetching data on the server
@@ -33,8 +34,8 @@ export default async function CommunityGridPage() {
         outboxCount={mySentRequests.length}
       />
 
-      <section className="max-w-6xl mx-auto relative z-10">
-        <header className="mb-12 pt-10">
+      <section className="max-w-6xl mx-auto relative z-10 pt-10">
+        <header className="mb-12">
           <Link
             href="/"
             className="text-kindred-lime text-xs font-black uppercase tracking-[0.3em] hover:opacity-70 transition-all flex items-center gap-2 mb-8"
@@ -52,8 +53,6 @@ export default async function CommunityGridPage() {
               </p>
             </div>
 
-            {/* Note: The search input below won't filter the list 
-                unless your CommunityGrid component handles its own state. */}
             <div className="relative flex-1 w-full">
               <div className="absolute inset-y-0 left-5 flex items-center pointer-events-none text-kindred-text/40 dark:text-white/20">
                 🔍
