@@ -63,7 +63,6 @@ export default async function InboxPage() {
                   </div>
 
                   <div className="flex gap-3 w-full md:w-auto">
-                    {/* ALWAYS SHOW DELETE - DISABLED UNLESS COMPLETED */}
                     <form action={deleteFavour} className="flex-1 md:flex-none">
                       <input type="hidden" name="favourId" value={req.id} />
                       <button

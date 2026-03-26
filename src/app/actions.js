@@ -296,3 +296,19 @@ export async function deleteFavour(formData) {
   revalidatePath("/outbox");
   revalidatePath("/");
 }
+
+// Added this to fix the Inbox form error while keeping your code intact
+export async function completeFavour(formData) {
+  const { userId } = await auth();
+  if (!userId) throw new Error("Unauthorized");
+  const supabase = getSupabase();
+  const favourId = formData.get("favourId");
+
+  const { error } = await supabase
+    .from("favours")
+    .update({ status: "active", receiver_id: userId })
+    .eq("id", favourId);
+
+  if (error) throw error;
+  revalidatePath("/inbox");
+}
