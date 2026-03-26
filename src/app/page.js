@@ -51,26 +51,40 @@ export default async function Home({ searchParams }) {
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
   );
 
-  const profiles = (await getProfiles()) || [];
-  const myRequests = userId ? (await getMyRequests()) || [] : [];
-  const mySentRequests = userId ? (await getMySentRequests()) || [] : [];
+  // Get all data in parallel
+  const [profiles, rawRequests, rawSentRequests] = await Promise.all([
+    getProfiles() || [],
+    userId ? getMyRequests() : [],
+    userId ? getMySentRequests() : [],
+  ]);
+
+  const myRequests = rawRequests || [];
+  const mySentRequests = rawSentRequests || [];
   const activeMission = await getMissionData(missionId);
 
-  // FIXED: Added 'pending' and 'negotiating' to the filter so the 100 deeds appear
-  const { data: myDeeds } = userId
+  // ULTRA-STABLE FETCH: No joins, just raw rows.
+  const { data: rawDeeds } = userId
     ? await tempClient
         .from("favours")
-        .select(
-          `
-          *,
-          sender:sender_id(full_name),
-          receiver:receiver_id(full_name)
-        `,
-        )
+        .select("*")
         .or(`sender_id.eq.${userId},receiver_id.eq.${userId}`)
         .in("status", ["active", "completed", "pending", "negotiating"])
         .order("created_at", { ascending: false })
     : { data: [] };
+
+  // Manually map the names from the profiles we already have
+  const myDeeds =
+    rawDeeds?.map((deed) => {
+      const senderProfile = profiles.find((p) => p.clerk_id === deed.sender_id);
+      const receiverProfile = profiles.find(
+        (p) => p.clerk_id === deed.receiver_id,
+      );
+      return {
+        ...deed,
+        sender_name: senderProfile?.full_name || "Kindred Soul",
+        receiver_name: receiverProfile?.full_name || "Kindred Soul",
+      };
+    }) || [];
 
   const myProfile = profiles.find((p) => p.clerk_id === userId);
 
@@ -119,9 +133,9 @@ export default async function Home({ searchParams }) {
                   </div>
 
                   <div className="flex flex-wrap justify-center md:justify-start gap-4 items-center">
-                    <div className="bg-black/5 dark:bg-white/10 border border-black/10 dark:border-white/20 px-4 py-2 rounded-full flex items-center gap-2 backdrop-blur-md text-kindred-lime">
+                    <div className="bg-black/5 dark:bg-white/10 border border-black/10 dark:border-white/20 px-4 py-2 rounded-full flex items-center gap-2 backdrop-blur-md">
                       <span className="text-lg">😇</span>
-                      <span className="text-xs font-black uppercase tracking-widest">
+                      <span className="text-xs font-black text-kindred-lime uppercase tracking-widest">
                         {myProfile?.halos || 0} HALOS
                       </span>
                     </div>
@@ -184,8 +198,8 @@ export default async function Home({ searchParams }) {
                           <p className="text-[10px] text-kindred-text/40 uppercase tracking-widest font-black pl-5">
                             Partner:{" "}
                             {deed.sender_id === userId
-                              ? deed.receiver?.full_name || "Kindred Soul"
-                              : deed.sender?.full_name || "Kindred Soul"}
+                              ? deed.receiver_name
+                              : deed.sender_name}
                           </p>
                         </div>
 
