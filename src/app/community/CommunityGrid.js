@@ -15,7 +15,7 @@ export default function CommunityGrid({
   communityProfiles = [],
   userId,
   sendFavourRequest,
-  searchTerm = "", // Received as a prop from the parent
+  searchTerm = "",
 }) {
   // Filter logic using the prop passed down from the parent
   const filteredProfiles = communityProfiles.filter((profile) => {
