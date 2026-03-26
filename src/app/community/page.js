@@ -1,44 +1,40 @@
-"use client";
-
-import { useState, useEffect } from "react";
 import {
   getProfiles,
   sendFavourRequest,
   getMyRequests,
   getMySentRequests,
 } from "../actions";
-import { useAuth } from "@clerk/nextjs";
+import { auth } from "@clerk/nextjs/server";
 import Link from "next/link";
 import CommunityGrid from "./CommunityGrid";
 import NavBar from "@/components/NavBar";
 
-export default function CommunityGridPage() {
-  const { userId, isLoaded } = useAuth();
-  const [communityProfiles, setCommunityProfiles] = useState([]);
-  const [searchTerm, setSearchTerm] = useState("");
-  const [counts, setCounts] = useState({ inbox: 0, outbox: 0 });
+export const dynamic = "force-dynamic";
 
 export default async function CommunityGridPage() {
   const { userId } = await auth();
 
+  // Fetching data on the server
   const profiles = (await getProfiles()) || [];
   const myRequests = userId ? (await getMyRequests()) || [] : [];
   const mySentRequests = userId ? (await getMySentRequests()) || [] : [];
 
+  // Filter out the logged-in user from the community list
   const communityProfiles = profiles.filter((p) => p.clerk_id !== userId);
 
   return (
     <main className="min-h-screen bg-kindred-bg p-4 md:p-8 text-kindred-text relative overflow-hidden isolate transition-colors duration-300">
+      {/* Decorative Glow */}
       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[1000px] h-[400px] bg-kindred-lime/10 blur-[120px] pointer-events-none -z-10"></div>
 
       <NavBar
         userId={userId}
-        inboxCount={counts.inbox}
-        outboxCount={counts.outbox}
+        inboxCount={myRequests.length}
+        outboxCount={mySentRequests.length}
       />
 
       <section className="max-w-6xl mx-auto relative z-10">
-        <header className="mb-12">
+        <header className="mb-12 pt-10">
           <Link
             href="/"
             className="text-kindred-lime text-xs font-black uppercase tracking-[0.3em] hover:opacity-70 transition-all flex items-center gap-2 mb-8"
@@ -56,6 +52,8 @@ export default async function CommunityGridPage() {
               </p>
             </div>
 
+            {/* Note: The search input below won't filter the list 
+                unless your CommunityGrid component handles its own state. */}
             <div className="relative flex-1 w-full">
               <div className="absolute inset-y-0 left-5 flex items-center pointer-events-none text-kindred-text/40 dark:text-white/20">
                 🔍
@@ -64,7 +62,6 @@ export default async function CommunityGridPage() {
                 type="text"
                 placeholder="Search community members..."
                 id="header-search-community"
-                /* THE NUCLEAR FIX: Using a CSS variable for the border color to force the lime in dark mode */
                 style={{
                   border: "2px solid var(--kindred-card-border, #a3e635)",
                 }}
@@ -78,7 +75,6 @@ export default async function CommunityGridPage() {
           communityProfiles={communityProfiles}
           userId={userId}
           sendFavourRequest={sendFavourRequest}
-          searchTerm={searchTerm}
         />
       </section>
     </main>
