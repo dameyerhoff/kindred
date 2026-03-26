@@ -12,6 +12,7 @@ import NavBar from "@/components/NavBar";
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
+// This page shows you a list of people who have asked you for a favour
 export default async function InboxPage() {
   const { userId } = await auth();
   const myRequests = (await getMyRequests()) || [];
@@ -19,6 +20,7 @@ export default async function InboxPage() {
 
   return (
     <main className="min-h-screen bg-kindred-bg p-4 md:p-8 text-kindred-text relative overflow-hidden isolate transition-colors duration-300">
+      {/* This adds the pretty green light in the background */}
       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[1000px] h-[400px] bg-kindred-lime/10 blur-[120px] pointer-events-none -z-10"></div>
 
       <NavBar
@@ -28,6 +30,7 @@ export default async function InboxPage() {
       />
 
       <div className="max-w-4xl mx-auto relative z-10">
+        {/* This button takes you back to your main profile page */}
         <Link
           href="/"
           className="inline-block text-[10px] font-black uppercase tracking-[0.3em] text-kindred-lime hover:opacity-70 transition-all mb-12 border border-kindred-lime/20 px-4 py-2 rounded-full hover:bg-kindred-lime/10"
@@ -83,41 +86,26 @@ export default async function InboxPage() {
                       </button>
                     </form>
 
-                    {!isCompleted && (
-                      <>
-                        <form
-                          action={releaseFavour}
-                          className="flex-1 md:flex-none"
-                        >
-                          <input type="hidden" name="favourId" value={req.id} />
-                          <button
-                            type="submit"
-                            className="w-full text-kindred-text/40 hover:text-kindred-text px-4 py-3 rounded-xl font-black text-[10px] uppercase border border-black/5 dark:border-white/5 transition-all"
-                          >
-                            {req.status === "active" ? "Release" : "Decline"}
-                          </button>
-                        </form>
-
-                        <form
-                          action={startNegotiation}
-                          className="flex-1 md:flex-none"
-                        >
-                          <input type="hidden" name="favourId" value={req.id} />
-                          <button
-                            type="submit"
-                            className="w-full bg-kindred-lime text-kindred-dark px-6 py-3 rounded-xl font-black text-xs hover:brightness-110 transition-all shadow-md uppercase shadow-kindred/20"
-                          >
-                            {isAgreed ? "Re-negotiate 🔄" : "Discuss Terms 🤝"}
-                          </button>
-                        </form>
-                      </>
-                    )}
-                  </div>
+                  <form action={completeFavour}>
+                    <input type="hidden" name="favourId" value={req.id} />
+                    <input
+                      type="hidden"
+                      name="receiverId"
+                      value={req.receiver_id}
+                    />
+                    <button
+                      type="submit"
+                      className="bg-kindred-text dark:bg-white text-kindred-bg dark:text-kindred-dark px-6 py-3 rounded-xl font-black text-xs hover:bg-kindred-lime hover:text-kindred-dark transition-all shadow-2xl uppercase hover:shadow-kindred"
+                    >
+                      Help & Earn 😇
+                    </button>
+                  </form>
                 </div>
               );
             })}
           </div>
         ) : (
+          /* If nobody has sent you a request, show this empty box instead */
           <div className="bg-black/5 dark:bg-white/5 border border-dashed border-black/10 dark:border-white/10 rounded-[2rem] p-20 text-center">
             <p className="text-kindred-text/20 text-xl font-black uppercase tracking-[0.4em]">
               Inbox Clear • Spirit Strong

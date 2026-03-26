@@ -4,6 +4,7 @@ import {
   getMySentRequests,
 } from "../actions";
 import { auth } from "@clerk/nextjs/server";
+import { auth } from "@clerk/nextjs/server";
 import Link from "next/link";
 import NavBar from "@/components/NavBar";
 import NoticeBoardClient from "./NoticeBoardClient";

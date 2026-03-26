@@ -37,7 +37,6 @@ export default function CommunityGrid({
           className="p-6 rounded-[2rem] border-2 border-kindred-lime shadow-kindred transition-all duration-300 group relative overflow-hidden flex flex-col hover:brightness-110"
         >
           <div className="absolute top-0 right-0 w-32 h-32 bg-kindred-lime/5 blur-3xl rounded-full opacity-0 group-hover:opacity-100 transition-opacity"></div>
-
           <div className="flex justify-between items-start mb-4 relative z-10">
             <div className="flex-1">
               <h3 className="text-xl font-black text-kindred-text transition-colors">
@@ -48,21 +47,18 @@ export default function CommunityGrid({
                   {profile.city} • {getSaintlyRank(profile.halos).title}
                 </p>
               </div>
-            </div>
-
-            <div className="flex flex-col items-end gap-2">
-              <div className="flex items-center bg-kindred-text/5 px-3 py-1.5 rounded-full border border-kindred-text/10">
-                <span className="text-sm">😇</span>
-                <span className="text-xs font-black text-kindred-lime ml-2">
-                  {profile.halos || 0}
-                </span>
-              </div>
               <Link
                 href={`/profile/${profile.clerk_id}`}
                 className="text-[8px] font-black uppercase tracking-tighter bg-kindred-lime text-kindred-dark px-2 py-1 rounded-lg hover:scale-105 transition-transform shadow-sm"
               >
                 View Profile 👤
               </Link>
+            </div>
+            <div className="flex items-center bg-kindred-text/5 px-3 py-1.5 rounded-full border border-kindred-text/10 self-start">
+              <span className="text-sm">😇</span>
+              <span className="text-xs font-black text-kindred-lime ml-2">
+                {profile.halos || 0}
+              </span>
             </div>
           </div>
 
@@ -99,14 +95,18 @@ export default function CommunityGrid({
                   }}
                   className="w-full border border-kindred-text/10 rounded-xl p-3 text-[10px] font-bold appearance-none cursor-pointer"
                 >
-                  <option value="" disabled>
-                    Select a skill...
-                  </option>
-                  {profile.tags?.map((tag, idx) => (
-                    <option key={idx} value={tag.label}>
-                      {tag.label}
-                    </option>
-                  )) || (
+                  {profile.tags && profile.tags.length > 0 ? (
+                    <>
+                      <option value="" disabled>
+                        Select a skill...
+                      </option>
+                      {profile.tags.map((tag, idx) => (
+                        <option key={idx} value={tag.label}>
+                          {tag.label}
+                        </option>
+                      ))}
+                    </>
+                  ) : (
                     <option value="General Favour">
                       General Kindred Favour
                     </option>
