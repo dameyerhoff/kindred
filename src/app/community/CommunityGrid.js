@@ -17,16 +17,7 @@ export default function CommunityGrid({
   sendFavourRequest,
   searchTerm = "",
 }) {
-  const [searchTerm, setSearchTerm] = useState("");
-
-  // Search Listener - Restored to pure logic
-  if (typeof document !== "undefined") {
-    const input = document.getElementById("header-search-community");
-    if (input) {
-      input.oninput = (e) => setSearchTerm(e.target.value);
-    }
-  }
-
+  // Filter logic using the prop passed down from the parent
   const filteredProfiles = communityProfiles.filter((profile) => {
     const search = searchTerm.toLowerCase();
     const inName = profile.full_name?.toLowerCase().includes(search) || false;

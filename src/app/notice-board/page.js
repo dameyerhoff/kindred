@@ -7,9 +7,10 @@ import {
   getMySentRequests,
 } from "../actions";
 import { auth } from "@clerk/nextjs/server";
+import { auth } from "@clerk/nextjs/server";
 import Link from "next/link";
-import NoticeBoardGrid from "./NoticeBoardGrid";
 import NavBar from "@/components/NavBar";
+import NoticeBoardClient from "./NoticeBoardClient";
 
 export default function NoticeBoard() {
   const { userId } = useAuth(); // Client-side hook for auth
@@ -17,10 +18,12 @@ export default function NoticeBoard() {
   const [counts, setCounts] = useState({ inbox: 0, outbox: 0 });
   const [searchTerm, setSearchTerm] = useState("");
 
-export default async function NoticeBoard() {
+export default async function NoticeBoardPage() {
+  // 1. Fetch data on the Server
   const { userId } = await auth();
-
   const openMissions = await getPublicNoticeBoard();
+
+  // 2. Fetch counts if user is logged in
   const myRequests = userId ? (await getMyRequests()) || [] : [];
   const mySentRequests = userId ? (await getMySentRequests()) || [] : [];
 
@@ -43,32 +46,8 @@ export default async function NoticeBoard() {
             ← Back to your Profile
           </Link>
 
-          <div className="flex flex-col md:flex-row md:items-center gap-6 md:gap-10">
-            <div className="flex-shrink-0">
-              <h1 className="text-4xl md:text-5xl font-black tracking-tighter mb-2 text-kindred-text leading-none">
-                Notice Board
-              </h1>
-              <p className="text-kindred-lime/60 text-[10px] font-bold uppercase tracking-widest">
-                Active Missions in the Kindred Network
-              </p>
-            </div>
-
-            <div className="relative flex-1 w-full">
-              <div className="absolute inset-y-0 left-5 flex items-center pointer-events-none text-kindred-text/40 dark:text-white/20">
-                🔍
-              </div>
-              <input
-                type="text"
-                placeholder="Filter missions..."
-                id="header-search-notice"
-                /* THE NUCLEAR FIX: Explicit 2px border using your lime color */
-                style={{
-                  border: "2px solid var(--kindred-card-border, #a3e635)",
-                }}
-                className="w-full bg-kindred-bg dark:bg-white/5 rounded-2xl py-4 pl-12 pr-6 text-sm text-kindred-text dark:text-white placeholder:text-kindred-text/50 dark:placeholder:text-white/40 focus:outline-none focus:border-kindred-lime transition-all shadow-sm dark:shadow-kindred"
-              />
-            </div>
-          </div>
+          {/* We pass the initial data to a Client component that handles the search bar */}
+          <NoticeBoardClient openMissions={openMissions} userId={userId} />
         </header>
 
         <NoticeBoardGrid

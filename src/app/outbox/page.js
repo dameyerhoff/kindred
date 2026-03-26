@@ -42,25 +42,68 @@ export default async function OutboxPage() {
 
         {mySentRequests.length > 0 ? (
           <div className="grid gap-4">
-            {mySentRequests.map((req) => (
-              <div
-                key={req.id}
-                className="bg-black/5 dark:bg-white/5 backdrop-blur-xl p-6 rounded-[2rem] border border-black/10 dark:border-kindred-blue-glow/10 flex justify-between items-center shadow-2xl group hover:border-kindred-blue-glow/30 hover:shadow-kindred-blue transition-all"
-              >
-                <div>
-                  {/* This shows the message you sent out to the community */}
-                  <p className="text-xl font-bold italic text-kindred-text/80 group-hover:text-kindred-blue-glow transition-colors">
-                    &ldquo;{req.favour_text}&rdquo;
-                  </p>
-                  <p className="text-[10px] text-kindred-blue-glow uppercase font-black tracking-widest mt-2 opacity-60">
-                    Awaiting Kindred Spirit
-                  </p>
-                </div>
-                {/* This little tag shows that the request is still waiting for an answer */}
-                <div className="bg-kindred-blue-glow/10 px-4 py-2 rounded-full border border-kindred-blue-glow/20">
-                  <span className="text-[10px] font-black text-kindred-blue-glow uppercase tracking-widest">
-                    Pending
-                  </span>
+            {mySentRequests.map((req) => {
+              const isAgreed = req.status === "active" && req.scheduled_date;
+              const isCompleted = req.status === "completed";
+
+              return (
+                <div
+                  key={req.id}
+                  className={`backdrop-blur-xl p-6 rounded-[2rem] border flex flex-col md:flex-row justify-between items-start md:items-center shadow-2xl group transition-all gap-6 ${
+                    isCompleted
+                      ? "bg-kindred-blue-glow/10 border-kindred-blue-glow/40"
+                      : "bg-black/5 dark:bg-white/5 border-black/10 dark:border-kindred-blue-glow/10"
+                  }`}
+                >
+                  <div className="flex-1">
+                    <p className="text-xl font-bold italic text-kindred-text/80 group-hover:text-kindred-blue-glow transition-colors">
+                      &ldquo;{req.favour_text}&rdquo;
+                    </p>
+                    <p className="text-[10px] text-kindred-blue-glow uppercase font-black tracking-widest mt-2 opacity-60">
+                      {isCompleted
+                        ? "Success ✅"
+                        : req.status === "active"
+                          ? "Mission Claimed 🤝"
+                          : "Awaiting Kindred Spirit"}
+                    </p>
+                  </div>
+
+                  <div className="flex flex-wrap gap-4 items-center w-full md:w-auto">
+                    {/* DELETE HISTORY FORM */}
+                    <form action={deleteFavour} className="flex-1 md:flex-none">
+                      <input type="hidden" name="favourId" value={req.id} />
+                      <button
+                        type="submit"
+                        disabled={!isCompleted}
+                        className={`w-full px-6 py-3 rounded-xl text-[10px] font-black uppercase transition-all shadow-lg ${
+                          isCompleted
+                            ? "bg-red-500/20 text-red-500 border border-red-500/40 hover:bg-red-500 hover:text-white cursor-pointer"
+                            : "bg-white/5 text-white/10 border border-white/5 cursor-not-allowed grayscale"
+                        }`}
+                      >
+                        Clear History 🗑️
+                      </button>
+                    </form>
+
+                    {!isCompleted && (
+                      <form
+                        action={startNegotiation}
+                        className="flex-1 md:flex-none"
+                      >
+                        <input type="hidden" name="favourId" value={req.id} />
+                        <button
+                          type="submit"
+                          className="w-full bg-kindred-blue-glow/10 px-6 py-3 rounded-xl border border-kindred-blue-glow/20 text-[10px] font-black text-kindred-blue-glow uppercase tracking-widest hover:bg-kindred-blue-glow/20 transition-all"
+                        >
+                          {isAgreed
+                            ? "Re-negotiate 🔄"
+                            : req.status === "active"
+                              ? "Discuss Terms 🤝"
+                              : "Pending"}
+                        </button>
+                      </form>
+                    )}
+                  </div>
                 </div>
               );
             })}
