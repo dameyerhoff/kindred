@@ -42,7 +42,6 @@ export default async function FavourMapPage() {
           </p>
         </header>
 
-        {/* FIXED: Added userId={userId} prop below */}
         <FavourMapClient
           openMissions={openMissions}
           userId={userId}
