@@ -3,7 +3,7 @@ import {
   getMyRequests,
   getMySentRequests,
 } from "../actions";
-import { getUserId } from "@/lib/clerk-server"; // FIXED: Safe helper
+import { auth } from "@clerk/nextjs/server";
 import Link from "next/link";
 import FavourMapClient from "./FavourMapClient";
 import NavBar from "@/components/NavBar";
@@ -11,7 +11,7 @@ import NavBar from "@/components/NavBar";
 export const dynamic = "force-dynamic";
 
 export default async function FavourMapPage() {
-  const userId = await getUserId(); // FIXED: Using helper
+  const { userId } = await auth();
   const openMissions = await getPublicNoticeBoard();
   const myRequests = userId ? (await getMyRequests()) || [] : [];
   const mySentRequests = userId ? (await getMySentRequests()) || [] : [];
@@ -42,7 +42,6 @@ export default async function FavourMapPage() {
           </p>
         </header>
 
-        {/* FIXED: Added userId={userId} prop below */}
         <FavourMapClient
           openMissions={openMissions}
           userId={userId}

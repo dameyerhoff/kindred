@@ -1,6 +1,12 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import {
+  getProfiles,
+  sendFavourRequest,
+  getMyRequests,
+  getMySentRequests,
+} from "../actions";
 import { useAuth } from "@clerk/nextjs";
 import Link from "next/link";
 import CommunityGrid from "./CommunityGrid";
@@ -12,34 +18,14 @@ export default function CommunityGridPage() {
   const [searchTerm, setSearchTerm] = useState("");
   const [counts, setCounts] = useState({ inbox: 0, outbox: 0 });
 
-  useEffect(() => {
-    async function loadData() {
-      // FIXED: Dynamically import server actions
-      const { getProfiles, getMyRequests, getMySentRequests } =
-        await import("../actions");
+export default async function CommunityGridPage() {
+  const { userId } = await auth();
 
-      const allProfiles = (await getProfiles()) || [];
-      setCommunityProfiles(allProfiles.filter((p) => p.clerk_id !== userId));
+  const profiles = (await getProfiles()) || [];
+  const myRequests = userId ? (await getMyRequests()) || [] : [];
+  const mySentRequests = userId ? (await getMySentRequests()) || [] : [];
 
-      if (userId) {
-        const inbox = await getMyRequests();
-        const outbox = await getMySentRequests();
-        setCounts({
-          inbox: inbox?.length || 0,
-          outbox: outbox?.length || 0,
-        });
-      }
-    }
-    if (isLoaded) {
-      loadData();
-    }
-  }, [userId, isLoaded]);
-
-  // FIXED: Wrapper for the favour request action
-  const handleSendFavourRequest = async (formData) => {
-    const { sendFavourRequest } = await import("../actions");
-    await sendFavourRequest(formData);
-  };
+  const communityProfiles = profiles.filter((p) => p.clerk_id !== userId);
 
   return (
     <main className="min-h-screen bg-kindred-bg p-4 md:p-8 text-kindred-text relative overflow-hidden isolate transition-colors duration-300">
@@ -71,28 +57,27 @@ export default function CommunityGridPage() {
             </div>
 
             <div className="relative flex-1 w-full">
-              <div className="absolute inset-y-0 left-5 flex items-center pointer-events-none text-kindred-text/40">
+              <div className="absolute inset-y-0 left-5 flex items-center pointer-events-none text-kindred-text/40 dark:text-white/20">
                 🔍
               </div>
               <input
                 type="text"
                 placeholder="Search community members..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
+                id="header-search-community"
+                /* THE NUCLEAR FIX: Using a CSS variable for the border color to force the lime in dark mode */
                 style={{
                   border: "2px solid var(--kindred-card-border, #a3e635)",
                 }}
-                className="w-full bg-kindred-bg dark:bg-white/5 rounded-2xl py-4 pl-12 pr-6 text-sm text-kindred-text dark:text-white placeholder:text-kindred-text/50 focus:outline-none focus:border-kindred-lime transition-all shadow-sm"
+                className="w-full bg-kindred-bg dark:bg-white/5 rounded-2xl py-4 pl-12 pr-6 text-sm text-kindred-text dark:text-white placeholder:text-kindred-text/50 dark:placeholder:text-white/40 focus:outline-none focus:border-kindred-lime transition-all shadow-sm dark:shadow-kindred"
               />
             </div>
           </div>
         </header>
 
-        {/* FIXED: Passing the wrapper instead of the direct server action */}
         <CommunityGrid
           communityProfiles={communityProfiles}
           userId={userId}
-          sendFavourRequest={handleSendFavourRequest}
+          sendFavourRequest={sendFavourRequest}
           searchTerm={searchTerm}
         />
       </section>

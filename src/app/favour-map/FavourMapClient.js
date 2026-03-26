@@ -7,6 +7,7 @@ import {
   MarkerF,
   InfoWindow,
 } from "@react-google-maps/api";
+import { claimFavour } from "../actions";
 
 const containerStyle = {
   width: "100%",
@@ -107,12 +108,7 @@ export default function FavourMapClient({ openMissions = [], apiKey, userId }) {
     googleMapsApiKey: apiKey,
   });
 
-  // FIXED: Dynamic wrapper for claim action
-  const handleClaim = async (formData) => {
-    const { claimFavour } = await import("../actions");
-    await claimFavour(formData);
-  };
-
+  // Filtering logic mirrored from NoticeBoardGrid
   const filteredMissions = openMissions.filter((mission) => {
     const search = searchTerm.toLowerCase();
     const inText = mission.favour_text?.toLowerCase().includes(search) || false;
@@ -134,6 +130,7 @@ export default function FavourMapClient({ openMissions = [], apiKey, userId }) {
 
   return (
     <div className="rounded-[2.5rem] overflow-hidden border border-white/10 shadow-2xl relative z-10 bg-black group">
+      {/* Search Overlay */}
       <div className="absolute top-6 left-1/2 -translate-x-1/2 z-20 w-full max-w-md px-4">
         <div className="relative">
           <input
@@ -184,7 +181,7 @@ export default function FavourMapClient({ openMissions = [], apiKey, userId }) {
                 </span>
 
                 {userId && userId !== selectedMission.sender_id ? (
-                  <form action={handleClaim}>
+                  <form action={claimFavour}>
                     <input
                       type="hidden"
                       name="favourId"

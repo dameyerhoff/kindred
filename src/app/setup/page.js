@@ -1,5 +1,5 @@
 "use client";
-
+import { saveProfile, getProfiles } from "../actions";
 import { useAuth, SignInButton } from "@clerk/nextjs";
 import { useState, useEffect } from "react";
 import Link from "next/link";
@@ -95,10 +95,8 @@ export default function SetupPage() {
     addTag({ label: name, slug: slug });
   };
 
-  // FIXED: Handle form action dynamically
-  const handleFormAction = async (formData) => {
-    const { saveProfile } = await import("../actions");
-    const hiddenInput = document.querySelector('input[name="tags"]');
+  const onFormSubmit = (e) => {
+    const hiddenInput = e.currentTarget.querySelector('input[name="tags"]');
     if (hiddenInput) {
       hiddenInput.value = JSON.stringify(tags);
     }
@@ -136,6 +134,7 @@ export default function SetupPage() {
           &larr; Back to Dashboard
         </Link>
 
+        {/* This is the main box for the profile form */}
         <div className="bg-black/5 dark:bg-white/5 backdrop-blur-3xl border border-black/10 dark:border-white/10 p-8 md:p-12 rounded-[3rem] shadow-2xl">
           <h2 className="text-4xl font-black mb-2 tracking-tighter uppercase">
             {myProfile ? "Manage Profile" : "Create Profile"}
@@ -146,7 +145,11 @@ export default function SetupPage() {
               : "Join the kindred guardian network"}
           </p>
 
-          <form action={handleFormAction} className="space-y-6">
+          <form
+            action={saveProfile}
+            onSubmit={onFormSubmit}
+            className="space-y-6"
+          >
             <input type="hidden" name="tags" value={JSON.stringify(tags)} />
 
             <div>
