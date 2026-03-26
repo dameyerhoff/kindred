@@ -1,3 +1,6 @@
+"use client";
+
+import { useEffect, useState } from "react";
 import {
   getMyRequests,
   getMySentRequests,
@@ -5,16 +8,29 @@ import {
   deleteFavour,
 } from "../actions";
 import Link from "next/link";
-import { auth } from "@clerk/nextjs/server";
+import { useAuth } from "@clerk/nextjs";
 import NavBar from "@/components/NavBar";
 
-export const dynamic = "force-dynamic";
-export const revalidate = 0;
+export default function OutboxPage() {
+  const { userId, isLoaded } = useAuth();
+  const [myRequests, setMyRequests] = useState([]);
+  const [mySentRequests, setMySentRequests] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-export default async function OutboxPage() {
-  const { userId } = await auth();
-  const myRequests = userId ? (await getMyRequests()) || [] : [];
-  const mySentRequests = (await getMySentRequests()) || [];
+  useEffect(() => {
+    async function loadData() {
+      if (userId) {
+        const reqs = await getMyRequests();
+        const sent = await getMySentRequests();
+        setMyRequests(reqs || []);
+        setMySentRequests(sent || []);
+      }
+      setLoading(false);
+    }
+    if (isLoaded) {
+      loadData();
+    }
+  }, [userId, isLoaded]);
 
   return (
     <main className="min-h-screen bg-kindred-bg p-4 md:p-8 text-kindred-text relative overflow-hidden isolate transition-colors duration-300">
@@ -38,7 +54,7 @@ export default async function OutboxPage() {
           Sent Requests 📤
         </h1>
 
-        {mySentRequests.length > 0 ? (
+        {!loading && mySentRequests.length > 0 ? (
           <div className="grid gap-4">
             {mySentRequests.map((req) => {
               const isAgreed = req.status === "active" && req.scheduled_date;
@@ -63,7 +79,6 @@ export default async function OutboxPage() {
                   </div>
 
                   <div className="flex gap-4 items-center">
-                    {/* ALWAYS SHOW DELETE - DISABLED UNLESS COMPLETED */}
                     <form action={deleteFavour}>
                       <input type="hidden" name="favourId" value={req.id} />
                       <button
@@ -100,11 +115,13 @@ export default async function OutboxPage() {
             })}
           </div>
         ) : (
-          <div className="bg-black/5 dark:bg-white/5 border border-dashed border-black/10 dark:border-white/10 rounded-[2rem] p-20 text-center">
-            <p className="text-kindred-text/20 text-xl font-black uppercase tracking-[0.4em]">
-              Outbox Empty
-            </p>
-          </div>
+          !loading && (
+            <div className="bg-black/5 dark:bg-white/5 border border-dashed border-black/10 dark:border-white/10 rounded-[2rem] p-20 text-center">
+              <p className="text-kindred-text/20 text-xl font-black uppercase tracking-[0.4em]">
+                Outbox Empty
+              </p>
+            </div>
+          )
         )}
       </div>
     </main>
