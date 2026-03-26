@@ -39,7 +39,7 @@ export default async function NoticeBoardPage() {
             href="/"
             className="text-kindred-lime text-xs font-black uppercase tracking-[0.3em] hover:opacity-70 transition-all flex items-center gap-2 mb-8"
           >
-            ← Back to your Profile
+            &larr; Back to your Profile
           </Link>
 
           {/* This component handles the search input and the grid display */}

@@ -12,8 +12,11 @@ import Link from "next/link";
 import CommunityGrid from "./CommunityGrid";
 import NavBar from "@/components/NavBar";
 
-export const dynamic = "force-dynamic";
-export const revalidate = 0;
+export default function CommunityGridPage() {
+  const { userId, isLoaded } = useAuth();
+  const [communityProfiles, setCommunityProfiles] = useState([]);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [counts, setCounts] = useState({ inbox: 0, outbox: 0 });
 
 export default async function CommunityGridPage() {
   const { userId } = await auth();

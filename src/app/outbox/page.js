@@ -8,8 +8,28 @@ import Link from "next/link";
 import { useAuth } from "@clerk/nextjs";
 import NavBar from "@/components/NavBar";
 
-export const dynamic = "force-dynamic";
-export const revalidate = 0;
+export default function OutboxPage() {
+  const { userId, isLoaded } = useAuth();
+  const [myRequests, setMyRequests] = useState([]);
+  const [mySentRequests, setMySentRequests] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function loadData() {
+      if (userId) {
+        // FIXED: Dynamically import to keep client and server separate during build
+        const { getMyRequests, getMySentRequests } = await import("../actions");
+        const reqs = await getMyRequests();
+        const sent = await getMySentRequests();
+        setMyRequests(reqs || []);
+        setMySentRequests(sent || []);
+      }
+      setLoading(false);
+    }
+    if (isLoaded) {
+      loadData();
+    }
+  }, [userId, isLoaded]);
 
 // This builds the main page for the Outbox
 export default async function OutboxPage() {

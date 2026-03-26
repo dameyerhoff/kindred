@@ -51,6 +51,8 @@ export default function SetupPage() {
   useEffect(() => {
     async function loadData() {
       if (userId) {
+        // FIXED: Dynamically import to separate client and server boundaries
+        const { getProfiles } = await import("../actions");
         const profiles = await getProfiles();
         const found = profiles?.find((p) => p.clerk_id === userId);
         if (found) {
@@ -98,6 +100,7 @@ export default function SetupPage() {
     if (hiddenInput) {
       hiddenInput.value = JSON.stringify(tags);
     }
+    await saveProfile(formData);
   };
 
   if (!isLoaded || loading) return null;

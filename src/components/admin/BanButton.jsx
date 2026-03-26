@@ -1,7 +1,7 @@
 "use client";
 
 import { useTransition } from "react";
-import { banUserAction } from "@/lib/actions";
+// FIXED: Removed the static import of banUserAction
 
 // This is the button admins use to stop or allow someone from using the site
 export default function BanButton({ userId, isBanned }) {
@@ -18,6 +18,8 @@ export default function BanButton({ userId, isBanned }) {
     // This tells the database to change whether the person is banned or not
     startTransition(async () => {
       try {
+        // FIXED: Dynamically import the admin action right when needed
+        const { banUserAction } = await import("@/lib/actions");
         await banUserAction(userId, isBanned);
       } catch (err) {
         // If the computer has a problem, this shows a message saying it failed
