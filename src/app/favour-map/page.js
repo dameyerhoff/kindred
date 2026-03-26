@@ -3,7 +3,6 @@ import {
   getMyRequests,
   getMySentRequests,
 } from "../actions";
-import { auth } from "@clerk/nextjs/server";
 import Link from "next/link";
 import FavourMapClient from "./FavourMapClient";
 import NavBar from "@/components/NavBar";
@@ -11,7 +10,10 @@ import NavBar from "@/components/NavBar";
 export const dynamic = "force-dynamic";
 
 export default async function FavourMapPage() {
+  // DYNAMIC IMPORT FIX
+  const { auth } = await import("@clerk/nextjs/server");
   const { userId } = await auth();
+
   const openMissions = await getPublicNoticeBoard();
   const myRequests = userId ? (await getMyRequests()) || [] : [];
   const mySentRequests = userId ? (await getMySentRequests()) || [] : [];
@@ -26,7 +28,7 @@ export default async function FavourMapPage() {
         outboxCount={mySentRequests.length}
       />
 
-      <section className="max-w-6xl mx-auto relative z-10">
+      <section className="max-w-6xl mx-auto relative z-10 pt-10">
         <header className="mb-12">
           <Link
             href="/"

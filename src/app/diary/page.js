@@ -1,4 +1,3 @@
-import { auth } from "@clerk/nextjs/server";
 import { getMyRequests, getMySentRequests } from "../actions";
 import NavBar from "@/components/NavBar";
 import Diary from "@/components/Diary";
@@ -6,10 +5,11 @@ import Diary from "@/components/Diary";
 export const dynamic = "force-dynamic";
 
 export default async function DiaryPage() {
+  // DYNAMIC IMPORT FIX
+  const { auth } = await import("@clerk/nextjs/server");
   const { userId } = await auth();
 
   const myRequests = userId ? (await getMyRequests()) || [] : [];
-
   const mySentRequests = userId ? (await getMySentRequests()) || [] : [];
 
   return (
@@ -22,7 +22,7 @@ export default async function DiaryPage() {
         outboxCount={mySentRequests.length}
       />
 
-      <section className="max-w-4xl mx-auto relative z-10">
+      <section className="max-w-4xl mx-auto relative z-10 pt-10">
         <header className="mb-12">
           <h1 className="text-5xl font-black tracking-tighter mb-2 text-white uppercase">
             My Diary
