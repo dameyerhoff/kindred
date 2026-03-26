@@ -1,3 +1,6 @@
+"use client";
+
+import { useEffect, useState } from "react";
 import {
   getPublicNoticeBoard,
   getMyRequests,
@@ -26,8 +29,8 @@ export default async function NoticeBoardPage() {
 
       <NavBar
         userId={userId}
-        inboxCount={myRequests.length}
-        outboxCount={mySentRequests.length}
+        inboxCount={counts.inbox}
+        outboxCount={counts.outbox}
       />
 
       <section className="max-w-6xl mx-auto relative z-10">

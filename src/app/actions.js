@@ -15,7 +15,6 @@ function getSupabase() {
 export async function completeFavour(formData) {
   const { userId } = await auth();
   if (!userId) throw new Error("Unauthorized");
-
   const supabase = getSupabase();
   const favourId = formData.get("favourId");
   const receiverId = formData.get("receiverId");
