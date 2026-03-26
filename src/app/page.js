@@ -51,10 +51,8 @@ export default async function Home({ searchParams }) {
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
   );
 
-  // FETCH 1: Get all profiles first to use for name mapping
   const allProfiles = (await getProfiles()) || [];
 
-  // FETCH 2: Get Inbox/Outbox counts for the NavBar
   const [myRequests, mySentRequests] = await Promise.all([
     userId ? getMyRequests() : [],
     userId ? getMySentRequests() : [],
@@ -62,7 +60,6 @@ export default async function Home({ searchParams }) {
 
   const activeMission = await getMissionData(missionId);
 
-  // FETCH 3: The "Safe" Deed Fetch (No joins to hide rows!)
   const { data: rawDeeds } = userId
     ? await tempClient
         .from("favours")
@@ -72,7 +69,6 @@ export default async function Home({ searchParams }) {
         .order("created_at", { ascending: false })
     : { data: [] };
 
-  // Manually map profiles to the deeds so names show up without breaking the row
   const myDeeds =
     rawDeeds?.map((deed) => {
       const sender = allProfiles.find((p) => p.clerk_id === deed.sender_id);
@@ -133,7 +129,7 @@ export default async function Home({ searchParams }) {
                   <div className="flex flex-wrap justify-center md:justify-start gap-4 items-center">
                     <div className="bg-black/5 dark:bg-white/10 border border-black/10 dark:border-white/20 px-4 py-2 rounded-full flex items-center gap-2 backdrop-blur-md">
                       <span className="text-lg">😇</span>
-                      <span className="text-xs font-black text-kindred-text uppercase tracking-widest">
+                      <span className="text-xs font-black text-kindred-lime uppercase tracking-widest">
                         {myProfile?.halos || 0} HALOS
                       </span>
                     </div>
@@ -148,21 +144,19 @@ export default async function Home({ searchParams }) {
                     <div className="flex gap-2">
                       <Link
                         href="/inbox"
-                        className="flex items-center gap-2 bg-kindred-lime/20 border border-kindred-lime/40 px-3 py-2 rounded-xl hover:bg-kindred-lime/40 transition-all"
+                        className="flex items-center gap-2 bg-kindred-lime/20 border border-kindred-lime/40 px-3 py-2 rounded-xl hover:bg-kindred-lime/50 transition-all text-kindred-lime"
                       >
-                        <span className="text-base text-kindred-lime">📬</span>
-                        <span className="text-sm font-black text-kindred-lime">
+                        <span className="text-base">📬</span>
+                        <span className="text-sm font-black">
                           {myRequests.length}
                         </span>
                       </Link>
                       <Link
                         href="/outbox"
-                        className="flex items-center gap-2 bg-kindred-blue-glow/20 border border-kindred-blue-glow/30 px-3 py-2 rounded-xl hover:bg-kindred-blue-glow/40 transition-all"
+                        className="flex items-center gap-2 bg-kindred-blue-glow/20 border border-kindred-blue-glow/30 px-3 py-2 rounded-xl hover:bg-kindred-blue-glow/50 transition-all text-kindred-blue-glow"
                       >
-                        <span className="text-base text-kindred-blue-glow">
-                          📤
-                        </span>
-                        <span className="text-sm font-black text-kindred-blue-glow">
+                        <span className="text-base">📤</span>
+                        <span className="text-sm font-black">
                           {mySentRequests.length}
                         </span>
                       </Link>
@@ -202,10 +196,7 @@ export default async function Home({ searchParams }) {
                         </div>
 
                         <div className="flex flex-wrap items-center gap-2">
-                          {/* UPDATED LOGIC: Include 'active' status for renegotiation */}
-                          {deed.status === "pending" ||
-                          deed.status === "negotiating" ||
-                          deed.status === "active" ? (
+                          {deed.status !== "completed" ? (
                             <>
                               <Link
                                 href={`/?missionId=${deed.id}`}
@@ -215,20 +206,18 @@ export default async function Home({ searchParams }) {
                                   ? "Discuss Terms 💬"
                                   : "Renegotiate 🤝"}
                               </Link>
-                              <button className="text-[10px] bg-red-500/10 text-red-400 border border-red-500/20 px-3 py-1.5 rounded-lg font-black uppercase tracking-tighter hover:bg-red-500/20">
+                              <button className="text-[10px] bg-red-500/10 text-red-400 border border-red-500/20 px-3 py-1.5 rounded-lg font-black uppercase tracking-tighter hover:bg-red-500/20 transition-all">
                                 Release 🚩
                               </button>
                               {deed.status === "active" && (
                                 <span className="text-[9px] bg-kindred-lime/20 text-kindred-lime px-2 py-0.5 rounded-full uppercase font-black tracking-tighter border border-kindred-lime/20">
-                                  Mission Active 🛡️
+                                  In Progress
                                 </span>
                               )}
                             </>
                           ) : (
                             <span className="text-[9px] bg-kindred-lime/10 text-kindred-lime px-2 py-0.5 rounded-full uppercase font-black tracking-tighter border border-kindred-lime/20">
-                              {deed.status === "completed"
-                                ? "Completed 😇"
-                                : "Archived"}
+                              Mission Complete 😇
                             </span>
                           )}
                         </div>
