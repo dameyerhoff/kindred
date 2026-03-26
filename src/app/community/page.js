@@ -1,12 +1,6 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import {
-  getProfiles,
-  sendFavourRequest,
-  getMyRequests,
-  getMySentRequests,
-} from "../actions";
 import { useAuth } from "@clerk/nextjs";
 import Link from "next/link";
 import CommunityGrid from "./CommunityGrid";
@@ -20,6 +14,10 @@ export default function CommunityGridPage() {
 
   useEffect(() => {
     async function loadData() {
+      // FIXED: Dynamically import server actions
+      const { getProfiles, getMyRequests, getMySentRequests } =
+        await import("../actions");
+
       const allProfiles = (await getProfiles()) || [];
       setCommunityProfiles(allProfiles.filter((p) => p.clerk_id !== userId));
 
@@ -36,6 +34,12 @@ export default function CommunityGridPage() {
       loadData();
     }
   }, [userId, isLoaded]);
+
+  // FIXED: Wrapper for the favour request action
+  const handleSendFavourRequest = async (formData) => {
+    const { sendFavourRequest } = await import("../actions");
+    await sendFavourRequest(formData);
+  };
 
   return (
     <main className="min-h-screen bg-kindred-bg p-4 md:p-8 text-kindred-text relative overflow-hidden isolate transition-colors duration-300">
@@ -84,10 +88,11 @@ export default function CommunityGridPage() {
           </div>
         </header>
 
+        {/* FIXED: Passing the wrapper instead of the direct server action */}
         <CommunityGrid
           communityProfiles={communityProfiles}
           userId={userId}
-          sendFavourRequest={sendFavourRequest}
+          sendFavourRequest={handleSendFavourRequest}
           searchTerm={searchTerm}
         />
       </section>

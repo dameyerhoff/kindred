@@ -1,24 +1,23 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import {
-  getPublicNoticeBoard,
-  getMyRequests,
-  getMySentRequests,
-} from "../actions";
 import { useAuth } from "@clerk/nextjs";
 import Link from "next/link";
 import NoticeBoardGrid from "./NoticeBoardGrid";
 import NavBar from "@/components/NavBar";
 
 export default function NoticeBoard() {
-  const { userId, isLoaded } = useAuth(); // Added isLoaded for better sync
+  const { userId, isLoaded } = useAuth();
   const [openMissions, setOpenMissions] = useState([]);
   const [counts, setCounts] = useState({ inbox: 0, outbox: 0 });
   const [searchTerm, setSearchTerm] = useState("");
 
   useEffect(() => {
     async function loadData() {
+      // FIXED: Dynamically import server actions to satisfy Next.js 16/Turbopack boundaries
+      const { getPublicNoticeBoard, getMyRequests, getMySentRequests } =
+        await import("../actions");
+
       const missions = await getPublicNoticeBoard();
       setOpenMissions(missions);
 
@@ -52,7 +51,7 @@ export default function NoticeBoard() {
             href="/"
             className="text-kindred-lime text-xs font-black uppercase tracking-[0.3em] hover:opacity-70 transition-all flex items-center gap-2 mb-8"
           >
-            ← Back to your Profile
+            &larr; Back to your Profile
           </Link>
 
           <div className="flex flex-col md:flex-row md:items-center gap-6 md:gap-10">

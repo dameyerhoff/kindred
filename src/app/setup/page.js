@@ -1,5 +1,5 @@
 "use client";
-import { saveProfile, getProfiles } from "../actions";
+
 import { useAuth, SignInButton } from "@clerk/nextjs";
 import { useState, useEffect } from "react";
 import Link from "next/link";
@@ -51,6 +51,8 @@ export default function SetupPage() {
   useEffect(() => {
     async function loadData() {
       if (userId) {
+        // FIXED: Dynamically import to separate client and server boundaries
+        const { getProfiles } = await import("../actions");
         const profiles = await getProfiles();
         const found = profiles?.find((p) => p.clerk_id === userId);
         if (found) {
@@ -93,11 +95,14 @@ export default function SetupPage() {
     addTag({ label: name, slug: slug });
   };
 
-  const onFormSubmit = (e) => {
-    const hiddenInput = e.currentTarget.querySelector('input[name="tags"]');
+  // FIXED: Handle form action dynamically
+  const handleFormAction = async (formData) => {
+    const { saveProfile } = await import("../actions");
+    const hiddenInput = document.querySelector('input[name="tags"]');
     if (hiddenInput) {
       hiddenInput.value = JSON.stringify(tags);
     }
+    await saveProfile(formData);
   };
 
   if (!isLoaded || loading) return null;
@@ -141,11 +146,7 @@ export default function SetupPage() {
               : "Join the kindred guardian network"}
           </p>
 
-          <form
-            action={saveProfile}
-            onSubmit={onFormSubmit}
-            className="space-y-6"
-          >
+          <form action={handleFormAction} className="space-y-6">
             <input type="hidden" name="tags" value={JSON.stringify(tags)} />
 
             <div>

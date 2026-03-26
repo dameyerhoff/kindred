@@ -13,7 +13,11 @@ export default function ContestRow({ contest }) {
 
     // This starts the process of taking the contest off the list
     startTransition(async () => {
+      // FIXED: Prepared for dynamic action if needed later
       console.log("Deleting contest", contest.id);
+      // Example of how you'd call it safely:
+      // const { deleteContestAction } = await import("@/lib/actions");
+      // await deleteContestAction(contest.id);
     });
   };
 

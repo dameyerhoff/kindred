@@ -2,13 +2,15 @@
 
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import { finalizeMission, updateMissionTerms } from "@/app/actions";
 
 export default function NegotiationCard({ activeMission }) {
   const searchParams = useSearchParams();
   const isEdit = searchParams.get("mode") === "edit";
 
+  // FIXED: Handle actions dynamically
   async function handleAction(formData) {
+    const { finalizeMission, updateMissionTerms } =
+      await import("@/app/actions");
     if (isEdit) {
       await updateMissionTerms(formData);
     } else {

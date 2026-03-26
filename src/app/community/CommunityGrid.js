@@ -14,7 +14,7 @@ const getSaintlyRank = (halos = 0) => {
 export default function CommunityGrid({
   communityProfiles = [],
   userId,
-  sendFavourRequest,
+  sendFavourRequest, // This is the wrapper we made in the parent
   searchTerm = "",
 }) {
   const filteredProfiles = communityProfiles.filter((profile) => {
@@ -80,6 +80,7 @@ export default function CommunityGrid({
 
           {userId ? (
             <form
+              // Using the passed wrapper directly is fine here
               action={sendFavourRequest}
               className="relative z-10 mt-auto pt-4 border-t border-kindred-text/10"
             >

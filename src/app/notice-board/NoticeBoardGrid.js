@@ -1,12 +1,18 @@
 "use client";
 
-import { claimFavour } from "../actions";
+// FIXED: Removed the top-level static import of claimFavour
 
 export default function NoticeBoardGrid({
   openMissions = [],
   userId,
   searchTerm = "",
 }) {
+  // FIXED: Dynamic wrapper for the claim action to satisfy build boundaries
+  const handleClaim = async (formData) => {
+    const { claimFavour } = await import("../actions");
+    await claimFavour(formData);
+  };
+
   // Filter logic happens here based on the prop passed from the page
   const filteredMissions = openMissions.filter((mission) => {
     const search = searchTerm.toLowerCase();
@@ -57,7 +63,8 @@ export default function NoticeBoardGrid({
             </div>
 
             {userId && userId !== mission.sender_id ? (
-              <form action={claimFavour}>
+              /* FIXED: Using the dynamic handleClaim wrapper */
+              <form action={handleClaim}>
                 <input type="hidden" name="favourId" value={mission.id} />
                 <button
                   type="submit"

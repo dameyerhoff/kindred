@@ -1,13 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import {
-  getMyRequests,
-  releaseFavour,
-  startNegotiation,
-  getMySentRequests,
-  deleteFavour,
-} from "../actions";
 import Link from "next/link";
 import { useAuth } from "@clerk/nextjs";
 import NavBar from "@/components/NavBar";
@@ -21,6 +14,8 @@ export default function InboxPage() {
   useEffect(() => {
     async function loadData() {
       if (userId) {
+        // FIXED: Dynamically import server actions to satisfy Next.js 16 boundaries
+        const { getMyRequests, getMySentRequests } = await import("../actions");
         const reqs = await getMyRequests();
         const sent = await getMySentRequests();
         setMyRequests(reqs || []);
@@ -32,6 +27,22 @@ export default function InboxPage() {
       loadData();
     }
   }, [userId, isLoaded]);
+
+  // FIXED: Wrapper functions to call server actions dynamically
+  const handleRelease = async (formData) => {
+    const { releaseFavour } = await import("../actions");
+    await releaseFavour(formData);
+  };
+
+  const handleNegotiation = async (formData) => {
+    const { startNegotiation } = await import("../actions");
+    await startNegotiation(formData);
+  };
+
+  const handleDelete = async (formData) => {
+    const { deleteFavour } = await import("../actions");
+    await deleteFavour(formData);
+  };
 
   return (
     <main className="min-h-screen bg-kindred-bg p-4 md:p-8 text-kindred-text relative overflow-hidden isolate transition-colors duration-300">
@@ -79,7 +90,8 @@ export default function InboxPage() {
                   </div>
 
                   <div className="flex gap-3 w-full md:w-auto">
-                    <form action={deleteFavour} className="flex-1 md:flex-none">
+                    {/* FIXED: Action calls now use the dynamic wrapper */}
+                    <form action={handleDelete} className="flex-1 md:flex-none">
                       <input type="hidden" name="favourId" value={req.id} />
                       <button
                         type="submit"
@@ -97,7 +109,7 @@ export default function InboxPage() {
                     {!isCompleted && (
                       <>
                         <form
-                          action={releaseFavour}
+                          action={handleRelease}
                           className="flex-1 md:flex-none"
                         >
                           <input type="hidden" name="favourId" value={req.id} />
@@ -110,7 +122,7 @@ export default function InboxPage() {
                         </form>
 
                         <form
-                          action={startNegotiation}
+                          action={handleNegotiation}
                           className="flex-1 md:flex-none"
                         >
                           <input type="hidden" name="favourId" value={req.id} />

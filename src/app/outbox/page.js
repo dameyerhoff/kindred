@@ -1,12 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import {
-  getMyRequests,
-  getMySentRequests,
-  startNegotiation,
-  deleteFavour,
-} from "../actions";
 import Link from "next/link";
 import { useAuth } from "@clerk/nextjs";
 import NavBar from "@/components/NavBar";
@@ -20,6 +14,8 @@ export default function OutboxPage() {
   useEffect(() => {
     async function loadData() {
       if (userId) {
+        // FIXED: Dynamically import to keep client and server separate during build
+        const { getMyRequests, getMySentRequests } = await import("../actions");
         const reqs = await getMyRequests();
         const sent = await getMySentRequests();
         setMyRequests(reqs || []);
@@ -31,6 +27,17 @@ export default function OutboxPage() {
       loadData();
     }
   }, [userId, isLoaded]);
+
+  // FIXED: Wrapper functions for dynamic action calls
+  const handleDelete = async (formData) => {
+    const { deleteFavour } = await import("../actions");
+    await deleteFavour(formData);
+  };
+
+  const handleNegotiation = async (formData) => {
+    const { startNegotiation } = await import("../actions");
+    await startNegotiation(formData);
+  };
 
   return (
     <main className="min-h-screen bg-kindred-bg p-4 md:p-8 text-kindred-text relative overflow-hidden isolate transition-colors duration-300">
@@ -79,7 +86,8 @@ export default function OutboxPage() {
                   </div>
 
                   <div className="flex gap-4 items-center">
-                    <form action={deleteFavour}>
+                    {/* FIXED: Using dynamic wrapper handle */}
+                    <form action={handleDelete}>
                       <input type="hidden" name="favourId" value={req.id} />
                       <button
                         type="submit"
@@ -95,7 +103,7 @@ export default function OutboxPage() {
                     </form>
 
                     {!isCompleted && (
-                      <form action={startNegotiation}>
+                      <form action={handleNegotiation}>
                         <input type="hidden" name="favourId" value={req.id} />
                         <button
                           type="submit"
