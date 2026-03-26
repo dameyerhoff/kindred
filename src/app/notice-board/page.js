@@ -6,7 +6,7 @@ import {
   getMyRequests,
   getMySentRequests,
 } from "../actions";
-import { useAuth } from "@clerk/nextjs";
+import { auth } from "@clerk/nextjs/server";
 import Link from "next/link";
 import NoticeBoardGrid from "./NoticeBoardGrid";
 import NavBar from "@/components/NavBar";
@@ -17,22 +17,12 @@ export default function NoticeBoard() {
   const [counts, setCounts] = useState({ inbox: 0, outbox: 0 });
   const [searchTerm, setSearchTerm] = useState("");
 
-  useEffect(() => {
-    async function loadData() {
-      const missions = await getPublicNoticeBoard();
-      setOpenMissions(missions);
+export default async function NoticeBoard() {
+  const { userId } = await auth();
 
-      if (userId) {
-        const inbox = await getMyRequests();
-        const outbox = await getMySentRequests();
-        setCounts({
-          inbox: inbox?.length || 0,
-          outbox: outbox?.length || 0,
-        });
-      }
-    }
-    loadData();
-  }, [userId]);
+  const openMissions = await getPublicNoticeBoard();
+  const myRequests = userId ? (await getMyRequests()) || [] : [];
+  const mySentRequests = userId ? (await getMySentRequests()) || [] : [];
 
   return (
     <main className="min-h-screen bg-kindred-bg p-4 md:p-8 text-kindred-text relative overflow-hidden isolate transition-colors duration-300">
@@ -64,18 +54,18 @@ export default function NoticeBoard() {
             </div>
 
             <div className="relative flex-1 w-full">
-              <div className="absolute inset-y-0 left-5 flex items-center pointer-events-none text-kindred-text/40">
+              <div className="absolute inset-y-0 left-5 flex items-center pointer-events-none text-kindred-text/40 dark:text-white/20">
                 🔍
               </div>
               <input
                 type="text"
                 placeholder="Filter missions..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
+                id="header-search-notice"
+                /* THE NUCLEAR FIX: Explicit 2px border using your lime color */
                 style={{
                   border: "2px solid var(--kindred-card-border, #a3e635)",
                 }}
-                className="w-full bg-kindred-bg dark:bg-white/5 rounded-2xl py-4 pl-12 pr-6 text-sm text-kindred-text dark:text-white placeholder:text-kindred-text/50 focus:outline-none focus:border-kindred-lime transition-all shadow-sm"
+                className="w-full bg-kindred-bg dark:bg-white/5 rounded-2xl py-4 pl-12 pr-6 text-sm text-kindred-text dark:text-white placeholder:text-kindred-text/50 dark:placeholder:text-white/40 focus:outline-none focus:border-kindred-lime transition-all shadow-sm dark:shadow-kindred"
               />
             </div>
           </div>
