@@ -56,6 +56,7 @@ export default async function Home({ searchParams }) {
   const mySentRequests = userId ? (await getMySentRequests()) || [] : [];
   const activeMission = await getMissionData(missionId);
 
+  // FIXED: Expanded the .in filter to include all possible statuses
   const { data: myDeeds } = userId
     ? await tempClient
         .from("favours")
@@ -63,7 +64,7 @@ export default async function Home({ searchParams }) {
           "*, sender:sender_id(full_name), receiver:receiver_id(full_name), scheduled_date, scheduled_time, exchange_details, sender_signed_off, receiver_signed_off",
         )
         .or(`sender_id.eq.${userId},receiver_id.eq.${userId}`)
-        .in("status", ["active", "completed"])
+        .in("status", ["active", "completed", "pending", "negotiating"])
         .order("created_at", { ascending: false })
     : { data: [] };
 
@@ -94,7 +95,6 @@ export default async function Home({ searchParams }) {
               <div className="absolute -inset-1 bg-gradient-to-r from-kindred-lime via-emerald-400 to-kindred-blue-glow rounded-[2.5rem] blur-xl opacity-20 group-hover:opacity-50 transition duration-1000"></div>
               <div className="relative bg-black/5 dark:bg-white/5 backdrop-blur-3xl border border-black/10 dark:border-white/10 p-8 rounded-[2.5rem] flex flex-col md:flex-row gap-8 items-center">
                 <div className="relative">
-                  {/* SAFE CHARAT CHECK: Added fallback and optional chaining */}
                   <div className="w-24 h-24 rounded-full border-4 border-kindred-lime flex items-center justify-center bg-kindred-bg text-4xl font-black text-kindred-text shadow-kindred">
                     {myProfile?.full_name?.charAt(0) || "?"}
                   </div>
@@ -188,10 +188,15 @@ export default async function Home({ searchParams }) {
                       <span className="italic flex-1">
                         &ldquo;{deed.favour_text}&rdquo;
                       </span>
+                      {/* FIXED: Dynamic labels for all status types */}
                       <span className="text-[9px] bg-kindred-lime/10 text-kindred-lime px-2 py-0.5 rounded-full uppercase font-black tracking-tighter">
                         {deed.status === "completed"
                           ? "Completed 😇"
-                          : "Active 🤝"}
+                          : deed.status === "negotiating"
+                            ? "Negotiating 🤝"
+                            : deed.status === "pending"
+                              ? "Awaiting 🕒"
+                              : "Active 🛡️"}
                       </span>
                     </div>
                   ))}
