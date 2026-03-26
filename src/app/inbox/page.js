@@ -4,6 +4,7 @@ import {
   startNegotiation,
   getMySentRequests,
   deleteFavour,
+  completeFavour, // Added this import
 } from "../actions";
 import Link from "next/link";
 import { auth } from "@clerk/nextjs/server";
@@ -86,20 +87,21 @@ export default async function InboxPage() {
                       </button>
                     </form>
 
-                  <form action={completeFavour}>
-                    <input type="hidden" name="favourId" value={req.id} />
-                    <input
-                      type="hidden"
-                      name="receiverId"
-                      value={req.receiver_id}
-                    />
-                    <button
-                      type="submit"
-                      className="bg-kindred-text dark:bg-white text-kindred-bg dark:text-kindred-dark px-6 py-3 rounded-xl font-black text-xs hover:bg-kindred-lime hover:text-kindred-dark transition-all shadow-2xl uppercase hover:shadow-kindred"
-                    >
-                      Help & Earn 😇
-                    </button>
-                  </form>
+                    <form action={completeFavour}>
+                      <input type="hidden" name="favourId" value={req.id} />
+                      <input
+                        type="hidden"
+                        name="receiverId"
+                        value={req.receiver_id}
+                      />
+                      <button
+                        type="submit"
+                        className="bg-kindred-text dark:bg-white text-kindred-bg dark:text-kindred-dark px-6 py-3 rounded-xl font-black text-xs hover:bg-kindred-lime hover:text-kindred-dark transition-all shadow-2xl uppercase hover:shadow-kindred"
+                      >
+                        Help & Earn 😇
+                      </button>
+                    </form>
+                  </div>
                 </div>
               );
             })}
