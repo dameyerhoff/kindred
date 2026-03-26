@@ -56,15 +56,15 @@ export default async function Home({ searchParams }) {
   const mySentRequests = userId ? (await getMySentRequests()) || [] : [];
   const activeMission = await getMissionData(missionId);
 
-  // FIXED: Using a 'clean' select that won't fail if a profile is missing
+  // FIXED: Added 'pending' and 'negotiating' to the filter so the 100 deeds appear
   const { data: myDeeds } = userId
     ? await tempClient
         .from("favours")
         .select(
           `
           *,
-          sender:profiles!sender_id(full_name),
-          receiver:profiles!receiver_id(full_name)
+          sender:sender_id(full_name),
+          receiver:receiver_id(full_name)
         `,
         )
         .or(`sender_id.eq.${userId},receiver_id.eq.${userId}`)
@@ -119,9 +119,9 @@ export default async function Home({ searchParams }) {
                   </div>
 
                   <div className="flex flex-wrap justify-center md:justify-start gap-4 items-center">
-                    <div className="bg-black/5 dark:bg-white/10 border border-black/10 dark:border-white/20 px-4 py-2 rounded-full flex items-center gap-2 backdrop-blur-md">
+                    <div className="bg-black/5 dark:bg-white/10 border border-black/10 dark:border-white/20 px-4 py-2 rounded-full flex items-center gap-2 backdrop-blur-md text-kindred-lime">
                       <span className="text-lg">😇</span>
-                      <span className="text-xs font-black text-kindred-text uppercase tracking-widest">
+                      <span className="text-xs font-black uppercase tracking-widest">
                         {myProfile?.halos || 0} HALOS
                       </span>
                     </div>
@@ -136,17 +136,16 @@ export default async function Home({ searchParams }) {
                     <div className="flex gap-2">
                       <Link
                         href="/inbox"
-                        className="flex items-center gap-2 bg-kindred-lime/20 border border-kindred-lime/40 px-3 py-2 rounded-xl hover:bg-kindred-lime/40 transition-all group relative"
+                        className="flex items-center gap-2 bg-kindred-lime/20 border border-kindred-lime/40 px-3 py-2 rounded-xl hover:bg-kindred-lime/40 transition-all"
                       >
                         <span className="text-base text-kindred-lime">📬</span>
                         <span className="text-sm font-black text-kindred-lime">
                           {myRequests.length}
                         </span>
                       </Link>
-
                       <Link
                         href="/outbox"
-                        className="flex items-center gap-2 bg-kindred-blue-glow/20 border border-kindred-blue-glow/30 px-3 py-2 rounded-xl hover:bg-kindred-blue-glow/40 transition-all group relative"
+                        className="flex items-center gap-2 bg-kindred-blue-glow/20 border border-kindred-blue-glow/30 px-3 py-2 rounded-xl hover:bg-kindred-blue-glow/40 transition-all"
                       >
                         <span className="text-base text-kindred-blue-glow">
                           📤
