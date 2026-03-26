@@ -1,13 +1,10 @@
-"use client";
-
-import { useState, useEffect } from "react";
 import {
   getProfiles,
   sendFavourRequest,
   getMyRequests,
   getMySentRequests,
 } from "../actions";
-import { useAuth } from "@clerk/nextjs";
+import { auth } from "@clerk/nextjs/server";
 import Link from "next/link";
 import CommunityGrid from "./CommunityGrid";
 import NavBar from "@/components/NavBar";
@@ -30,8 +27,8 @@ export default async function CommunityGridPage() {
 
       <NavBar
         userId={userId}
-        inboxCount={counts.inbox}
-        outboxCount={counts.outbox}
+        inboxCount={myRequests.length}
+        outboxCount={mySentRequests.length}
       />
 
       <section className="max-w-6xl mx-auto relative z-10">
@@ -52,30 +49,14 @@ export default async function CommunityGridPage() {
                 The network of Guardians and Saints ready to help
               </p>
             </div>
-
-            <div className="relative flex-1 w-full">
-              <div className="absolute inset-y-0 left-5 flex items-center pointer-events-none text-kindred-text/40 dark:text-white/20">
-                🔍
-              </div>
-              <input
-                type="text"
-                placeholder="Search community members..."
-                id="header-search-community"
-                /* THE NUCLEAR FIX: Using a CSS variable for the border color to force the lime in dark mode */
-                style={{
-                  border: "2px solid var(--kindred-card-border, #a3e635)",
-                }}
-                className="w-full bg-kindred-bg dark:bg-white/5 rounded-2xl py-4 pl-12 pr-6 text-sm text-kindred-text dark:text-white placeholder:text-kindred-text/50 dark:placeholder:text-white/40 focus:outline-none focus:border-kindred-lime transition-all shadow-sm dark:shadow-kindred"
-              />
-            </div>
           </div>
         </header>
 
+        {/* The CommunityGrid component should handle its own 'searchTerm' state internally */}
         <CommunityGrid
           communityProfiles={communityProfiles}
           userId={userId}
           sendFavourRequest={sendFavourRequest}
-          searchTerm={searchTerm}
         />
       </section>
     </main>
