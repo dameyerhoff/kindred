@@ -1,10 +1,10 @@
 "use server";
 
 import { createClient } from "@supabase/supabase-js";
-import { auth } from "@clerk/nextjs/server";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
+// Internal helper for Supabase
 function getSupabase() {
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
@@ -12,6 +12,7 @@ function getSupabase() {
 }
 
 export async function saveProfile(formData) {
+  const { auth } = await import("@clerk/nextjs/server");
   const { userId } = await auth();
   if (!userId) throw new Error("Unauthorized");
   const supabase = getSupabase();
@@ -57,6 +58,7 @@ export async function getPublicNoticeBoard() {
 }
 
 export async function claimFavour(formData) {
+  const { auth } = await import("@clerk/nextjs/server");
   const { userId } = await auth();
   if (!userId) throw new Error("Unauthorized");
   const supabase = getSupabase();
@@ -80,6 +82,7 @@ export async function startNegotiation(formData) {
 }
 
 export async function releaseFavour(formData) {
+  const { auth } = await import("@clerk/nextjs/server");
   const { userId } = await auth();
   if (!userId) throw new Error("Unauthorized");
   const supabase = getSupabase();
@@ -96,6 +99,7 @@ export async function releaseFavour(formData) {
 }
 
 export async function finalizeMission(formData) {
+  const { auth } = await import("@clerk/nextjs/server");
   const { userId } = await auth();
   if (!userId) throw new Error("Unauthorized");
   const supabase = getSupabase();
@@ -121,6 +125,7 @@ export async function finalizeMission(formData) {
 }
 
 export async function updateMissionTerms(formData) {
+  const { auth } = await import("@clerk/nextjs/server");
   const { userId } = await auth();
   if (!userId) throw new Error("Unauthorized");
   const supabase = getSupabase();
@@ -146,6 +151,7 @@ export async function updateMissionTerms(formData) {
 }
 
 export async function signOffMission(formData) {
+  const { auth } = await import("@clerk/nextjs/server");
   const { userId } = await auth();
   if (!userId) throw new Error("Unauthorized");
   const supabase = getSupabase();
@@ -210,6 +216,7 @@ export async function awardHalo(targetUserId) {
 }
 
 export async function sendFavourRequest(formData) {
+  const { auth } = await import("@clerk/nextjs/server");
   const { userId } = await auth();
   if (!userId) throw new Error("Unauthorized");
   const supabase = getSupabase();
@@ -235,6 +242,7 @@ export async function sendFavourRequest(formData) {
 }
 
 export async function getMyRequests() {
+  const { auth } = await import("@clerk/nextjs/server");
   const { userId } = await auth();
   if (!userId) return [];
   const supabase = getSupabase();
@@ -248,6 +256,7 @@ export async function getMyRequests() {
 }
 
 export async function getMySentRequests() {
+  const { auth } = await import("@clerk/nextjs/server");
   const { userId } = await auth();
   if (!userId) return [];
   const supabase = getSupabase();
@@ -273,6 +282,7 @@ export async function declineFavour(formData) {
 }
 
 export async function deleteFavour(formData) {
+  const { auth } = await import("@clerk/nextjs/server");
   const { userId } = await auth();
   if (!userId) throw new Error("Unauthorized");
   const supabase = getSupabase();
@@ -297,8 +307,8 @@ export async function deleteFavour(formData) {
   revalidatePath("/");
 }
 
-// Added this to fix the Inbox form error while keeping your code intact
 export async function completeFavour(formData) {
+  const { auth } = await import("@clerk/nextjs/server");
   const { userId } = await auth();
   if (!userId) throw new Error("Unauthorized");
   const supabase = getSupabase();

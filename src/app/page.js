@@ -42,7 +42,7 @@ export default async function Home({ searchParams }) {
   const params = await searchParams;
   const missionId = params.missionId;
 
-  const tempClient = createClient(
+  const supabase = createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
   );
@@ -52,7 +52,7 @@ export default async function Home({ searchParams }) {
   const mySentRequests = (await getMySentRequests()) || [];
   const activeMission = await getMissionData(missionId);
 
-  const { data: myDeeds } = await tempClient
+  const { data: myDeeds } = await supabase
     .from("favours")
     .select(
       "*, sender:sender_id(full_name), receiver:receiver_id(full_name), scheduled_date, scheduled_time, exchange_details, sender_signed_off, receiver_signed_off",
@@ -118,7 +118,6 @@ export default async function Home({ searchParams }) {
                       : deed.receiver_id;
                     const isCompleted = deed.status === "completed";
 
-                    // Logic to check if YOU have signed off on THEM
                     const haveIVouched = isReceiver
                       ? deed.receiver_signed_off
                       : deed.sender_signed_off;
@@ -168,7 +167,6 @@ export default async function Home({ searchParams }) {
                                         : "Requested 🤝"}
                                 </span>
 
-                                {/* RESTORED: Re-negotiate Button */}
                                 {!isCompleted && (
                                   <Link
                                     href={`/?missionId=${deed.id}&mode=edit`}
