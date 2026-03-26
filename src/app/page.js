@@ -29,6 +29,7 @@ async function getMissionData(missionId) {
     process.env.NEXT_PUBLIC_SUPABASE_URL,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
   );
+  // Restored the proper join for the active negotiation view
   const { data } = await supabase
     .from("favours")
     .select("*, profiles:sender_id(full_name)")
@@ -56,11 +57,17 @@ export default async function Home({ searchParams }) {
   const mySentRequests = userId ? (await getMySentRequests()) || [] : [];
   const activeMission = await getMissionData(missionId);
 
-  // SIMPLIFIED SELECT: Removed the nested profile joins to force the data to appear
+  // RESTORED: Full relational select so names and details are available
   const { data: myDeeds } = userId
     ? await tempClient
         .from("favours")
-        .select("*")
+        .select(
+          `
+          *,
+          sender:sender_id(full_name, city),
+          receiver:receiver_id(full_name, city)
+        `,
+        )
         .or(`sender_id.eq.${userId},receiver_id.eq.${userId}`)
         .in("status", ["active", "completed", "pending", "negotiating"])
         .order("created_at", { ascending: false })
@@ -146,9 +153,10 @@ export default async function Home({ searchParams }) {
                     </Link>
 
                     <div className="flex gap-2">
+                      {/* FIXED: Inbox Button Color & Readability */}
                       <Link
                         href="/inbox"
-                        className="flex items-center gap-2 bg-kindred-lime/20 border border-kindred-lime/30 px-3 py-2 rounded-xl hover:bg-kindred-lime/40 transition-all group relative"
+                        className="flex items-center gap-2 bg-kindred-lime/20 border border-kindred-lime/40 px-3 py-2 rounded-xl hover:bg-kindred-lime/40 transition-all group relative"
                       >
                         <span className="text-base">📬</span>
                         <span className="text-sm font-black text-kindred-lime">
@@ -176,19 +184,56 @@ export default async function Home({ searchParams }) {
                 <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-kindred-lime/50 mb-4">
                   Kindred Mission Log ({myDeeds.length})
                 </h3>
-                <div className="space-y-3">
+                <div className="space-y-4">
                   {myDeeds.map((deed) => (
                     <div
                       key={deed.id}
-                      className="flex items-center gap-3 text-sm text-kindred-text/40 border-b border-black/5 dark:border-white/5 last:border-0 last:pb-0 pb-2"
+                      className="group relative bg-white/5 p-4 rounded-2xl border border-white/5 hover:border-kindred-lime/30 transition-all"
                     >
-                      <span className="text-kindred-lime">✨</span>
-                      <span className="italic flex-1">
-                        &ldquo;{deed.favour_text}&rdquo;
-                      </span>
-                      <span className="text-[9px] bg-kindred-lime/10 text-kindred-lime px-2 py-0.5 rounded-full uppercase font-black tracking-tighter">
-                        {deed.status}
-                      </span>
+                      <div className="flex flex-col md:flex-row justify-between gap-4">
+                        <div className="space-y-1">
+                          <div className="flex items-center gap-2">
+                            <span className="text-kindred-lime text-xs">
+                              ✨
+                            </span>
+                            <p className="text-sm font-bold text-kindred-text italic leading-tight">
+                              &ldquo;{deed.favour_text}&rdquo;
+                            </p>
+                          </div>
+                          <p className="text-[10px] text-kindred-text/40 uppercase tracking-widest font-black pl-5">
+                            Partner:{" "}
+                            {deed.sender?.full_name === myProfile.full_name
+                              ? deed.receiver?.full_name
+                              : deed.sender?.full_name || "Kindred Soul"}
+                          </p>
+                        </div>
+
+                        <div className="flex flex-wrap items-center gap-2">
+                          {/* DYNAMIC ACTION BUTTONS */}
+                          {deed.status === "pending" ||
+                          deed.status === "negotiating" ? (
+                            <>
+                              <Link
+                                href={`/?missionId=${deed.id}`}
+                                className="text-[10px] bg-kindred-lime text-kindred-dark px-3 py-1.5 rounded-lg font-black uppercase tracking-tighter hover:bg-white transition-colors"
+                              >
+                                {deed.status === "negotiating"
+                                  ? "Renegotiate 🤝"
+                                  : "Discuss Terms 💬"}
+                              </Link>
+                              <button className="text-[10px] bg-red-500/10 text-red-400 border border-red-500/20 px-3 py-1.5 rounded-lg font-black uppercase tracking-tighter hover:bg-red-500/20">
+                                Release 🚩
+                              </button>
+                            </>
+                          ) : (
+                            <span className="text-[9px] bg-kindred-lime/10 text-kindred-lime px-2 py-0.5 rounded-full uppercase font-black tracking-tighter border border-kindred-lime/20">
+                              {deed.status === "completed"
+                                ? "Completed 😇"
+                                : "Active 🛡️"}
+                            </span>
+                          )}
+                        </div>
+                      </div>
                     </div>
                   ))}
                 </div>
