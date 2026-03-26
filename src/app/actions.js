@@ -10,7 +10,6 @@ function getSupabase() {
   return createClient(supabaseUrl, supabaseKey);
 }
 
-// --- NEW ACTION ADDED HERE ---
 export async function completeFavour(formData) {
   const { auth } = await import("@clerk/nextjs/server");
   const { userId } = await auth();
@@ -19,7 +18,6 @@ export async function completeFavour(formData) {
   const favourId = formData.get("favourId");
   const receiverId = formData.get("receiverId");
 
-  // 1. Update the favour status to completed
   const { error: favourError } = await supabase
     .from("favours")
     .update({ status: "completed" })
@@ -27,7 +25,6 @@ export async function completeFavour(formData) {
 
   if (favourError) throw favourError;
 
-  // 2. Award a Halo to the person who helped (the receiver)
   if (receiverId) {
     await awardHalo(receiverId);
   }
@@ -38,7 +35,6 @@ export async function completeFavour(formData) {
 
   return { success: true };
 }
-// --- END OF NEW ACTION ---
 
 export async function saveProfile(formData) {
   const { auth } = await import("@clerk/nextjs/server");

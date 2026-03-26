@@ -40,7 +40,6 @@ async function getMissionData(missionId) {
 export default async function Home({ searchParams }) {
   await headers();
 
-  // FIXED: Dynamic Import to prevent "server-only" build errors
   const { auth } = await import("@clerk/nextjs/server");
   const { userId } = await auth();
 
@@ -81,7 +80,6 @@ export default async function Home({ searchParams }) {
       />
 
       <section className="max-w-6xl mx-auto space-y-12 relative z-10 pt-10">
-        {/* FIXED: Passing actions as props to avoid illegal client-side imports */}
         {activeMission && (
           <NegotiationCard
             activeMission={activeMission}
