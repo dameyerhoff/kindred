@@ -7,6 +7,7 @@ import {
   updateMissionTerms,
   markJobDone,
   deleteFavour,
+  releaseFavour,
 } from "./actions";
 import Link from "next/link";
 import { createClient } from "@supabase/supabase-js";
@@ -165,7 +166,6 @@ export default async function Home({ searchParams }) {
         )}
         {myProfile && !activeMission ? (
           <div className="space-y-6">
-            {/* Profile Header ... */}
             <div className="relative group">
               <div className="absolute -inset-1 bg-gradient-to-r from-kindred-lime via-emerald-400 to-kindred-blue-glow rounded-[2.5rem] blur-xl opacity-20 group-hover:opacity-50 transition duration-1000"></div>
               <div className="relative bg-black/5 dark:bg-white/5 backdrop-blur-3xl border border-black/10 dark:border-white/10 p-8 rounded-[2.5rem] flex flex-col md:flex-row gap-8 items-center">
@@ -274,11 +274,28 @@ export default async function Home({ searchParams }) {
                                     : "TBC 🤝"}
                                 </p>
                               </div>
+                              {/* DISPLAY: RESTORED DATE AND TIME */}
+                              <div className="space-y-1">
+                                <p className="text-[9px] text-kindred-text/40 uppercase font-black tracking-[0.2em]">
+                                  Agreed Date
+                                </p>
+                                <p className="text-[11px] font-bold text-kindred-text/80">
+                                  {deed.scheduled_date || "TBC 📅"}
+                                </p>
+                              </div>
+                              <div className="space-y-1">
+                                <p className="text-[9px] text-kindred-text/40 uppercase font-black tracking-[0.2em]">
+                                  Agreed Time
+                                </p>
+                                <p className="text-[11px] font-bold text-kindred-text/80">
+                                  {deed.scheduled_time || "TBC ⏰"}
+                                </p>
+                              </div>
                             </div>
                           </div>
 
                           <div className="flex flex-col items-end justify-center gap-2 min-w-[180px]">
-                            {/* TOP ACTION AREA */}
+                            {/* TOP ACTION BUTTON */}
                             <div className="w-full">
                               {bothSigned ? (
                                 <div className="bg-kindred-lime/10 border border-kindred-lime/30 px-4 py-2.5 rounded-xl text-center w-full">
@@ -314,9 +331,9 @@ export default async function Home({ searchParams }) {
                               )}
                             </div>
 
-                            {/* BOTTOM ROW: [Delete] | [Renegotiate] | [Release] */}
+                            {/* BOTTOM TOOLBAR: DELETE | RENEGOTIATE | RELEASE */}
                             <div className="grid grid-cols-3 gap-2 w-full">
-                              {/* 1. DELETE BUTTON (Always far left) */}
+                              {/* 1. DELETE */}
                               {bothSigned ? (
                                 <form action={deleteFavour} className="w-full">
                                   <input
@@ -343,7 +360,7 @@ export default async function Home({ searchParams }) {
                                 </div>
                               )}
 
-                              {/* 2. RENEGOTIATE BUTTON (Middle child) - Only show if terms agreed AND sign-off hasn't started */}
+                              {/* 2. RENEGOTIATE */}
                               {!eitherSigned && !bothSigned && termsAgreed ? (
                                 <Link
                                   href={`/?missionId=${deed.id}`}
@@ -356,14 +373,22 @@ export default async function Home({ searchParams }) {
                                 <div className="flex-1"></div>
                               )}
 
-                              {/* 3. RELEASE BUTTON (Far right) - Hide if sign-off started */}
+                              {/* 3. RELEASE */}
                               {!eitherSigned && !bothSigned ? (
-                                <button
-                                  className="w-full text-[12px] bg-red-500/10 text-red-400 border border-red-500/20 py-2.5 rounded-xl font-black hover:bg-red-500/30 transition-all opacity-60 hover:opacity-100 flex items-center justify-center"
-                                  title="Release"
-                                >
-                                  🚩
-                                </button>
+                                <form action={releaseFavour} className="w-full">
+                                  <input
+                                    type="hidden"
+                                    name="favourId"
+                                    value={deed.id}
+                                  />
+                                  <button
+                                    type="submit"
+                                    className="w-full text-[12px] bg-red-500/10 text-red-400 border border-red-500/20 py-2.5 rounded-xl font-black hover:bg-red-500/30 transition-all opacity-60 hover:opacity-100 flex items-center justify-center"
+                                    title="Release"
+                                  >
+                                    🚩
+                                  </button>
+                                </form>
                               ) : (
                                 <div className="flex-1"></div>
                               )}

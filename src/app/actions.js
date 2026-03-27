@@ -10,7 +10,6 @@ function getSupabase() {
   return createClient(supabaseUrl, supabaseKey);
 }
 
-// FIXED: Added markJobDone as an alias for signOffMission to fix the build error
 export async function markJobDone(formData) {
   return await signOffMission(formData);
 }
@@ -115,16 +114,28 @@ export async function releaseFavour(formData) {
   const { auth } = await import("@clerk/nextjs/server");
   const { userId } = await auth();
   if (!userId) throw new Error("Unauthorized");
+
   const supabase = getSupabase();
   const favourId = formData.get("favourId");
+
   const { error } = await supabase
     .from("favours")
-    .update({ receiver_id: null, status: "pending" })
+    .update({
+      receiver_id: null,
+      status: "pending",
+      exchange_details: null,
+      scheduled_date: null,
+      scheduled_time: null,
+      sender_signed_off: false,
+      receiver_signed_off: false,
+    })
     .eq("id", favourId);
+
   if (error) throw error;
+
+  revalidatePath("/");
   revalidatePath("/notice-board");
   revalidatePath("/inbox");
-  revalidatePath("/");
   redirect("/notice-board");
 }
 
@@ -209,10 +220,10 @@ export async function signOffMission(formData) {
 
   if (Object.keys(updateData).length === 0) return;
 
-  const bothSigned =
-    (isSender ? true : favour.sender_signed_off) &&
-    (!isSender ? true : favour.receiver_signed_off);
-  if (bothSigned) {
+  const currentSenderSigned = isSender ? true : favour.sender_signed_off;
+  const currentReceiverSigned = !isSender ? true : favour.receiver_signed_off;
+
+  if (currentSenderSigned && currentReceiverSigned) {
     updateData.status = "completed";
   }
 
