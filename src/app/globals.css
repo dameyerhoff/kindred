@@ -53,3 +53,87 @@ body {
     background-color 0.3s ease,
     color 0.3s ease;
 }
+
+@layer base {
+  /* This targets any element with the kindred-lime text class */
+  .text-kindred-lime {
+    transition: text-shadow 0.3s ease;
+  }
+
+  /* The Lighthouse Magic: Automatic shadow in light mode only */
+  :root .text-kindred-lime {
+    text-shadow: 0.5px 0.5px 1px rgba(0, 0, 0, 0.8);
+  }
+
+  /* Remove/Soften the shadow when the 'dark' class is present on the html/body */
+  .dark .text-kindred-lime {
+    text-shadow: 0 0 12px rgba(163, 230, 53, 0.2);
+  }
+}
+
+@layer components {
+  /* 1. Global Contrast for Light Mode Only */
+  /* This ensures dark mode stays untouched while light mode gets readable shadows */
+  :root:not(.dark) .text-kindred-lime,
+  :root:not(.dark) .kindred-text-contrast {
+    text-shadow: 1px 1px 0px rgba(0, 0, 0, 0.8) !important;
+  }
+
+  /* 2. Specific Page Slogans (The text under H1/H2 titles) */
+  :root:not(.dark) p.text-kindred-lime\/60,
+  :root:not(.dark) .tracking-widest.text-kindred-lime {
+    color: #65a30d !important; /* Slightly darker lime for light mode slogans */
+    text-shadow: 0.5px 0.5px 0px rgba(0, 0, 0, 0.2);
+  }
+
+  /* 3. Notice Board "Claim" Button Outline */
+  :root:not(.dark) button.bg-kindred-lime.text-kindred-dark {
+    box-shadow: 0 4px 14px rgba(163, 230, 53, 0.4);
+    border: 1px solid rgba(0, 0, 0, 0.1);
+  }
+
+  /* 4. Notice Board "Claim" Text Outline (White text on Lime) */
+  :root:not(.dark) .bg-kindred-lime .text-white,
+  :root:not(.dark) button.bg-kindred-lime {
+    text-shadow: 1px 1px 0px rgba(0, 0, 0, 0.2);
+  }
+
+  /* 5. Placeholder Fix (Lighthouse 100) */
+  :root:not(.dark) ::placeholder {
+    color: rgba(0, 0, 0, 0.6) !important;
+    opacity: 1 !important;
+  }
+}
+
+@layer components {
+  /* 1. THE CITY & RANK LINE (e.g., HULL • LEVEL 1 SAINT) */
+  /* This targets the subtitle text in your profile header */
+  :root:not(.dark) .text-kindred-lime\/80,
+  :root:not(.dark) .text-kindred-lime.text-sm.font-bold {
+    color: #4d7c0f !important; /* A deeper, "Lighthouse 100" Lime-Green */
+    text-shadow: 0.5px 0.5px 0px rgba(0, 0, 0, 0.1);
+  }
+
+  /* 2. THE INBOX/OUTBOX TEXT */
+  /* This targets the black text labels on your lime buttons */
+  :root:not(.dark) .text-kindred-lime.font-black.uppercase,
+  :root:not(.dark) a[href="/inbox"] span,
+  :root:not(.dark) a[href="/outbox"] span {
+    text-shadow: 1px 1px 0px rgba(0, 0, 0, 0.7) !important;
+  }
+
+  /* 3. KINDRED MISSION LOG HEADER */
+  /* Specifically targets that Deed Feed header text */
+  :root:not(.dark) h3.text-kindred-lime\/50,
+  :root:not(.dark) h3.text-kindred-lime {
+    color: #65a30d !important; /* Darker Lime for accessibility */
+    text-shadow: 1px 1px 0px rgba(0, 0, 0, 0.8) !important;
+    opacity: 1 !important; /* Ensure it's not too faded to read */
+  }
+
+  /* 4. DISCUSS TERMS BUTTON TEXT (White on Lime) */
+  :root:not(.dark) button.bg-kindred-lime,
+  :root:not(.dark) a.bg-kindred-lime {
+    text-shadow: 1.5px 1.5px 0px rgba(0, 0, 0, 0.8) !important;
+  }
+}

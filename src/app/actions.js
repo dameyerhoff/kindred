@@ -10,6 +10,11 @@ function getSupabase() {
   return createClient(supabaseUrl, supabaseKey);
 }
 
+// FIXED: Added markJobDone as an alias for signOffMission to fix the build error
+export async function markJobDone(formData) {
+  return await signOffMission(formData);
+}
+
 export async function completeFavour(formData) {
   const { auth } = await import("@clerk/nextjs/server");
   const { userId } = await auth();
@@ -264,6 +269,9 @@ export async function sendFavourRequest(formData) {
   if (error) throw error;
   revalidatePath("/");
   revalidatePath("/community");
+  revalidatePath("/outbox");
+
+  return { success: true };
 }
 
 export async function getMyRequests() {

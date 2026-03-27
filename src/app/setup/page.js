@@ -51,7 +51,6 @@ export default function SetupPage() {
   useEffect(() => {
     async function loadData() {
       if (userId) {
-        // FIXED: Dynamically import to separate client and server boundaries
         const { getProfiles } = await import("../actions");
         const profiles = await getProfiles();
         const found = profiles?.find((p) => p.clerk_id === userId);
@@ -95,18 +94,14 @@ export default function SetupPage() {
     addTag({ label: name, slug: slug });
   };
 
-  // FIXED: Added 'async' and defined 'formData'
   const onFormSubmit = async (e) => {
     e.preventDefault();
     const formData = new FormData(e.currentTarget);
-
     const hiddenInput = e.currentTarget.querySelector('input[name="tags"]');
     if (hiddenInput) {
       hiddenInput.value = JSON.stringify(tags);
-      // Ensure the newly stringified tags are actually in the formData
       formData.set("tags", JSON.stringify(tags));
     }
-
     await saveProfile(formData);
   };
 
@@ -115,12 +110,12 @@ export default function SetupPage() {
   if (!userId) {
     return (
       <main className="min-h-screen bg-kindred-bg flex items-center justify-center p-6 text-kindred-text text-center transition-colors duration-300">
-        <div className="w-full max-w-md bg-black/5 dark:bg-white/5 backdrop-blur-3xl p-8 rounded-[2.5rem] border border-black/10 dark:border-white/10">
+        <div className="w-full max-w-md bg-black/5 dark:bg-white/5 backdrop-blur-3xl p-8 rounded-[2.5rem] border-2 border-kindred-lime shadow-[0_0_30px_rgba(163,230,53,0.2)]">
           <h2 className="text-2xl font-black mb-6 uppercase tracking-tighter">
             Identity Required
           </h2>
           <SignInButton mode="modal">
-            <button className="w-full bg-kindred-lime hover:bg-kindred-text dark:hover:bg-white text-kindred-dark dark:hover:text-kindred-dark font-black py-4 rounded-2xl transition-all uppercase tracking-widest text-sm shadow-kindred">
+            <button className="w-full bg-kindred-lime hover:bg-white text-kindred-dark font-black py-4 rounded-2xl transition-all uppercase tracking-widest text-sm shadow-kindred">
               Log In to Kindred
             </button>
           </SignInButton>
@@ -141,7 +136,8 @@ export default function SetupPage() {
           &larr; Back to Dashboard
         </Link>
 
-        <div className="bg-black/5 dark:bg-white/5 backdrop-blur-3xl border border-black/10 dark:border-white/10 p-8 md:p-12 rounded-[3rem] shadow-2xl">
+        {/* S-RANK TILE: Persistent Lime Border and Glow */}
+        <div className="bg-black/20 dark:bg-black/40 backdrop-blur-3xl border-2 border-kindred-lime p-8 md:p-12 rounded-[3rem] shadow-[0_0_40px_rgba(163,230,53,0.15)]">
           <h2 className="text-4xl font-black mb-2 tracking-tighter uppercase">
             {myProfile ? "Manage Profile" : "Create Profile"}
           </h2>
@@ -155,45 +151,46 @@ export default function SetupPage() {
             <input type="hidden" name="tags" value={JSON.stringify(tags)} />
 
             <div>
-              <label className="block text-[10px] font-black uppercase tracking-widest mb-2 opacity-40">
+              <label className="block text-[10px] font-black uppercase tracking-widest mb-2 opacity-50">
                 Full Name
               </label>
+              {/* ENHANCED: Muted Dark Lime background */}
               <input
                 name="full_name"
                 defaultValue={myProfile?.full_name || ""}
-                className="w-full p-4 rounded-2xl bg-black/5 dark:bg-black/40 border border-black/10 dark:border-white/10 focus:border-kindred-lime/50 outline-none text-kindred-text font-bold transition-colors"
+                className="w-full p-4 rounded-2xl bg-[#84cc16]/10 dark:bg-[#84cc16]/20 border border-kindred-lime/30 focus:border-kindred-lime focus:bg-[#84cc16]/25 outline-none text-kindred-text font-bold transition-all"
                 required
               />
             </div>
 
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="block text-[10px] font-black uppercase tracking-widest mb-2 opacity-40">
+                <label className="block text-[10px] font-black uppercase tracking-widest mb-2 opacity-50">
                   City
                 </label>
                 <input
                   name="city"
                   defaultValue={myProfile?.city || ""}
-                  className="w-full p-4 rounded-2xl bg-black/5 dark:bg-black/40 border border-black/10 dark:border-white/10 focus:border-kindred-lime/50 outline-none text-kindred-text font-bold transition-colors"
+                  className="w-full p-4 rounded-2xl bg-[#84cc16]/10 dark:bg-[#84cc16]/20 border border-kindred-lime/30 focus:border-kindred-lime focus:bg-[#84cc16]/25 outline-none text-kindred-text font-bold transition-all"
                   required
                 />
               </div>
               <div>
-                <label className="block text-[10px] font-black uppercase tracking-widest mb-2 opacity-40">
+                <label className="block text-[10px] font-black uppercase tracking-widest mb-2 opacity-50">
                   Postcode
                 </label>
                 <input
                   name="postcode"
                   defaultValue={myProfile?.postcode || ""}
-                  className="w-full p-4 rounded-2xl bg-black/5 dark:bg-black/40 border border-black/10 dark:border-white/10 focus:border-kindred-lime/50 outline-none text-kindred-text font-bold transition-colors"
+                  className="w-full p-4 rounded-2xl bg-[#84cc16]/10 dark:bg-[#84cc16]/20 border border-kindred-lime/30 focus:border-kindred-lime focus:bg-[#84cc16]/25 outline-none text-kindred-text font-bold transition-all"
                   required
                 />
               </div>
             </div>
 
             <div className="relative">
-              <label className="block text-[10px] font-black uppercase tracking-widest mb-2 opacity-40">
-                Skills & Interests (Your Offerings)
+              <label className="block text-[10px] font-black uppercase tracking-widest mb-2 opacity-50">
+                Skills & Interests
               </label>
 
               <div className="flex flex-wrap gap-2 mb-4">
@@ -217,12 +214,12 @@ export default function SetupPage() {
               <input
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                placeholder="Search (e.g. Gardening, Baking...)"
-                className="w-full p-4 rounded-2xl bg-black/5 dark:bg-black/40 border border-black/10 dark:border-white/10 focus:border-kindred-lime/50 outline-none text-kindred-text font-bold transition-all placeholder:opacity-30"
+                placeholder="Search Skills..."
+                className="w-full p-4 rounded-2xl bg-[#84cc16]/10 dark:bg-[#84cc16]/20 border border-kindred-lime/30 focus:border-kindred-lime focus:bg-[#84cc16]/25 outline-none text-kindred-text font-bold transition-all placeholder:opacity-30"
               />
 
               {search && (
-                <div className="absolute z-20 w-full mt-2 bg-kindred-bg dark:bg-kindred-dark border border-black/10 dark:border-white/10 rounded-2xl overflow-hidden shadow-2xl max-h-48 overflow-y-auto">
+                <div className="absolute z-20 w-full mt-2 bg-kindred-lime border border-kindred-lime/20 rounded-2xl overflow-hidden shadow-2xl max-h-48 overflow-y-auto">
                   {KINDRED_BANK.filter(
                     (item) =>
                       item.label.toLowerCase().includes(search.toLowerCase()) &&
@@ -232,30 +229,18 @@ export default function SetupPage() {
                       key={item.slug}
                       type="button"
                       onClick={() => addTag(item)}
-                      className="w-full text-left p-4 hover:bg-kindred-lime hover:text-kindred-dark font-bold text-sm transition-colors border-b border-black/5 dark:border-white/5 last:border-0"
+                      className="w-full text-left p-4 bg-kindred-lime text-kindred-dark hover:bg-kindred-blue-glow hover:text-white font-black text-xs transition-all border-b border-black/5 last:border-0 uppercase tracking-widest"
                     >
                       + {item.label}
                     </button>
                   ))}
-                  {search.length > 2 &&
-                    !KINDRED_BANK.some(
-                      (i) => i.label.toLowerCase() === search.toLowerCase(),
-                    ) && (
-                      <button
-                        type="button"
-                        onClick={() => createCustomTag(search)}
-                        className="w-full text-left p-4 bg-black/5 dark:bg-white/5 hover:bg-kindred-lime hover:text-kindred-dark font-bold text-xs italic transition-colors"
-                      >
-                        Add custom: "{search}"
-                      </button>
-                    )}
                 </div>
               )}
             </div>
 
             <button
               type="submit"
-              className="w-full mt-6 bg-kindred-text dark:bg-white text-kindred-bg dark:text-kindred-dark hover:bg-kindred-lime dark:hover:bg-kindred-lime font-black py-5 rounded-[2rem] shadow-2xl transition-all active:scale-95 uppercase tracking-widest text-sm"
+              className="w-full mt-6 bg-kindred-lime text-kindred-dark hover:bg-white font-black py-5 rounded-[2rem] shadow-kindred transition-all active:scale-95 uppercase tracking-[0.2em] text-sm"
             >
               {myProfile
                 ? "Update Guardian Details 😇"
