@@ -185,7 +185,22 @@ export default async function Home({ searchParams }) {
                     {myProfile?.city || "Unknown Zone"} •{" "}
                     {getSaintlyRank(myProfile?.halos || 0).title}
                   </p>
-                  <div className="flex flex-wrap justify-center md:justify-start gap-4 items-center mt-6">
+
+                  {/* FIXED SKILLS SECTION: Safely renders objects or strings */}
+                  {myProfile?.tags && myProfile.tags.length > 0 && (
+                    <div className="flex flex-wrap justify-center md:justify-start gap-2 mb-6">
+                      {myProfile.tags.map((tag, idx) => (
+                        <span
+                          key={idx}
+                          className="bg-kindred-lime/10 border border-kindred-lime/30 text-kindred-lime text-[9px] font-black uppercase tracking-widest px-3 py-1 rounded-full"
+                        >
+                          {typeof tag === "object" ? tag.label : tag}
+                        </span>
+                      ))}
+                    </div>
+                  )}
+
+                  <div className="flex flex-wrap justify-center md:justify-start gap-4 items-center">
                     <div className="bg-black/5 dark:bg-white/10 border border-black/10 dark:border-white/20 px-4 py-2 rounded-full flex items-center gap-2 backdrop-blur-md">
                       <span className="text-lg">😇</span>
                       <span className="text-xs font-black text-kindred-text uppercase tracking-widest">
@@ -274,7 +289,6 @@ export default async function Home({ searchParams }) {
                                     : "TBC 🤝"}
                                 </p>
                               </div>
-                              {/* DISPLAY: RESTORED DATE AND TIME */}
                               <div className="space-y-1">
                                 <p className="text-[9px] text-kindred-text/40 uppercase font-black tracking-[0.2em]">
                                   Agreed Date
@@ -295,7 +309,6 @@ export default async function Home({ searchParams }) {
                           </div>
 
                           <div className="flex flex-col items-end justify-center gap-2 min-w-[180px]">
-                            {/* TOP ACTION BUTTON */}
                             <div className="w-full">
                               {bothSigned ? (
                                 <div className="bg-kindred-lime/10 border border-kindred-lime/30 px-4 py-2.5 rounded-xl text-center w-full">
@@ -331,9 +344,7 @@ export default async function Home({ searchParams }) {
                               )}
                             </div>
 
-                            {/* BOTTOM TOOLBAR: DELETE | RENEGOTIATE | RELEASE */}
                             <div className="grid grid-cols-3 gap-2 w-full">
-                              {/* 1. DELETE */}
                               {bothSigned ? (
                                 <form action={deleteFavour} className="w-full">
                                   <input
@@ -360,7 +371,6 @@ export default async function Home({ searchParams }) {
                                 </div>
                               )}
 
-                              {/* 2. RENEGOTIATE */}
                               {!eitherSigned && !bothSigned && termsAgreed ? (
                                 <Link
                                   href={`/?missionId=${deed.id}`}
@@ -373,7 +383,6 @@ export default async function Home({ searchParams }) {
                                 <div className="flex-1"></div>
                               )}
 
-                              {/* 3. RELEASE */}
                               {!eitherSigned && !bothSigned ? (
                                 <form action={releaseFavour} className="w-full">
                                   <input
