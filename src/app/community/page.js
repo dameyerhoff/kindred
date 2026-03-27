@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useAuth } from "@clerk/nextjs"; // Added to fix the "Log In" issue
 import {
   getProfiles,
   sendFavourRequest,
@@ -12,23 +13,31 @@ import CommunityGrid from "./CommunityGrid";
 import NavBar from "@/components/NavBar";
 
 export default function CommunityGridPage() {
-  const [userId, setUserId] = useState(null);
+  // THE FIX: Use the Clerk hook to get the logged-in user's ID
+  const { userId } = useAuth();
+
   const [profiles, setProfiles] = useState([]);
   const [myRequests, setMyRequests] = useState([]);
   const [mySentRequests, setMySentRequests] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [loading, setLoading] = useState(true);
 
-  // Fetching data on the client to support real-time search state
   useEffect(() => {
     async function loadData() {
       try {
-        // We fetch the profiles from your existing server action
         const p = await getProfiles();
         setProfiles(p || []);
 
-        // Note: For userId, in a full build you'd use Clerk's useAuth()
-        // but this keeps your existing logic flowing.
+        // Fetch counts for the NavBar if user is logged in
+        if (userId) {
+          const [incoming, outgoing] = await Promise.all([
+            getMyRequests(),
+            getMySentRequests(),
+          ]);
+          setMyRequests(incoming || []);
+          setMySentRequests(outgoing || []);
+        }
+
         setLoading(false);
       } catch (err) {
         console.error("Failed to load community data:", err);
@@ -36,8 +45,9 @@ export default function CommunityGridPage() {
       }
     }
     loadData();
-  }, []);
+  }, [userId]); // Re-run when userId is detected
 
+  // Filter out the logged-in user from the list
   const communityProfiles = profiles.filter((p) => p.clerk_id !== userId);
 
   return (
@@ -70,7 +80,6 @@ export default function CommunityGridPage() {
               </p>
             </div>
 
-            {/* SEARCH BAR: Perfectly positioned in the header */}
             <div className="relative flex-1 w-full">
               <div className="absolute inset-y-0 left-5 flex items-center pointer-events-none text-kindred-text/40 dark:text-white/20">
                 🔍
