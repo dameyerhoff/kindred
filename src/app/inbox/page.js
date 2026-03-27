@@ -3,7 +3,7 @@ import {
   releaseFavour,
   getMySentRequests,
   deleteFavour,
-  markJobDone, // Swapped completeFavour for markJobDone
+  markJobDone,
 } from "../actions";
 import Link from "next/link";
 import NavBar from "@/components/NavBar";
@@ -44,7 +44,7 @@ export default async function InboxPage() {
           <div className="grid gap-4">
             {myRequests.map((req) => {
               const isCompleted = req.status === "completed";
-              const iHaveSigned = req.receiver_signed_off; // Inbox is your side (receiver)
+              const iHaveSigned = req.receiver_signed_off;
               const partnerHasSigned = req.sender_signed_off;
               const eitherSigned = iHaveSigned || partnerHasSigned;
 
@@ -57,11 +57,11 @@ export default async function InboxPage() {
                       : "bg-black/5 dark:bg-white/5 border-black/10 dark:border-white/10"
                   }`}
                 >
-                  <div className="flex-1 space-y-2">
-                    <p className="text-xl font-bold italic group-hover:text-kindred-lime transition-colors">
-                      &ldquo;{req.favour_text}&rdquo;
-                    </p>
-                    <div className="flex items-center gap-3">
+                  <div className="flex-1 space-y-4">
+                    <div className="space-y-1">
+                      <p className="text-xl font-bold italic group-hover:text-kindred-lime transition-colors">
+                        &ldquo;{req.favour_text}&rdquo;
+                      </p>
                       <p className="text-[10px] text-kindred-lime uppercase font-black tracking-widest">
                         {isCompleted
                           ? "Mission Completed ✨"
@@ -69,11 +69,36 @@ export default async function InboxPage() {
                             ? "Mission Active 🤝"
                             : "New Favour Request ✨"}
                       </p>
-                      {req.exchange_details && (
-                        <p className="text-[10px] text-white/40 italic">
-                          Return: {req.exchange_details}
+                    </div>
+
+                    {/* TERMS GRID: Restored Agreed Date & Time with TBC Fallbacks */}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-y-3 pl-5 border-l border-white/10">
+                      <div className="space-y-1">
+                        <p className="text-[9px] text-kindred-text/40 uppercase font-black tracking-[0.2em]">
+                          Return Favour
                         </p>
-                      )}
+                        <p className="text-[11px] font-bold italic text-kindred-lime">
+                          {req.exchange_details
+                            ? `"${req.exchange_details}"`
+                            : "TBC 🤝"}
+                        </p>
+                      </div>
+                      <div className="space-y-1">
+                        <p className="text-[9px] text-kindred-text/40 uppercase font-black tracking-[0.2em]">
+                          Agreed Date
+                        </p>
+                        <p className="text-[11px] font-bold text-kindred-text/80">
+                          {req.scheduled_date || "TBC 📅"}
+                        </p>
+                      </div>
+                      <div className="space-y-1">
+                        <p className="text-[9px] text-kindred-text/40 uppercase font-black tracking-[0.2em]">
+                          Agreed Time
+                        </p>
+                        <p className="text-[11px] font-bold text-kindred-text/80">
+                          {req.scheduled_time || "TBC ⏰"}
+                        </p>
+                      </div>
                     </div>
                   </div>
 
@@ -93,20 +118,20 @@ export default async function InboxPage() {
                                 Job Done ✅
                               </div>
                             ) : (
-                              <button className="w-full bg-red-600 text-white px-4 py-2.5 rounded-xl font-black uppercase tracking-tighter hover:bg-red-500 shadow-[0_4px_15px_rgba(220,38,38,0.4)] transition-all flex items-center justify-center gap-2 text-[10px] border border-white/10">
+                              <button className="w-full bg-red-600 text-white px-4 py-2.5 rounded-xl font-black uppercase tracking-tighter hover:bg-red-500 shadow-[0_4px_15_px_rgba(220,38,38,0.4)] transition-all flex items-center justify-center gap-2 text-[10px] border border-white/10">
                                 <span className="text-sm">❌</span> Job Done?
                               </button>
                             )}
                           </form>
                         )}
 
-                        {/* 2. RENEGOTIATE / DISCUSS (Hides if sign-off started) */}
+                        {/* 2. DISCUSS / RENEGOTIATE */}
                         {!eitherSigned && (
                           <Link
                             href={`/?missionId=${req.id}`}
                             className="w-full text-center bg-kindred-lime text-kindred-dark px-6 py-3 rounded-xl font-black text-xs hover:bg-white transition-all shadow-xl uppercase"
                           >
-                            {req.status === "active"
+                            {req.exchange_details && req.scheduled_date
                               ? "Renegotiate 🤝"
                               : "Discuss Terms 💬"}
                           </Link>
@@ -137,7 +162,7 @@ export default async function InboxPage() {
                         )}
                       </>
                     ) : (
-                      /* 4. FULL COMPLETION: ACTIVE DELETE */
+                      /* 4. FULL COMPLETION */
                       <div className="flex flex-col gap-2 w-full">
                         <div className="bg-kindred-lime/10 border border-kindred-lime/30 px-4 py-2 rounded-xl text-center w-full">
                           <p className="text-[9px] text-kindred-lime uppercase font-black tracking-widest">
